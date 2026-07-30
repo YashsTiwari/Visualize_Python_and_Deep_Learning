@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Dot Product Intuition</title>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+        background: #f4f7fb;
+        padding: 40px;
+        color: #222;
+      }
+
+      .main-title {
+        text-align: center;
+        font-size: 54px;
+        margin-bottom: 50px;
+      }
+
+      .section {
+        background: white;
+        border-radius: 24px;
+        padding: 40px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      }
+
+      .section-title {
+        text-align: center;
+        font-size: 40px;
+        margin-bottom: 20px;
+      }
+
+      .subtitle {
+        text-align: center;
+        font-size: 26px;
+        color: #555;
+        margin-bottom: 40px;
+      }
+
+      .controls {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-bottom: 40px;
+      }
+
+      button {
+        padding: 16px 28px;
+        border: none;
+        border-radius: 14px;
+        font-size: 22px;
+        color: white;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      button:hover {
+        transform: scale(1.05);
+      }
+
+      .blue {
+        background: #1565c0;
+      }
+
+      .green {
+        background: #2e7d32;
+      }
+
+      .red {
+        background: #c62828;
+      }
+
+      .demo-area {
+        min-height: 760px;
+        border-radius: 24px;
+        background: #fafafa;
+        position: relative;
+        overflow: hidden;
+        padding: 40px;
+      }
+
+      .matrix-layout {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        gap: 120px;
+        margin-top: 40px;
+      }
+
+      .horizontal-vector {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+      }
+
+      .vertical-vector {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        align-items: center;
+      }
+
+      .box {
+        width: 90px;
+        height: 90px;
+        border-radius: 16px;
+        border: 4px solid #222;
+        background: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 34px;
+        font-weight: bold;
+        transition: 1s;
+        position: relative;
+      }
+
+      .label {
+        text-align: center;
+        font-size: 30px;
+        font-weight: bold;
+        margin-bottom: 20px;
+      }
+
+      .dimension {
+        text-align: center;
+        font-size: 22px;
+        color: #666;
+        margin-top: 12px;
+      }
+
+      .result-area {
+        margin-top: 90px;
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        flex-wrap: wrap;
+      }
+
+      .result-box {
+        width: 130px;
+        height: 130px;
+        border-radius: 18px;
+        border: 5px dashed #777;
+        background: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 34px;
+        transition: 1s;
+      }
+
+      .plus {
+        font-size: 48px;
+        margin-top: 40px;
+        font-weight: bold;
+      }
+
+      .final-box {
+        width: 180px;
+        height: 180px;
+        border-radius: 22px;
+        border: 6px solid #2e7d32;
+        background: #dcedc8;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 52px;
+        font-weight: bold;
+        margin: auto;
+        margin-top: 60px;
+        transition: 1s;
+      }
+
+      .message {
+        margin-top: 40px;
+        text-align: center;
+        font-size: 32px;
+        font-weight: bold;
+        min-height: 50px;
+      }
+
+      .code {
+        margin-top: 40px;
+        background: #1e1e1e;
+        color: #00ff99;
+        padding: 24px;
+        border-radius: 18px;
+        font-size: 24px;
+        line-height: 1.8;
+        overflow-x: auto;
+      }
+
+      .red-box {
+        background: #ffcdd2;
+        border-color: #c62828;
+      }
+
+      .blue-box {
+        background: #bbdefb;
+        border-color: #1565c0;
+      }
+
+      .green-box {
+        background: #c8e6c9;
+        border-color: #2e7d32;
+      }
+
+      .highlight {
+        transform: scale(1.12);
+        box-shadow: 0 0 25px #ff9800;
+      }
+
+      .multiply-text {
+        text-align: center;
+        margin-top: 18px;
+        font-size: 26px;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="main-title">🧠 Dot Product Visualization</div>
+
+    <div class="section">
+      <div class="section-title">Row Vector × Column Vector</div>
+
+      <div class="subtitle">Multiply matching pairs → Then add all results</div>
+
+      <div class="controls">
+        <button class="blue" onclick="runExample1()">Example 1</button>
+
+        <button class="green" onclick="runExample2()">Example 2</button>
+
+        <button class="red" onclick="resetDemo()">Reset</button>
+      </div>
+
+      <div class="demo-area">
+        <div class="matrix-layout">
+          <!-- LEFT VECTOR -->
+
+          <div>
+            <div class="label">Row Vector</div>
+
+            <div class="horizontal-vector">
+              <div class="box" id="a1">1</div>
+
+              <div class="box" id="a2">2</div>
+
+              <div class="box" id="a3">3</div>
+            </div>
+
+            <div class="dimension">1 × 3</div>
+          </div>
+
+          <!-- RIGHT VECTOR -->
+
+          <div>
+            <div class="label">Column Vector</div>
+
+            <div class="vertical-vector">
+              <div class="box" id="b1">4</div>
+
+              <div class="box" id="b2">5</div>
+
+              <div class="box" id="b3">6</div>
+            </div>
+
+            <div class="dimension">3 × 1</div>
+          </div>
+        </div>
+
+        <!-- RESULT -->
+
+        <div class="label" style="margin-top: 80px">
+          Pairwise Multiplications
+        </div>
+
+        <div class="result-area">
+          <div>
+            <div class="result-box" id="r1">?</div>
+
+            <div class="multiply-text" id="m1">-</div>
+          </div>
+
+          <div class="plus">+</div>
+
+          <div>
+            <div class="result-box" id="r2">?</div>
+
+            <div class="multiply-text" id="m2">-</div>
+          </div>
+
+          <div class="plus">+</div>
+
+          <div>
+            <div class="result-box" id="r3">?</div>
+
+            <div class="multiply-text" id="m3">-</div>
+          </div>
+        </div>
+
+        <div class="label" style="margin-top: 60px">Final Dot Product</div>
+
+        <div class="final-box" id="finalBox">?</div>
+      </div>
+
+      <div class="message" id="mainMessage">Click an example to start</div>
+
+      <div class="code" id="codeBlock">
+        A = [[1,2,3]] B = [ [4], [5], [6] ] (1×4) + (2×5) + (3×6)
+      </div>
+    </div>
+
+    <script>
+      function sleep(ms) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+      }
+
+      function clearClasses(id) {
+        let el = document.getElementById(id);
+
+        el.classList.remove("red-box");
+        el.classList.remove("blue-box");
+        el.classList.remove("green-box");
+        el.classList.remove("highlight");
+      }
+
+      function resetDemo() {
+        let ids = ["a1", "a2", "a3", "b1", "b2", "b3", "r1", "r2", "r3"];
+
+        ids.forEach((id) => {
+          clearClasses(id);
+        });
+
+        document.getElementById("a1").innerHTML = "1";
+        document.getElementById("a2").innerHTML = "2";
+        document.getElementById("a3").innerHTML = "3";
+
+        document.getElementById("b1").innerHTML = "4";
+        document.getElementById("b2").innerHTML = "5";
+        document.getElementById("b3").innerHTML = "6";
+
+        document.getElementById("r1").innerHTML = "?";
+        document.getElementById("r2").innerHTML = "?";
+        document.getElementById("r3").innerHTML = "?";
+
+        document.getElementById("m1").innerHTML = "-";
+        document.getElementById("m2").innerHTML = "-";
+        document.getElementById("m3").innerHTML = "-";
+
+        document.getElementById("finalBox").innerHTML = "?";
+
+        document.getElementById("mainMessage").innerHTML =
+          "Click an example to start";
+      }
+
+      async function animatePair(a, b, r, m, equation, result, colorClass) {
+        let aBox = document.getElementById(a);
+        let bBox = document.getElementById(b);
+        let rBox = document.getElementById(r);
+
+        aBox.classList.add(colorClass);
+        bBox.classList.add(colorClass);
+
+        aBox.classList.add("highlight");
+        bBox.classList.add("highlight");
+
+        document.getElementById("mainMessage").innerHTML = equation;
+
+        await sleep(1800);
+
+        rBox.classList.add(colorClass);
+        rBox.classList.add("highlight");
+
+        rBox.innerHTML = result;
+
+        document.getElementById(m).innerHTML = equation;
+
+        await sleep(1800);
+
+        aBox.classList.remove("highlight");
+        bBox.classList.remove("highlight");
+      }
+
+      async function runExample1() {
+        resetDemo();
+
+        document.getElementById("codeBlock").innerHTML = `A = [[1,2,3]]
+
+B = [
+ [4],
+ [5],
+ [6]
+]
+
+(1×4) + (2×5) + (3×6)`;
+
+        await animatePair("a1", "b1", "r1", "m1", "1 × 4 = 4", "4", "red-box");
+
+        await animatePair(
+          "a2",
+          "b2",
+          "r2",
+          "m2",
+          "2 × 5 = 10",
+          "10",
+          "blue-box",
+        );
+
+        await animatePair(
+          "a3",
+          "b3",
+          "r3",
+          "m3",
+          "3 × 6 = 18",
+          "18",
+          "green-box",
+        );
+
+        document.getElementById("mainMessage").innerHTML =
+          "Now adding all multiplication results";
+
+        await sleep(2200);
+
+        document.getElementById("finalBox").innerHTML = "32";
+
+        document.getElementById("mainMessage").innerHTML = "4 + 10 + 18 = 32";
+      }
+
+      async function runExample2() {
+        resetDemo();
+
+        document.getElementById("a1").innerHTML = "2";
+        document.getElementById("a2").innerHTML = "1";
+        document.getElementById("a3").innerHTML = "4";
+
+        document.getElementById("b1").innerHTML = "3";
+        document.getElementById("b2").innerHTML = "2";
+        document.getElementById("b3").innerHTML = "5";
+
+        document.getElementById("codeBlock").innerHTML = `A = [[2,1,4]]
+
+B = [
+ [3],
+ [2],
+ [5]
+]
+
+(2×3) + (1×2) + (4×5)`;
+
+        await animatePair("a1", "b1", "r1", "m1", "2 × 3 = 6", "6", "red-box");
+
+        await animatePair("a2", "b2", "r2", "m2", "1 × 2 = 2", "2", "blue-box");
+
+        await animatePair(
+          "a3",
+          "b3",
+          "r3",
+          "m3",
+          "4 × 5 = 20",
+          "20",
+          "green-box",
+        );
+
+        document.getElementById("mainMessage").innerHTML =
+          "Now adding all multiplication results";
+
+        await sleep(2200);
+
+        document.getElementById("finalBox").innerHTML = "28";
+
+        document.getElementById("mainMessage").innerHTML = "6 + 2 + 20 = 28";
+      }
+    </script>
+  </body>
+</html>

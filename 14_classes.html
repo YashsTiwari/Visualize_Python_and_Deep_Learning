@@ -1,0 +1,1031 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Classes & Inheritance — Interactive Story</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", Arial, sans-serif;
+      }
+      body {
+        background: #eef2f8;
+        padding: 16px;
+      }
+      h1 {
+        text-align: center;
+        margin-bottom: 12px;
+        font-size: 23px;
+        color: #1a237e;
+        font-weight: 800;
+      }
+      .ctrl {
+        text-align: center;
+        margin-bottom: 12px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 5px;
+      }
+      .ctrl button {
+        padding: 8px 13px;
+        font-size: 12.5px;
+        font-weight: 700;
+        border: none;
+        border-radius: 8px;
+        background: #1565c0;
+        color: #fff;
+        cursor: pointer;
+        transition:
+          background 0.15s,
+          transform 0.1s;
+        letter-spacing: 0.3px;
+      }
+      .ctrl button:hover {
+        background: #0d47a1;
+      }
+      .ctrl button:active {
+        transform: scale(0.94);
+      }
+      #scene {
+        position: relative;
+        width: 100%;
+        max-width: 960px;
+        height: 610px;
+        background: #fff;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 6px 32px rgba(0, 0, 0, 0.14);
+        margin: 0 auto;
+      }
+      #msgBox {
+        position: absolute;
+        top: 10px;
+        left: 0;
+        right: 0;
+        z-index: 950;
+        text-align: center;
+        font-size: 18px;
+        font-weight: 700;
+        pointer-events: none;
+        padding: 4px 24px;
+        color: #1a237e;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🏫 Classes &amp; Inheritance — Interactive Story</h1>
+    <div class="ctrl">
+      <button onclick="goTo(1)">① Old System</button>
+      <button onclick="goTo(2)">② Rule Book</button>
+      <button onclick="goTo(3)">③ Rahul</button>
+      <button onclick="goTo(4)">④ Priya</button>
+      <button onclick="goTo(5)">⑤ Raju</button>
+      <button onclick="goTo(6)">⑥ Class Reveal</button>
+      <button onclick="goTo(7)">⑦ Dept Need</button>
+      <button onclick="goTo(8)">⑧ Wrong Solution</button>
+      <button onclick="goTo(9)">⑨ Better Solution</button>
+      <button onclick="goTo(10)">⑩ Inheritance</button>
+    </div>
+    <div id="scene">
+      <div id="msgBox">👆 Click a step to begin</div>
+    </div>
+
+    <script>
+      "use strict";
+
+      /* ─────────── Timer helpers ─────────── */
+      const _T = [];
+      const cancelAll = () => {
+        _T.forEach(clearTimeout);
+        _T.length = 0;
+      };
+      const after = (ms, fn) => _T.push(setTimeout(fn, ms));
+
+      /* ─────────── Scene helpers ─────────── */
+      const $S = () => document.getElementById("scene");
+      const msg = (t) => {
+        const m = document.getElementById("msgBox");
+        if (m) m.innerHTML = t;
+      };
+
+      function clearScene() {
+        cancelAll();
+        $S().innerHTML = `<div id="msgBox" style="position:absolute;top:10px;left:0;right:0;z-index:950;
+       text-align:center;font-size:18px;font-weight:700;
+       pointer-events:none;padding:4px 24px;color:#1a237e;"></div>`;
+      }
+
+      /* Create absolutely-positioned element on scene */
+      function mk(tag, css = {}, html = "") {
+        const e = document.createElement(tag);
+        e.innerHTML = html;
+        e.style.position = "absolute";
+        Object.entries(css).forEach(([k, v]) => (e.style[k] = v));
+        $S().appendChild(e);
+        return e;
+      }
+
+      /* Animate element to (x, y) */
+      function mv(el, x, y, dur = 1.2) {
+        el.style.transition = `left ${dur}s ease, top ${dur}s ease`;
+        el.style.left = x + "px";
+        el.style.top = y + "px";
+      }
+
+      /* ─────────── Reusable component builders ─────────── */
+
+      function mkOffice(label, x, y, bc = "#1565c0", bg = "#f8fbff") {
+        return mk(
+          "div",
+          {
+            left: x + "px",
+            top: y + "px",
+            width: "180px",
+            height: "68px",
+            border: `3px solid ${bc}`,
+            borderRadius: "14px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: "15px",
+            fontWeight: "700",
+            background: bg,
+            boxShadow: "0 2px 8px rgba(0,0,0,.1)",
+            zIndex: "10",
+          },
+          label,
+        );
+      }
+
+      function mkPerson(emoji, name, x, y) {
+        const e = mk(
+          "div",
+          {
+            left: x + "px",
+            top: y + "px",
+            zIndex: "60",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "2px",
+          },
+          `<span style="font-size:40px;line-height:1">${emoji}</span>
+   <span style="font-size:13px;font-weight:700;color:#1a237e">${name}</span>`,
+        );
+        e.style.transition = "left 1.2s ease, top 1.2s ease";
+        return e;
+      }
+
+      function mkRulebook(x, y, sm = false) {
+        return mk(
+          "div",
+          {
+            left: x + "px",
+            top: y + "px",
+            width: sm ? "190px" : "234px",
+            padding: sm ? "13px" : "18px",
+            background: "#fff8e1",
+            border: "4px solid #f57c00",
+            borderRadius: "18px",
+            textAlign: "center",
+            fontSize: sm ? "13px" : "15px",
+            lineHeight: "2",
+            zIndex: "80",
+            boxShadow: "0 4px 18px rgba(0,0,0,.12)",
+          },
+          `<div style="font-size:${sm ? "15" : "17"}px;font-weight:800;margin-bottom:4px">📖 RULE BOOK</div>
+   <div>🪪 ID Card</div><div>📶 WiFi Access</div><div>📚 Library Access</div>`,
+        );
+      }
+
+      function mkCard(
+        name,
+        roll,
+        x,
+        y,
+        headerBg = "#1565c0",
+        headerText = "🪪 STUDENT CARD",
+        extra = "",
+        ec = "#e65100",
+      ) {
+        return mk(
+          "div",
+          {
+            left: x + "px",
+            top: y + "px",
+            width: "162px",
+            padding: "10px",
+            background: "white",
+            border: `3px solid ${headerBg}`,
+            borderRadius: "14px",
+            textAlign: "center",
+            fontSize: "13px",
+            lineHeight: "2",
+            boxShadow: "0 4px 16px rgba(0,0,0,.16)",
+            zIndex: "200",
+          },
+          `<div style="font-weight:800;font-size:11px;background:${headerBg};color:#fff;
+     margin:-10px -10px 6px;padding:5px 0;border-radius:11px 11px 0 0">${headerText}</div>
+   <div style="font-size:14px;font-weight:700">${name}</div>
+   <div style="color:#888;font-size:12px">${roll}</div>
+   <div style="margin-top:4px">📶 WiFi<br>📚 Library${
+     extra
+       ? `<br><span style="color:${ec};font-weight:700">${extra}</span>`
+       : ""
+   }</div>`,
+        );
+      }
+
+      function mkAdmin(x, y) {
+        return mk(
+          "div",
+          { left: x + "px", top: y + "px", textAlign: "center", zIndex: "55" },
+          `<div style="font-size:50px">🧑‍💼</div>
+     <div style="font-size:14px;font-weight:700">Admin</div>`,
+        );
+      }
+
+      function mkBubble(text, x, y) {
+        const b = mk(
+          "div",
+          {
+            left: x + "px",
+            top: y + "px",
+            background: "#e3f2fd",
+            border: "2.5px solid #1565c0",
+            borderRadius: "12px",
+            padding: "7px 14px",
+            fontSize: "17px",
+            fontWeight: "700",
+            zIndex: "350",
+            opacity: "0",
+            transition: "opacity .4s",
+            whiteSpace: "nowrap",
+          },
+          text,
+        );
+        after(40, () => (b.style.opacity = "1"));
+        return b;
+      }
+
+      function mkTick(x, y, ok = true) {
+        const e = mk(
+          "div",
+          {
+            left: x + "px",
+            top: y + "px",
+            fontSize: "26px",
+            zIndex: "400",
+            opacity: "0",
+            transition: "opacity .4s",
+          },
+          ok ? "✅" : "❌",
+        );
+        after(30, () => (e.style.opacity = "1"));
+        return e;
+      }
+
+      /* ═══════════════════════════════════════
+   STEP FUNCTIONS  (each fully self-contained)
+═══════════════════════════════════════ */
+
+      function goTo(n) {
+        clearScene();
+        [step1, step2, step3, step4, step5, step6, step7, step8, step9, step10][
+          n - 1
+        ]();
+      }
+
+      /* ────────────────────────────────────────
+   STEP 1 — Old System: Queue Moves
+──────────────────────────────────────── */
+      function step1() {
+        msg("🏫 Old System: Every student must visit all 3 offices separately");
+
+        /* offices on right */
+        mkOffice("🪪 ID Office", 748, 90);
+        mkOffice("📶 WiFi Office", 748, 256);
+        mkOffice("📚 Library", 748, 422);
+
+        /* queue bracket */
+        mk("div", {
+          left: "44px",
+          top: "200px",
+          width: "4px",
+          height: "234px",
+          background: "#ddd",
+          borderRadius: "4px",
+        });
+        mk(
+          "div",
+          {
+            left: "50px",
+            top: "310px",
+            fontSize: "11px",
+            color: "#aaa",
+            fontStyle: "italic",
+          },
+          "Queue",
+        );
+
+        /* students */
+        const rahul = mkPerson("🙋", "Rahul", 52, 196);
+        const priya = mkPerson("🙋‍♀️", "Priya", 52, 296);
+        const aman = mkPerson("🧑", "Aman", 52, 396);
+
+        let ticks = [];
+
+        /* — Rahul's journey — */
+        after(600, () => {
+          mv(rahul, 706, 100);
+          msg("Rahul heads to 🪪 ID Office…");
+        });
+        after(2000, () => ticks.push(mkTick(736, 100)));
+        after(2700, () => {
+          mv(rahul, 706, 266);
+          msg("Now 📶 WiFi Office…");
+        });
+        after(4100, () => ticks.push(mkTick(736, 266)));
+        after(4800, () => {
+          mv(rahul, 706, 432);
+          msg("Finally 📚 Library…");
+        });
+        after(6200, () => ticks.push(mkTick(736, 432)));
+        after(7000, () => {
+          rahul.style.transition = "left .75s ease";
+          mv(rahul, 1020, 432, 0.75);
+        });
+
+        /* fade ticks, advance queue */
+        after(7700, () => {
+          ticks.forEach((t) => (t.style.opacity = "0"));
+          ticks = [];
+        });
+        after(8100, () => {
+          mv(priya, 52, 196, 0.5);
+          mv(aman, 52, 296, 0.5);
+          msg("Queue advances — Priya's turn…");
+        });
+
+        /* — Priya's journey — */
+        after(8900, () => mv(priya, 706, 100));
+        after(10300, () => ticks.push(mkTick(736, 100)));
+        after(11000, () => mv(priya, 706, 266));
+        after(12400, () => ticks.push(mkTick(736, 266)));
+        after(13100, () => mv(priya, 706, 432));
+        after(14500, () => ticks.push(mkTick(736, 432)));
+        after(15300, () => {
+          priya.style.transition = "left .75s ease";
+          mv(priya, 1020, 432, 0.75);
+        });
+        after(16100, () =>
+          msg("😩 Imagine 500 students — this is exhausting every semester!"),
+        );
+      }
+
+      /* ────────────────────────────────────────
+   STEP 2 — Rule Book
+──────────────────────────────────────── */
+      function step2() {
+        msg("💡 University creates ONE central Rule Book for all students");
+
+        /* ghost offices */
+        ["🪪 ID Office", "📶 WiFi Office", "📚 Library"].forEach((lab, i) => {
+          const o = mkOffice(lab, 748, 90 + i * 166);
+          o.style.opacity = ".12";
+        });
+        mk(
+          "div",
+          {
+            left: "748px",
+            top: "88px",
+            width: "180px",
+            height: "404px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: "90px",
+            opacity: ".18",
+            zIndex: "15",
+            pointerEvents: "none",
+          },
+          "🚫",
+        );
+
+        /* rule book pops in */
+        const rb = mkRulebook(354, 174);
+        rb.style.transform = "scale(0)";
+        rb.style.transition = "transform .88s cubic-bezier(.34,1.56,.64,1)";
+        after(200, () => (rb.style.transform = "scale(1)"));
+
+        after(1600, () =>
+          mk(
+            "div",
+            {
+              left: "300px",
+              top: "480px",
+              width: "368px",
+              textAlign: "center",
+              fontSize: "16px",
+              color: "#555",
+              lineHeight: "1.9",
+            },
+            "📖 One Rule Book replaces all 3 separate offices<br>✅ Every student follows the same blueprint",
+          ),
+        );
+
+        after(2800, () =>
+          msg("📖 One Rule Book = Blueprint for every student"),
+        );
+      }
+
+      /* ────────────────────────────────────────
+   STEP 3 — Rahul gets his card
+──────────────────────────────────────── */
+      function step3() {
+        msg("🚶 Rahul arrives at the university");
+
+        mkRulebook(44, 196);
+        mkAdmin(618, 204);
+
+        const rahul = mkPerson("🙋", "Rahul", -96, 222);
+        after(60, () => mv(rahul, 422, 222));
+
+        after(1600, () =>
+          msg("🧑‍💼 Admin checks the Rule Book: Is Rahul a student?"),
+        );
+        after(2000, () => mkBubble("Student? ✅ YES", 610, 138));
+        after(3100, () => msg("📖 Rule Book → Issues Student Card to Rahul"));
+        after(3300, () => {
+          /* card appears at Rule Book centre, then flies to Rahul */
+          const c = mkCard("Rahul", "Roll B101", 272, 214);
+          c.style.opacity = "0";
+          c.style.transition = "opacity .5s";
+          after(60, () => (c.style.opacity = "1"));
+          after(1000, () => {
+            c.style.transition = "left 1.3s ease, top 1.3s ease";
+            mv(c, 422, 330, 1.3);
+          });
+        });
+        after(5000, () =>
+          msg("🎉 Rahul now has: 🪪 ID + 📶 WiFi + 📚 Library access!"),
+        );
+      }
+
+      /* ────────────────────────────────────────
+   STEP 4 — Priya also gets a card (both visible)
+──────────────────────────────────────── */
+      function step4() {
+        msg("🙋‍♀️ Priya also arrives…");
+
+        mkRulebook(44, 196);
+        mkAdmin(618, 204);
+
+        /* Rahul already has his card (static) */
+        mkPerson("🙋", "Rahul", 292, 162);
+        mkCard("Rahul", "Roll B101", 288, 254);
+
+        const priya = mkPerson("🙋‍♀️", "Priya", -96, 222);
+        after(60, () => mv(priya, 462, 222));
+
+        after(1600, () => msg("Same Rule Book → Priya is also a student ✅"));
+        after(2000, () => mkBubble("Student? ✅ YES", 610, 138));
+        after(3100, () => {
+          const c = mkCard("Priya", "Roll B102", 272, 214);
+          c.style.opacity = "0";
+          c.style.transition = "opacity .5s";
+          after(60, () => (c.style.opacity = "1"));
+          after(1000, () => {
+            c.style.transition = "left 1.3s ease, top 1.3s ease";
+            mv(c, 462, 338, 1.3);
+          });
+        });
+        after(5000, () =>
+          msg("✅ Both Rahul & Priya get cards from the SAME Rule Book!"),
+        );
+      }
+
+      /* ────────────────────────────────────────
+   STEP 5 — Raju is rejected
+──────────────────────────────────────── */
+      function step5() {
+        msg("🧑 Raju also wants access…");
+
+        mkRulebook(44, 196);
+        mkAdmin(618, 204);
+
+        /* Rahul & Priya with cards (static context) */
+        mkPerson("🙋", "Rahul", 274, 142);
+        mkCard("Rahul", "Roll B101", 270, 232);
+        mkPerson("🙋‍♀️", "Priya", 390, 142);
+        mkCard("Priya", "Roll B102", 386, 232);
+
+        const raju = mkPerson("🧑", "Raju", -96, 220);
+        after(60, () => mv(raju, 514, 220));
+
+        after(1600, () => mkBubble("Student? ❌ NO!", 610, 138));
+        after(2200, () => msg("❌ Raju is not in the Rule Book — no card!"));
+        after(2700, () => {
+          mk(
+            "div",
+            {
+              left: "618px",
+              top: "424px",
+              width: "260px",
+              height: "86px",
+              border: "3px dashed #e53935",
+              borderRadius: "14px",
+              background: "#ffeaea",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "18px",
+              fontWeight: "700",
+              zIndex: "50",
+            },
+            "🚶 Visitor Area",
+          );
+          after(350, () => mv(raju, 648, 432, 1.2));
+        });
+        after(4400, () =>
+          msg("📖 CLASS defines WHO qualifies AND WHAT they receive"),
+        );
+      }
+
+      /* ────────────────────────────────────────
+   STEP 6 — Class Reveal
+──────────────────────────────────────── */
+      function step6() {
+        msg("📖 The RULE BOOK is what programmers call a CLASS");
+
+        const rv = mk("div", {
+          left: "50%",
+          top: "50%",
+          transform: "translate(-50%,-52%)",
+          background: "white",
+          padding: "26px 40px",
+          borderRadius: "20px",
+          boxShadow: "0 4px 26px rgba(0,0,0,.18)",
+          textAlign: "center",
+          fontSize: "20px",
+          zIndex: "500",
+          opacity: "0",
+          transition: "opacity .7s",
+        });
+        rv.innerHTML = `
+    <div style="font-size:26px;font-weight:800;margin-bottom:8px">📖 RULE BOOK</div>
+    <div style="font-size:50px;margin:4px 0">⬇️</div>
+    <div style="display:flex;justify-content:center;gap:60px;font-size:22px;margin-bottom:16px">
+      <div>🙋 Rahul</div><div>🙋‍♀️ Priya</div>
+    </div>
+    <div style="background:#f5f5f5;border-radius:12px;padding:12px 20px;font-size:16px;line-height:2.2">
+      <span style="font-weight:800;font-size:18px">CLASS</span> = Rule Book (Blueprint)<br>
+      <span style="font-weight:800;font-size:18px">OBJECTS</span> = Rahul, Priya (Created from Blueprint)
+    </div>`;
+        after(80, () => (rv.style.opacity = "1"));
+        after(1800, () =>
+          msg(
+            "One CLASS definition → Many OBJECTS, all sharing the same blueprint!",
+          ),
+        );
+      }
+
+      /* ────────────────────────────────────────
+   STEP 7 — Department Need
+──────────────────────────────────────── */
+      function step7() {
+        msg("🏢 Students in different departments need EXTRA access!");
+
+        /* CSE dept */
+        mk(
+          "div",
+          {
+            left: "38px",
+            top: "90px",
+            width: "340px",
+            padding: "16px",
+            background: "#e3f2fd",
+            border: "3px solid #1565c0",
+            borderRadius: "16px",
+            textAlign: "center",
+            zIndex: "20",
+          },
+          `<div style="font-weight:800;font-size:20px;margin-bottom:6px">💻 CSE Department</div>
+   <div style="color:#555;font-size:14px">Needs additional access:</div>
+   <div style="font-size:36px;margin-top:6px">🖥️ Computer Lab</div>`,
+        );
+
+        /* Mech dept */
+        mk(
+          "div",
+          {
+            left: "582px",
+            top: "90px",
+            width: "340px",
+            padding: "16px",
+            background: "#f3e5f5",
+            border: "3px solid #7b1fa2",
+            borderRadius: "16px",
+            textAlign: "center",
+            zIndex: "20",
+          },
+          `<div style="font-weight:800;font-size:20px;margin-bottom:6px">⚙️ Mech Department</div>
+   <div style="color:#555;font-size:14px">Needs additional access:</div>
+   <div style="font-size:36px;margin-top:6px">🔧 Mech Lab</div>`,
+        );
+
+        /* Students */
+        mkPerson("🙋", "Rahul (CSE)", 182, 318);
+        mkCard("Rahul", "B101 (CSE)", 174, 412);
+
+        mkPerson("🙋‍♀️", "Priya (Mech)", 680, 318);
+        mkCard("Priya", "B102 (Mech)", 672, 412);
+
+        /* missing access labels */
+        after(1100, () => {
+          msg("💻 Rahul's card has no Computer Lab access!");
+          const m = mk(
+            "div",
+            {
+              left: "174px",
+              top: "520px",
+              width: "162px",
+              textAlign: "center",
+              fontSize: "13px",
+              color: "#c62828",
+              fontWeight: "700",
+              zIndex: "250",
+              opacity: "0",
+              transition: "opacity .4s",
+            },
+            "❌ Missing: 💻 Lab",
+          );
+          after(50, () => (m.style.opacity = "1"));
+        });
+        after(3200, () => {
+          msg("⚙️ Priya's card has no Mech Lab access either!");
+          const m = mk(
+            "div",
+            {
+              left: "672px",
+              top: "520px",
+              width: "162px",
+              textAlign: "center",
+              fontSize: "13px",
+              color: "#c62828",
+              fontWeight: "700",
+              zIndex: "250",
+              opacity: "0",
+              transition: "opacity .4s",
+            },
+            "❌ Missing: ⚙️ Lab",
+          );
+          after(50, () => (m.style.opacity = "1"));
+        });
+        after(5400, () =>
+          msg(
+            "❓ How do we add dept-specific access without duplicating everything?",
+          ),
+        );
+      }
+
+      /* ────────────────────────────────────────
+   STEP 8 — Wrong Solution (icon-by-icon)
+──────────────────────────────────────── */
+      function step8() {
+        msg(
+          "❌ Wrong Approach: Create a brand-new card from scratch for each department",
+        );
+
+        mkPerson("🙋", "Rahul", 186, 28);
+        mkPerson("🙋‍♀️", "Priya", 636, 28);
+
+        mk(
+          "div",
+          {
+            left: "88px",
+            top: "46px",
+            fontSize: "15px",
+            fontWeight: "700",
+            color: "#1565c0",
+          },
+          "💻 CSE Student Card",
+        );
+        mk(
+          "div",
+          {
+            left: "550px",
+            top: "46px",
+            fontSize: "15px",
+            fontWeight: "700",
+            color: "#7b1fa2",
+          },
+          "⚙️ Mech Student Card",
+        );
+
+        /* card frames */
+        const cF = mk(
+          "div",
+          {
+            left: "70px",
+            top: "82px",
+            width: "286px",
+            border: "3px solid #1565c0",
+            borderRadius: "15px",
+            background: "white",
+            padding: "13px 15px",
+            boxShadow: "0 4px 14px rgba(0,0,0,.1)",
+            zIndex: "50",
+          },
+          `<div style="font-weight:800;font-size:13px;color:#1565c0;
+        border-bottom:2px solid #e3f2fd;padding-bottom:6px;margin-bottom:4px">🪪 CSE STUDENT CARD</div>`,
+        );
+
+        const mF = mk(
+          "div",
+          {
+            left: "544px",
+            top: "82px",
+            width: "286px",
+            border: "3px solid #7b1fa2",
+            borderRadius: "15px",
+            background: "white",
+            padding: "13px 15px",
+            boxShadow: "0 4px 14px rgba(0,0,0,.1)",
+            zIndex: "50",
+          },
+          `<div style="font-weight:800;font-size:13px;color:#7b1fa2;
+        border-bottom:2px solid #f3e5f5;padding-bottom:6px;margin-bottom:4px">🪪 MECH STUDENT CARD</div>`,
+        );
+
+        function addRow(frame, icon, label, t) {
+          after(t, () => {
+            const r = document.createElement("div");
+            r.style.cssText =
+              "display:flex;align-items:center;gap:10px;padding:5px 0;opacity:0;transition:opacity .5s;font-size:16px";
+            r.innerHTML = `<span style="font-size:26px">${icon}</span><span>${label}</span>`;
+            frame.appendChild(r);
+            setTimeout(() => (r.style.opacity = "1"), 50);
+          });
+        }
+
+        const cse = [
+          ["🪪", "ID Card"],
+          ["📶", "WiFi Access"],
+          ["📚", "Library Access"],
+          ["💻", "Computer Lab"],
+        ];
+        const mec = [
+          ["🪪", "ID Card"],
+          ["📶", "WiFi Access"],
+          ["📚", "Library Access"],
+          ["⚙️", "Mech Lab"],
+        ];
+        const ms = 5900; /* mech start ms */
+
+        cse.forEach(([ic, lb], i) => addRow(cF, ic, lb, 500 + i * 1100));
+        mec.forEach(([ic, lb], i) => addRow(mF, ic, lb, ms + i * 1100));
+
+        /* message timeline */
+        after(500, () => msg("Building CSE card: adding 🪪 ID Card…"));
+        after(1600, () => msg("Adding 📶 WiFi Access…"));
+        after(2700, () => msg("Adding 📚 Library Access…"));
+        after(3800, () => msg("Adding 💻 Computer Lab — CSE card done!"));
+        after(ms, () =>
+          msg("Now Mech card from scratch: 🪪 ID Card… (again!)"),
+        );
+        after(ms + 1100, () => msg("📶 WiFi Access… (again!)"));
+        after(ms + 2200, () => msg("📚 Library Access… (again!)"));
+        after(ms + 3300, () => msg("⚙️ Mech Lab — done!"));
+        after(ms + 4300, () => {
+          msg("⚠️ We wrote 🪪 📶 📚 TWICE — pure duplication!");
+          /* red highlight boxes on the 3 duplicate rows in each card */
+          mk("div", {
+            left: "64px",
+            top: "78px",
+            width: "298px",
+            height: "172px",
+            border: "3px solid #e53935",
+            borderRadius: "14px",
+            zIndex: "99",
+            background: "rgba(229,57,53,.04)",
+            pointerEvents: "none",
+          });
+          mk("div", {
+            left: "538px",
+            top: "78px",
+            width: "298px",
+            height: "172px",
+            border: "3px solid #e53935",
+            borderRadius: "14px",
+            zIndex: "99",
+            background: "rgba(229,57,53,.04)",
+            pointerEvents: "none",
+          });
+          mk(
+            "div",
+            {
+              left: "395px",
+              top: "192px",
+              width: "130px",
+              textAlign: "center",
+              fontSize: "19px",
+              fontWeight: "800",
+              color: "#e53935",
+              lineHeight: "1.5",
+              zIndex: "200",
+            },
+            "🔁<br>DUPLICATE!",
+          );
+        });
+        after(ms + 5800, () =>
+          msg(
+            "😱 With 10 departments we copy 🪪📶📚 ten times. There MUST be a better way!",
+          ),
+        );
+      }
+
+      /* ────────────────────────────────────────
+   STEP 9 — Better Solution (pull card → attach)
+──────────────────────────────────────── */
+      function step9() {
+        msg(
+          "✅ Better: Pull Rahul's Student Card to centre → attach only what's new!",
+        );
+
+        /* Rahul on left with his card */
+        mkPerson("🙋", "Rahul", 60, 148);
+
+        const baseCard = mk(
+          "div",
+          {
+            left: "46px",
+            top: "268px",
+            width: "162px",
+            padding: "10px",
+            background: "white",
+            border: "3px solid #1565c0",
+            borderRadius: "14px",
+            textAlign: "center",
+            fontSize: "13px",
+            lineHeight: "2",
+            boxShadow: "0 4px 16px rgba(0,0,0,.16)",
+            zIndex: "200",
+            transition: "left 1.5s ease, top 1.5s ease, border-color .4s",
+          },
+          `<div style="font-weight:800;font-size:11px;background:#1565c0;color:#fff;
+     margin:-10px -10px 6px;padding:5px 0;border-radius:11px 11px 0 0">🪪 STUDENT CARD</div>
+   <div style="font-size:14px;font-weight:700">Rahul</div>
+   <div style="color:#888;font-size:12px">B101</div>
+   <div style="margin-top:4px">📶 WiFi<br>📚 Library</div>`,
+        );
+
+        after(700, () =>
+          msg(
+            "Here's Rahul's existing Student Card — 📶 WiFi & 📚 Library already there…",
+          ),
+        );
+        after(2200, () => {
+          msg("Step 1: Detach the card from Rahul and pull it to the centre");
+          baseCard.style.left = "366px";
+          baseCard.style.top = "188px";
+        });
+        after(3900, () =>
+          msg("Step 2: EXTEND it — attach 💻 Computer Lab access!"),
+        );
+        after(4100, () => {
+          /* lab icon flies in from right */
+          const lab = mk(
+            "div",
+            {
+              left: "930px",
+              top: "258px",
+              fontSize: "46px",
+              zIndex: "300",
+              transition: "left 1.5s ease",
+            },
+            "💻",
+          );
+          after(80, () => (lab.style.left = "552px"));
+          after(1700, () => (lab.style.opacity = "0"));
+        });
+        after(5800, () => {
+          /* upgrade card */
+          baseCard.innerHTML = `
+      <div style="font-weight:800;font-size:11px;background:#e65100;color:#fff;
+           margin:-10px -10px 6px;padding:5px 0;border-radius:11px 11px 0 0">🪪 CSE STUDENT CARD</div>
+      <div style="font-size:14px;font-weight:700">Rahul</div>
+      <div style="color:#888;font-size:12px">B101</div>
+      <div style="margin-top:4px">📶 WiFi<br>📚 Library</div>
+      <div style="margin-top:5px;border-top:2px solid #e65100;padding-top:4px;
+           color:#e65100;font-weight:700;font-size:13px">💻 Computer Lab ✨</div>`;
+          baseCard.style.borderColor = "#e65100";
+        });
+        after(6100, () =>
+          msg(
+            "🎉 CSE Student = Student Card + Computer Lab — zero duplication!",
+          ),
+        );
+        after(7800, () => {
+          /* Priya's mech card on right for symmetry */
+          const mc = mk(
+            "div",
+            {
+              left: "700px",
+              top: "188px",
+              width: "162px",
+              padding: "10px",
+              background: "white",
+              border: "3px solid #7b1fa2",
+              borderRadius: "14px",
+              textAlign: "center",
+              fontSize: "13px",
+              lineHeight: "2",
+              boxShadow: "0 4px 16px rgba(0,0,0,.16)",
+              zIndex: "200",
+              opacity: "0",
+              transition: "opacity .6s",
+            },
+            `<div style="font-weight:800;font-size:11px;background:#7b1fa2;color:#fff;
+         margin:-10px -10px 6px;padding:5px 0;border-radius:11px 11px 0 0">🪪 MECH STUDENT CARD</div>
+     <div style="font-size:14px;font-weight:700">Priya</div>
+     <div style="color:#888;font-size:12px">B102</div>
+     <div style="margin-top:4px">📶 WiFi<br>📚 Library</div>
+     <div style="margin-top:5px;border-top:2px solid #7b1fa2;padding-top:4px;
+          color:#7b1fa2;font-weight:700;font-size:13px">⚙️ Mech Lab ✨</div>`,
+          );
+          after(60, () => (mc.style.opacity = "1"));
+          msg("Same logic for Priya: Student Card + ⚙️ Mech Lab!");
+        });
+      }
+
+      /* ────────────────────────────────────────
+   STEP 10 — Inheritance Reveal
+──────────────────────────────────────── */
+      function step10() {
+        msg(
+          "🐍 This is INHERITANCE — child class reuses parent's features and adds its own!",
+        );
+
+        const tree = mk("div", {
+          left: "50%",
+          top: "50%",
+          transform: "translate(-50%,-52%)",
+          textAlign: "center",
+          zIndex: "500",
+          opacity: "0",
+          transition: "opacity .8s",
+        });
+
+        tree.innerHTML = `
+    <div style="display:inline-block;padding:16px 34px;
+      background:#fff8e1;border:4px solid #f57c00;border-radius:16px;
+      font-size:20px;font-weight:800">
+      STUDENT
+      <span style="font-size:13px;font-weight:400;color:#888"> (Parent Class)</span>
+      <div style="font-size:15px;font-weight:500;margin-top:5px">
+        🪪 ID &nbsp;•&nbsp; 📶 WiFi &nbsp;•&nbsp; 📚 Library
+      </div>
+    </div>
+    <div style="font-size:42px;display:flex;justify-content:center;gap:220px;margin:6px 0;line-height:1">
+      <span>↙️</span><span>↘️</span>
+    </div>
+    <div style="display:flex;justify-content:center;gap:40px">
+      <div style="padding:14px 24px;background:#e3f2fd;
+           border:3px solid #1565c0;border-radius:14px;
+           font-size:17px;font-weight:700;line-height:1.9">
+        CSE Student
+        <span style="font-size:12px;color:#666;font-weight:400"> (Child)</span><br>
+        <span style="font-size:13px;font-weight:400">🪪 📶 📚 (inherited)</span><br>
+        <span style="color:#1565c0">+ 💻 Computer Lab</span>
+      </div>
+      <div style="padding:14px 24px;background:#f3e5f5;
+           border:3px solid #7b1fa2;border-radius:14px;
+           font-size:17px;font-weight:700;line-height:1.9">
+        Mech Student
+        <span style="font-size:12px;color:#666;font-weight:400"> (Child)</span><br>
+        <span style="font-size:13px;font-weight:400">🪪 📶 📚 (inherited)</span><br>
+        <span style="color:#7b1fa2">+ ⚙️ Mech Lab</span>
+      </div>
+    </div>
+    <div style="margin-top:18px;font-size:14px;color:#555;
+         background:#f9f9f9;border-radius:10px;padding:10px 18px;
+         display:inline-block;border:1px solid #eee">
+      🐍 Python: &nbsp;
+      <code style="font-size:14px;background:#fff3e0;padding:3px 8px;
+            border-radius:5px;border:1px solid #ffe082">class CSEStudent(Student):</code>
+    </div>`;
+
+        after(80, () => (tree.style.opacity = "1"));
+        after(2000, () =>
+          msg(
+            '🐍 Python: <code style="background:#fff3e0;padding:2px 7px;border-radius:4px;border:1px solid #ffe082">class CSEStudent(Student):</code>  ← This is INHERITANCE!',
+          ),
+        );
+      }
+    </script>
+  </body>
+</html>

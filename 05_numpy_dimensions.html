@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Dimensions Intuition</title>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+        background: #f4f7fb;
+        padding: 40px;
+        color: #222;
+      }
+
+      .main-title {
+        text-align: center;
+        font-size: 52px;
+        margin-bottom: 50px;
+      }
+
+      .section {
+        background: white;
+        border-radius: 24px;
+        padding: 40px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      }
+
+      .section-title {
+        text-align: center;
+        font-size: 38px;
+        margin-bottom: 40px;
+      }
+
+      .controls {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-bottom: 40px;
+      }
+
+      button {
+        padding: 16px 28px;
+        border: none;
+        border-radius: 14px;
+        font-size: 22px;
+        color: white;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      button:hover {
+        transform: scale(1.05);
+      }
+
+      .blue {
+        background: #1565c0;
+      }
+
+      .green {
+        background: #2e7d32;
+      }
+
+      .orange {
+        background: #ef6c00;
+      }
+
+      .red {
+        background: #c62828;
+      }
+
+      .demo-area {
+        min-height: 520px;
+        border-radius: 24px;
+        background: #fafafa;
+        position: relative;
+        overflow: hidden;
+        padding: 40px;
+      }
+
+      .message {
+        margin-top: 30px;
+        text-align: center;
+        font-size: 30px;
+        font-weight: bold;
+        min-height: 50px;
+      }
+
+      .info {
+        text-align: center;
+        font-size: 30px;
+        margin-top: 20px;
+        font-weight: bold;
+        color: #444;
+      }
+
+      .code {
+        margin-top: 40px;
+        background: #1e1e1e;
+        color: #00ff99;
+        padding: 24px;
+        border-radius: 18px;
+        font-size: 24px;
+        line-height: 1.8;
+        overflow-x: auto;
+      }
+
+      .label {
+        text-align: center;
+        font-size: 36px;
+        margin-bottom: 30px;
+        font-weight: bold;
+      }
+
+      .pixel-row {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 80px;
+      }
+
+      .pixel {
+        width: 70px;
+        height: 70px;
+        border-radius: 10px;
+        border: 3px solid #222;
+        transition: 1s;
+      }
+
+      .highlight {
+        transform: scale(1.1);
+        box-shadow: 0 0 20px #ff9800;
+      }
+
+      .image-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 70px);
+        gap: 8px;
+        justify-content: center;
+        margin-top: 40px;
+      }
+
+      .photo {
+        width: 380px;
+        height: 260px;
+        border-radius: 20px;
+        border: 6px solid #222;
+        position: absolute;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 90px;
+        transition: 1s;
+        background: white;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+      }
+
+      .fade {
+        opacity: 0.5;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="main-title">🖼 Understanding Dimensions Visually</div>
+
+    <div class="section">
+      <div class="section-title">1D → 2D → 3D</div>
+
+      <div class="controls">
+        <button class="blue" onclick="show1D()">Show 1D</button>
+
+        <button class="green" onclick="show2D()">Show 2D</button>
+
+        <button class="orange" onclick="show3D()">Show 3D</button>
+
+        <button class="red" onclick="resetDemo()">Reset</button>
+      </div>
+
+      <div class="demo-area" id="demoArea">
+        <div class="label">Click a button to understand dimensions</div>
+      </div>
+
+      <div class="info" id="infoText">Dimensions = How data is organized</div>
+
+      <div class="message" id="mainMessage">Understanding arrays visually</div>
+
+      <div class="code" id="codeBlock">arr = np.array([1,2,3,4])</div>
+    </div>
+
+    <script>
+      function resetDemo() {
+        document.getElementById("demoArea").innerHTML = `
+        <div class="label">
+            Click a button to understand dimensions
+        </div>
+    `;
+
+        document.getElementById("infoText").innerHTML =
+          "Dimensions = How data is organized";
+
+        document.getElementById("mainMessage").innerHTML =
+          "Understanding arrays visually";
+
+        document.getElementById("codeBlock").innerHTML =
+          "arr = np.array([1,2,3,4])";
+      }
+
+      function show1D() {
+        document.getElementById("demoArea").innerHTML = `
+
+        <div class="label">
+            1D = One Row of Pixels
+        </div>
+
+        <div class="pixel-row">
+
+            <div class="pixel highlight"
+            style="background:#ff5252;"></div>
+
+            <div class="pixel highlight"
+            style="background:#ffeb3b;"></div>
+
+            <div class="pixel highlight"
+            style="background:#4caf50;"></div>
+
+            <div class="pixel highlight"
+            style="background:#2196f3;"></div>
+
+            <div class="pixel highlight"
+            style="background:#9c27b0;"></div>
+
+        </div>
+
+    `;
+
+        document.getElementById("infoText").innerHTML = "1D = One Direction";
+
+        document.getElementById("mainMessage").innerHTML =
+          "A 1D array stores values in a single line";
+
+        document.getElementById("codeBlock").innerHTML =
+          "arr = np.array([1,2,3,4,5])";
+      }
+
+      function show2D() {
+        document.getElementById("demoArea").innerHTML = `
+
+        <div class="label">
+            2D = One Complete Image
+        </div>
+
+        <div class="photo highlight"
+        style="
+            left:50%;
+            top:140px;
+            transform:translateX(-50%);
+            z-index:2;
+        ">
+
+            🌄
+
+        </div>
+
+    `;
+
+        document.getElementById("infoText").innerHTML = "2D = Height × Width";
+
+        document.getElementById("mainMessage").innerHTML =
+          "Many pixel rows combine to form one image";
+
+        document.getElementById("codeBlock").innerHTML = `arr = np.array([
+ [1,2,3],
+ [4,5,6],
+ [7,8,9]
+])`;
+      }
+
+      function show3D() {
+        document.getElementById("demoArea").innerHTML = `
+
+        <div class="label">
+            3D = Multiple Images
+        </div>
+
+        <div class="photo fade"
+        style="left:28%; top:170px; z-index:1;">
+            🌄
+        </div>
+
+        <div class="photo fade"
+        style="left:36%; top:140px; z-index:2;">
+            🌆
+        </div>
+
+        <div class="photo"
+        style="left:44%; top:110px; z-index:3;">
+            🌊
+        </div>
+
+    `;
+
+        document.getElementById("infoText").innerHTML =
+          "3D = Multiple 2D Images";
+
+        document.getElementById("mainMessage").innerHTML =
+          "A 3D array stores many images together";
+
+        document.getElementById("codeBlock").innerHTML = `arr = np.array([
+ [[...]],
+ [[...]],
+ [[...]]
+])`;
+      }
+    </script>
+  </body>
+</html>

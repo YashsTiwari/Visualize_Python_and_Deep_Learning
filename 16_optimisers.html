@@ -1,0 +1,586 @@
+```html
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Optimizer Intuition</title>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+      }
+
+      body {
+        background: #f4f7fb;
+        padding: 20px;
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .controls {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      button {
+        padding: 12px 18px;
+        margin: 5px;
+        border: none;
+        border-radius: 10px;
+        background: #1565c0;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+      }
+
+      .scene {
+        position: relative;
+
+        height: 750px;
+
+        background: white;
+
+        border-radius: 20px;
+
+        overflow: hidden;
+
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+      }
+
+      #message {
+        position: absolute;
+
+        top: 20px;
+
+        width: 100%;
+
+        text-align: center;
+
+        font-size: 28px;
+
+        font-weight: bold;
+
+        z-index: 1000;
+      }
+
+      /* ===================
+      BALL
+      =================== */
+
+      #ball {
+        position: absolute;
+
+        left: 50px;
+
+        top: 105px;
+
+        font-size: 44px;
+
+        z-index: 500;
+
+        transition: all 2s ease-in-out;
+      }
+
+      /* ===================
+      OPTIMIZER
+      =================== */
+
+      #optimizer {
+        position: absolute;
+
+        left: 250px;
+
+        top: 430px;
+
+        font-size: 55px;
+
+        display: none;
+
+        transition: all 1.5s;
+
+        z-index: 600;
+      }
+
+      /* ===================
+      MINIMA LABELS
+      =================== */
+
+      .label {
+        position: absolute;
+
+        padding: 10px 16px;
+
+        background: white;
+
+        border-radius: 12px;
+
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+
+        font-size: 22px;
+
+        font-weight: bold;
+
+        display: none;
+      }
+
+      #smallMinima {
+        left: 190px;
+
+        top: 540px;
+
+        border: 3px solid red;
+      }
+
+      #deepMinima {
+        left: 660px;
+
+        top: 630px;
+
+        border: 3px solid orange;
+      }
+
+      #globalMinima {
+        left: 980px;
+
+        top: 560px;
+
+        border: 3px solid green;
+      }
+
+      /* ===================
+      FINAL CARD
+      =================== */
+
+      #finalCard {
+        position: absolute;
+
+        left: 50%;
+
+        top: 50%;
+
+        transform: translate(-50%, -50%);
+
+        background: white;
+
+        padding: 40px;
+
+        border-radius: 20px;
+
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+
+        font-size: 28px;
+
+        line-height: 2;
+
+        text-align: center;
+
+        display: none;
+
+        z-index: 1000;
+      }
+
+      /* ===================
+      ANIMATIONS
+      =================== */
+
+      .shake {
+        animation: shake 0.35s infinite;
+      }
+
+      @keyframes shake {
+        0% {
+          transform: translateX(-4px);
+        }
+
+        50% {
+          transform: translateX(4px);
+        }
+
+        100% {
+          transform: translateX(-4px);
+        }
+      }
+
+      .bounce {
+        animation: bounce 1s infinite;
+      }
+
+      @keyframes bounce {
+        0% {
+          transform: translateY(0px);
+        }
+
+        50% {
+          transform: translateY(-12px);
+        }
+
+        100% {
+          transform: translateY(0px);
+        }
+      }
+
+      .glowRed {
+        box-shadow:
+          0 0 20px red,
+          0 0 40px red;
+      }
+
+      .glowOrange {
+        box-shadow:
+          0 0 20px orange,
+          0 0 40px orange;
+      }
+
+      .glowGreen {
+        box-shadow:
+          0 0 20px green,
+          0 0 40px green;
+      }
+
+      /* ===================
+      VALLEY LEGEND
+      =================== */
+
+      .legend {
+        position: absolute;
+
+        right: 20px;
+
+        top: 120px;
+
+        background: white;
+
+        padding: 15px;
+
+        border-radius: 15px;
+
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+
+        font-size: 20px;
+
+        line-height: 2;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>🚀 Understanding Optimizers</h1>
+
+    <div class="controls">
+      <button onclick="step1()">1 Gradient Descent</button>
+
+      <button onclick="step2()">2 Stuck</button>
+
+      <button onclick="step3()">3 Optimizer Push</button>
+
+      <button onclick="step4()">4 Deep Local Minima</button>
+
+      <button onclick="step5()">5 Global Minima</button>
+
+      <button onclick="step6()">6 Final Lesson</button>
+    </div>
+
+    <div class="scene">
+      <div id="message">Press Step 1</div>
+
+      <svg width="1200" height="700">
+        <path
+          d="
+M 50 120
+
+C 150 250, 220 500, 300 500
+
+C 380 500, 450 250, 520 250
+
+C 600 250, 700 600, 820 600
+
+C 930 600, 1020 680, 1150 680
+"
+          stroke="#1565c0"
+          stroke-width="8"
+          fill="none"
+        />
+      </svg>
+
+      <div id="ball">🔵</div>
+
+      <div id="optimizer">🚀</div>
+
+      <div id="smallMinima" class="label">🔴 Small Local Minima</div>
+
+      <div id="deepMinima" class="label">🟠 Deep Local Minima</div>
+
+      <div id="globalMinima" class="label">🟢 Global Minima</div>
+
+      <div id="finalCard"></div>
+    </div>
+
+    <script>
+      const ball = document.getElementById("ball");
+      const optimizer = document.getElementById("optimizer");
+      const msg = document.getElementById("message");
+
+      function resetScene() {
+        ball.style.left = "50px";
+        ball.style.top = "105px";
+
+        ball.className = "";
+
+        optimizer.style.display = "none";
+        optimizer.className = "";
+
+        document.getElementById("smallMinima").style.display = "none";
+        document.getElementById("deepMinima").style.display = "none";
+        document.getElementById("globalMinima").style.display = "none";
+
+        document.getElementById("finalCard").style.display = "none";
+      }
+
+      /* ===========================
+STEP 1
+Gradient Descent
+=========================== */
+
+      function step1() {
+        resetScene();
+
+        msg.innerHTML = "Gradient Descent starts rolling downhill...";
+
+        setTimeout(() => {
+          ball.style.left = "250px";
+          ball.style.top = "500px";
+        }, 500);
+
+        setTimeout(() => {
+          document.getElementById("smallMinima").style.display = "block";
+        }, 2500);
+
+        setTimeout(() => {
+          msg.innerHTML = "Oops! We reached a Small Local Minima.";
+        }, 3000);
+      }
+
+      /* ===========================
+STEP 2
+Stuck
+=========================== */
+
+      function step2() {
+        resetScene();
+
+        ball.style.left = "250px";
+        ball.style.top = "500px";
+
+        document.getElementById("smallMinima").style.display = "block";
+
+        msg.innerHTML = "Gradient Descent is stuck.";
+
+        setTimeout(() => {
+          ball.classList.add("shake");
+        }, 500);
+
+        setTimeout(() => {
+          msg.innerHTML = "I can't find a better direction.";
+        }, 2000);
+      }
+
+      /* ===========================
+STEP 3
+Optimizer Push
+=========================== */
+
+      function step3() {
+        resetScene();
+
+        ball.style.left = "250px";
+        ball.style.top = "500px";
+
+        document.getElementById("smallMinima").style.display = "block";
+
+        optimizer.style.display = "block";
+
+        optimizer.style.left = "150px";
+        optimizer.style.top = "450px";
+
+        msg.innerHTML = "Optimizer gives extra momentum.";
+
+        setTimeout(() => {
+          optimizer.classList.add("bounce");
+        }, 300);
+
+        setTimeout(() => {
+          ball.style.left = "420px";
+          ball.style.top = "250px";
+        }, 1500);
+
+        setTimeout(() => {
+          ball.style.left = "700px";
+          ball.style.top = "600px";
+        }, 3500);
+
+        setTimeout(() => {
+          document.getElementById("deepMinima").style.display = "block";
+        }, 5000);
+
+        setTimeout(() => {
+          msg.innerHTML = "Success! Escaped the bad local minima.";
+        }, 5500);
+      }
+
+      /* ===========================
+STEP 4
+Deep Local Minima
+=========================== */
+
+      function step4() {
+        resetScene();
+
+        ball.style.left = "700px";
+        ball.style.top = "600px";
+
+        document.getElementById("deepMinima").style.display = "block";
+
+        optimizer.style.display = "block";
+
+        optimizer.style.left = "620px";
+        optimizer.style.top = "520px";
+
+        msg.innerHTML = "Another valley... much deeper.";
+
+        setTimeout(() => {
+          optimizer.classList.add("bounce");
+        }, 1000);
+
+        setTimeout(() => {
+          msg.innerHTML = "Optimizer tries to push...";
+        }, 2000);
+
+        setTimeout(() => {
+          ball.style.left = "820px";
+          ball.style.top = "420px";
+        }, 3500);
+
+        setTimeout(() => {
+          ball.style.left = "700px";
+          ball.style.top = "600px";
+        }, 5500);
+
+        setTimeout(() => {
+          msg.innerHTML = "Still stuck.";
+        }, 7000);
+
+        setTimeout(() => {
+          ball.style.left = "820px";
+          ball.style.top = "420px";
+        }, 8500);
+
+        setTimeout(() => {
+          ball.style.left = "700px";
+          ball.style.top = "600px";
+        }, 10500);
+
+        setTimeout(() => {
+          msg.innerHTML = "Even optimizers have limits.";
+        }, 12000);
+      }
+
+      /* ===========================
+STEP 5
+Global Minima Reveal
+=========================== */
+
+      function step5() {
+        resetScene();
+
+        ball.style.left = "700px";
+        ball.style.top = "600px";
+
+        document.getElementById("deepMinima").style.display = "block";
+
+        document.getElementById("globalMinima").style.display = "block";
+
+        msg.innerHTML = "The Global Minima exists... but far away.";
+
+        setTimeout(() => {
+          document.getElementById("deepMinima").classList.add("glowOrange");
+        }, 1000);
+
+        setTimeout(() => {
+          document.getElementById("globalMinima").classList.add("glowGreen");
+        }, 2500);
+
+        setTimeout(() => {
+          msg.innerHTML =
+            "Deep Local Minima is already very close to the best solution.";
+        }, 4500);
+      }
+
+      /* ===========================
+STEP 6
+Final Lesson
+=========================== */
+
+      function step6() {
+        resetScene();
+
+        const card = document.getElementById("finalCard");
+
+        card.style.display = "block";
+
+        card.innerHTML = `
+
+<h2>🚀 What Did We Learn?</h2>
+
+<br>
+
+🔴 Small Local Minima
+
+<br>
+
+Bad Solution
+
+<br><br>
+
+🟠 Deep Local Minima
+
+<br>
+
+Very Good Solution
+
+<br><br>
+
+🟢 Global Minima
+
+<br>
+
+Best Possible Solution
+
+<br><br>
+
+🚀 Optimizers help us
+escape some local minima.
+
+<br><br>
+
+❌ They cannot guarantee
+reaching the Global Minima.
+
+<br><br>
+
+✅ In Deep Learning,
+a very good local minima
+is often enough.
+
+`;
+
+        msg.innerHTML = "Optimizers help us find better solutions.";
+      }
+    </script>
+  </body>
+</html>

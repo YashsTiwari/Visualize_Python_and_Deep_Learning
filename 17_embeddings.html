@@ -1,0 +1,728 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Why Embeddings?</title>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+      }
+
+      body {
+        background: #f4f7fb;
+        padding: 20px;
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .controls {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      button {
+        padding: 12px 18px;
+        margin: 5px;
+        border: none;
+        border-radius: 10px;
+        background: #1565c0;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+      }
+
+      .scene {
+        position: relative;
+
+        height: 800px;
+
+        background: white;
+
+        border-radius: 20px;
+
+        overflow: hidden;
+
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+      }
+
+      #message {
+        position: absolute;
+
+        top: 20px;
+
+        width: 100%;
+
+        text-align: center;
+
+        font-size: 28px;
+
+        font-weight: bold;
+
+        z-index: 1000;
+      }
+
+      /* ======================
+WORD CARDS
+====================== */
+
+      .wordCard {
+        position: absolute;
+
+        width: 180px;
+
+        padding: 15px;
+
+        text-align: center;
+
+        font-size: 28px;
+
+        font-weight: bold;
+
+        background: white;
+
+        border-radius: 15px;
+
+        box-shadow: 0 0 12px rgba(0, 0, 0, 0.15);
+
+        transition: all 2s;
+
+        display: none;
+      }
+
+      #king {
+        left: 80px;
+        top: 180px;
+      }
+
+      #queen {
+        left: 80px;
+        top: 320px;
+      }
+
+      #dog {
+        left: 80px;
+        top: 460px;
+      }
+
+      /* ======================
+NETWORK
+====================== */
+
+      #network {
+        position: absolute;
+
+        right: 140px;
+
+        top: 220px;
+
+        font-size: 120px;
+
+        display: none;
+      }
+
+      #networkText {
+        position: absolute;
+
+        right: 90px;
+
+        top: 370px;
+
+        font-size: 24px;
+
+        font-weight: bold;
+
+        display: none;
+      }
+
+      #speechBubble {
+        position: absolute;
+
+        right: 250px;
+
+        top: 170px;
+
+        padding: 15px;
+
+        background: #ffebee;
+
+        border: 2px solid red;
+
+        border-radius: 15px;
+
+        font-size: 22px;
+
+        display: none;
+      }
+
+      /* ======================
+EMBED MACHINE
+====================== */
+
+      #embedMachine {
+        position: absolute;
+
+        left: 50%;
+
+        top: 50%;
+
+        transform: translate(-50%, -50%);
+
+        width: 260px;
+
+        height: 220px;
+
+        background: #e8f5e9;
+
+        border: 4px solid green;
+
+        border-radius: 20px;
+
+        display: none;
+
+        font-size: 34px;
+
+        font-weight: bold;
+
+        text-align: center;
+
+        padding-top: 40px;
+      }
+
+      /* ======================
+VECTORS
+====================== */
+
+      .vectorCard {
+        position: absolute;
+
+        width: 260px;
+
+        padding: 12px;
+
+        background: #fff8e1;
+
+        border: 2px solid orange;
+
+        border-radius: 12px;
+
+        font-size: 20px;
+
+        text-align: center;
+
+        display: none;
+
+        transition: all 2s;
+      }
+
+      #kingVector {
+        left: 780px;
+        top: 170px;
+      }
+
+      #queenVector {
+        left: 780px;
+        top: 320px;
+      }
+
+      #dogVector {
+        left: 780px;
+        top: 470px;
+      }
+
+      /* ======================
+SEMANTIC SPACE
+====================== */
+
+      #spaceArea {
+        position: absolute;
+
+        left: 120px;
+
+        top: 120px;
+
+        width: 900px;
+
+        height: 550px;
+
+        border: 2px solid #ddd;
+
+        display: none;
+      }
+
+      #axisX {
+        position: absolute;
+
+        left: 50px;
+
+        bottom: 50px;
+
+        width: 760px;
+
+        height: 2px;
+
+        background: black;
+      }
+
+      #axisY {
+        position: absolute;
+
+        left: 50px;
+
+        top: 50px;
+
+        width: 2px;
+
+        height: 420px;
+
+        background: black;
+      }
+
+      .point {
+        position: absolute;
+
+        padding: 10px;
+
+        background: white;
+
+        border-radius: 10px;
+
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+
+        font-size: 22px;
+
+        font-weight: bold;
+
+        display: none;
+
+        transition: all 2s;
+      }
+
+      #kingPoint {
+        left: 350px;
+        top: 220px;
+      }
+
+      #queenPoint {
+        left: 470px;
+        top: 250px;
+      }
+
+      #dogPoint {
+        left: 720px;
+        top: 120px;
+      }
+
+      /* ======================
+QUESTION BOX
+====================== */
+
+      #questionBox {
+        position: absolute;
+
+        left: 50%;
+
+        top: 50%;
+
+        transform: translate(-50%, -50%);
+
+        background: white;
+
+        padding: 40px;
+
+        border-radius: 20px;
+
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+
+        font-size: 32px;
+
+        font-weight: bold;
+
+        text-align: center;
+
+        display: none;
+      }
+
+      /* ======================
+HELPERS
+====================== */
+
+      .glow {
+        box-shadow:
+          0 0 20px gold,
+          0 0 40px gold;
+      }
+
+      .shake {
+        animation: shake 0.4s infinite;
+      }
+
+      @keyframes shake {
+        0% {
+          transform: translateX(-5px);
+        }
+
+        50% {
+          transform: translateX(5px);
+        }
+
+        100% {
+          transform: translateX(-5px);
+        }
+      }
+
+      .fade {
+        opacity: 0.2;
+      }
+
+      .accept {
+        background: #e8f5e9 !important;
+        border: 2px solid green !important;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>🧠 Why Do We Need Embeddings?</h1>
+
+    <div class="controls">
+      <button onclick="step1()">1 Words Enter</button>
+
+      <button onclick="step2()">2 Rejected</button>
+
+      <button onclick="step3()">3 Embedding Machine</button>
+
+      <button onclick="step4()">4 Semantic Space</button>
+
+      <button onclick="step5()">5 What is 256D?</button>
+    </div>
+
+    <div class="scene">
+      <div id="message">Press Step 1</div>
+
+      <!-- WORDS -->
+
+      <div id="king" class="wordCard">👑 KING</div>
+
+      <div id="queen" class="wordCard">👑 QUEEN</div>
+
+      <div id="dog" class="wordCard">🐶 DOG</div>
+
+      <!-- NETWORK -->
+
+      <div id="network">🤖</div>
+
+      <div id="networkText">Neural Network</div>
+
+      <div id="speechBubble">❌ I only understand numbers!</div>
+
+      <!-- EMBEDDING MACHINE -->
+
+      <div id="embedMachine">
+        🧠
+
+        <br />
+
+        Embedding Machine
+      </div>
+
+      <!-- VECTORS -->
+
+      <div id="kingVector" class="vectorCard">[0.8, -0.4, 1.2, ...]</div>
+
+      <div id="queenVector" class="vectorCard">[0.7, -0.5, 1.1, ...]</div>
+
+      <div id="dogVector" class="vectorCard">[-1.2, 2.1, -0.8, ...]</div>
+
+      <!-- SPACE -->
+
+      <div id="spaceArea">
+        <div id="axisX"></div>
+
+        <div id="axisY"></div>
+
+        <div id="kingPoint" class="point">👑 KING</div>
+
+        <div id="queenPoint" class="point">👑 QUEEN</div>
+
+        <div id="dogPoint" class="point">🐶 DOG</div>
+      </div>
+
+      <!-- QUESTION -->
+
+      <div id="questionBox">
+        🤔
+
+        <br /><br />
+
+        Embedding Size = 256
+
+        <br /><br />
+
+        What does that mean?
+      </div>
+    </div>
+
+    <script>
+      const msg = document.getElementById("message");
+
+      function resetScene() {
+        document.getElementById("king").style.display = "none";
+        document.getElementById("queen").style.display = "none";
+        document.getElementById("dog").style.display = "none";
+
+        document.getElementById("network").style.display = "none";
+        document.getElementById("networkText").style.display = "none";
+        document.getElementById("speechBubble").style.display = "none";
+
+        document.getElementById("embedMachine").style.display = "none";
+
+        document.getElementById("kingVector").style.display = "none";
+        document.getElementById("queenVector").style.display = "none";
+        document.getElementById("dogVector").style.display = "none";
+
+        document.getElementById("spaceArea").style.display = "none";
+
+        document.getElementById("kingPoint").style.display = "none";
+        document.getElementById("queenPoint").style.display = "none";
+        document.getElementById("dogPoint").style.display = "none";
+
+        document.getElementById("questionBox").style.display = "none";
+
+        document.getElementById("speechBubble").innerHTML =
+          "❌ I only understand numbers!";
+
+        document.getElementById("king").style.left = "80px";
+        document.getElementById("queen").style.left = "80px";
+        document.getElementById("dog").style.left = "80px";
+      }
+
+      /* ==================================
+STEP 1
+WORDS ENTER NETWORK
+================================== */
+
+      function step1() {
+        resetScene();
+
+        msg.innerHTML = "Let's directly give words to a Neural Network.";
+
+        document.getElementById("king").style.display = "block";
+        document.getElementById("queen").style.display = "block";
+        document.getElementById("dog").style.display = "block";
+
+        document.getElementById("network").style.display = "block";
+        document.getElementById("networkText").style.display = "block";
+
+        setTimeout(() => {
+          document.getElementById("king").style.left = "800px";
+        }, 1000);
+
+        setTimeout(() => {
+          document.getElementById("queen").style.left = "800px";
+        }, 2500);
+
+        setTimeout(() => {
+          document.getElementById("dog").style.left = "800px";
+        }, 4000);
+      }
+
+      /* ==================================
+STEP 2
+REJECTED
+================================== */
+
+      function step2() {
+        resetScene();
+
+        document.getElementById("king").style.display = "block";
+        document.getElementById("queen").style.display = "block";
+        document.getElementById("dog").style.display = "block";
+
+        document.getElementById("network").style.display = "block";
+        document.getElementById("networkText").style.display = "block";
+
+        msg.innerHTML = "Neural Networks do not understand words.";
+
+        setTimeout(() => {
+          document.getElementById("king").style.left = "800px";
+        }, 500);
+
+        setTimeout(() => {
+          document.getElementById("speechBubble").style.display = "block";
+        }, 2200);
+
+        setTimeout(() => {
+          document.getElementById("king").style.left = "80px";
+        }, 3500);
+
+        setTimeout(() => {
+          document.getElementById("queen").style.left = "800px";
+        }, 5000);
+
+        setTimeout(() => {
+          document.getElementById("queen").style.left = "80px";
+        }, 7500);
+
+        setTimeout(() => {
+          document.getElementById("dog").style.left = "800px";
+        }, 9000);
+
+        setTimeout(() => {
+          document.getElementById("dog").style.left = "80px";
+        }, 11500);
+      }
+
+      /* ==================================
+STEP 3
+EMBEDDING MACHINE
+================================== */
+
+      function step3() {
+        resetScene();
+
+        document.getElementById("embedMachine").style.display = "block";
+
+        msg.innerHTML = "Embeddings convert words into numbers.";
+
+        setTimeout(() => {
+          document.getElementById("king").style.display = "block";
+        }, 500);
+
+        setTimeout(() => {
+          document.getElementById("kingVector").style.display = "block";
+        }, 2500);
+
+        setTimeout(() => {
+          document.getElementById("queen").style.display = "block";
+        }, 4000);
+
+        setTimeout(() => {
+          document.getElementById("queenVector").style.display = "block";
+        }, 6000);
+
+        setTimeout(() => {
+          document.getElementById("dog").style.display = "block";
+        }, 7500);
+
+        setTimeout(() => {
+          document.getElementById("dogVector").style.display = "block";
+        }, 9500);
+
+        setTimeout(() => {
+          msg.innerHTML = "Now they are numbers.";
+        }, 11000);
+      }
+
+      /* ==================================
+STEP 4
+SEMANTIC SPACE
+================================== */
+
+      function step4() {
+        resetScene();
+
+        document.getElementById("spaceArea").style.display = "block";
+
+        msg.innerHTML = "Do these numbers have meaning?";
+
+        setTimeout(() => {
+          document.getElementById("kingPoint").style.display = "block";
+        }, 800);
+
+        setTimeout(() => {
+          document.getElementById("queenPoint").style.display = "block";
+        }, 1800);
+
+        setTimeout(() => {
+          document.getElementById("dogPoint").style.display = "block";
+        }, 2800);
+
+        setTimeout(() => {
+          msg.innerHTML = "KING and QUEEN are close together.";
+        }, 4500);
+
+        setTimeout(() => {
+          document.getElementById("kingPoint").classList.add("glow");
+
+          document.getElementById("queenPoint").classList.add("glow");
+        }, 5000);
+
+        setTimeout(() => {
+          msg.innerHTML = "DOG is much farther away.";
+        }, 7000);
+      }
+
+      /* ==================================
+STEP 5
+TRANSITION TO 256D
+================================== */
+
+      function step5() {
+        resetScene();
+
+        document.getElementById("questionBox").style.display = "block";
+
+        msg.innerHTML = "Wait... something interesting.";
+
+        setTimeout(() => {
+          document.getElementById("questionBox").innerHTML = `
+
+🤔
+
+<br><br>
+
+KING
+
+↓
+
+[0.8,-0.4,1.2,...]
+
+<br><br>
+
+Embedding Size = 256
+
+`;
+        }, 2000);
+
+        setTimeout(() => {
+          msg.innerHTML = "We only visualized 2 dimensions.";
+        }, 5000);
+
+        setTimeout(() => {
+          document.getElementById("questionBox").innerHTML = `
+
+🤔
+
+<br><br>
+
+We showed only 2D.
+
+<br><br>
+
+Real embeddings may have
+
+50D
+
+100D
+
+256D
+
+768D
+
+<br><br>
+
+What does 256 Dimensions mean?
+
+`;
+        }, 7000);
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,619 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Loss Functions Intuition Demo</title>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: Arial;
+        background: #f4f7fb;
+        padding: 25px;
+      }
+
+      .title {
+        text-align: center;
+        font-size: 50px;
+        margin-bottom: 30px;
+      }
+
+      .container {
+        background: white;
+        border-radius: 24px;
+        padding: 30px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+      }
+
+      .controls {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-bottom: 25px;
+      }
+
+      button {
+        padding: 14px 22px;
+        border: none;
+        border-radius: 12px;
+        font-size: 20px;
+        color: white;
+        cursor: pointer;
+      }
+
+      .blue {
+        background: #1565c0;
+      }
+      .green {
+        background: #2e7d32;
+      }
+      .orange {
+        background: #ef6c00;
+      }
+      .red {
+        background: #c62828;
+      }
+
+      .message {
+        text-align: center;
+        font-size: 30px;
+        font-weight: bold;
+        margin-bottom: 25px;
+        min-height: 50px;
+      }
+
+      .scene {
+        position: relative;
+        height: 780px;
+        background: #fafafa;
+        border-radius: 24px;
+        overflow: hidden;
+        padding: 20px;
+      }
+
+      .road {
+        position: absolute;
+        left: 0;
+        top: 340px;
+        width: 100%;
+        height: 120px;
+        background: #616161;
+      }
+
+      .line {
+        position: absolute;
+        top: 395px;
+        width: 100%;
+        height: 10px;
+        background: repeating-linear-gradient(
+          to right,
+          white 0px,
+          white 60px,
+          transparent 60px,
+          transparent 120px
+        );
+      }
+
+      .store {
+        position: absolute;
+        left: 40px;
+        top: 220px;
+        font-size: 120px;
+      }
+
+      .customer {
+        position: absolute;
+        right: 50px;
+        top: 180px;
+        font-size: 120px;
+      }
+
+      .customerReaction {
+        position: absolute;
+        right: 110px;
+        top: 120px;
+        font-size: 90px;
+        opacity: 0;
+        transition: 0.5s;
+      }
+
+      .bike {
+        position: absolute;
+        left: 120px;
+        top: 300px;
+        font-size: 90px;
+        transition: 4s linear;
+      }
+
+      .prediction {
+        position: absolute;
+        left: 80px;
+        top: 100px;
+        font-size: 28px;
+        font-weight: bold;
+        background: white;
+        padding: 18px;
+        border-radius: 18px;
+        border: 4px solid #1565c0;
+      }
+
+      .actual {
+        position: absolute;
+        right: 120px;
+        top: 100px;
+        font-size: 28px;
+        font-weight: bold;
+        background: white;
+        padding: 18px;
+        border-radius: 18px;
+        border: 4px solid #2e7d32;
+        opacity: 0;
+        transition: 0.5s;
+      }
+
+      .errorArrow {
+        position: absolute;
+        top: 260px;
+        left: 42%;
+        font-size: 80px;
+        opacity: 0;
+        transition: 0.5s;
+      }
+
+      .errorText {
+        position: absolute;
+        top: 200px;
+        left: 35%;
+        font-size: 34px;
+        font-weight: bold;
+        background: #fff3e0;
+        padding: 18px;
+        border-radius: 18px;
+        border: 4px solid #ef6c00;
+        opacity: 0;
+        transition: 0.5s;
+      }
+
+      .ticket {
+        position: absolute;
+        width: 90px;
+        height: 100px;
+        background: #ffeb3b;
+        border: 4px solid #222;
+        border-radius: 16px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 30px;
+        font-weight: bold;
+        opacity: 0;
+        transition: 0.5s;
+      }
+
+      .explosion {
+        position: absolute;
+        font-size: 180px;
+        opacity: 0;
+        transition: 0.5s;
+      }
+
+      .lossBox {
+        margin-top: 25px;
+        background: #fff8e1;
+        border-left: 8px solid #ef6c00;
+        padding: 24px;
+        border-radius: 18px;
+        font-size: 24px;
+        line-height: 1.8;
+        min-height: 260px;
+      }
+
+      .bigText {
+        text-align: center;
+        font-size: 42px;
+        font-weight: bold;
+        margin-top: 25px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="title">📉 Loss Functions Through Story</div>
+
+    <div class="container">
+      <div class="controls">
+        <button class="blue" onclick="regressionScene()">
+          1. Regression Error
+        </button>
+
+        <button class="green" onclick="maeScene()">2. MAE</button>
+
+        <button class="orange" onclick="mseScene()">3. MSE</button>
+      </div>
+
+      <div class="message" id="message">Choose a section</div>
+
+      <div id="content"></div>
+    </div>
+
+    <script>
+      function regressionScene() {
+        document.getElementById("message").innerHTML =
+          "🍕 Regression = Predicting Delivery Time";
+
+        document.getElementById("content").innerHTML = `
+
+<div style="text-align:center;margin-bottom:25px;">
+
+<button class="blue"
+onclick="runRegression()">
+Start Delivery
+</button>
+
+</div>
+
+<div class="scene">
+
+<div class="prediction">
+Prediction:
+20 mins
+</div>
+
+<div class="actual"
+id="actual">
+Actual:
+35 mins
+</div>
+
+<div class="store">
+🏪
+</div>
+
+<div class="customer">
+🧑
+</div>
+
+<div class="customerReaction"
+id="reaction">
+😡
+</div>
+
+<div class="road"></div>
+<div class="line"></div>
+
+<div class="bike"
+id="bike">
+🏍️🍕
+</div>
+
+<div class="errorArrow"
+id="errorArrow">
+⬌
+</div>
+
+<div class="errorText"
+id="errorText">
+15 mins ERROR
+</div>
+
+</div>
+
+<div class="lossBox"
+id="output">
+
+AI predicts delivery time.
+<br><br>
+
+Loss Function measures:
+<br>
+"How wrong was the prediction?"
+
+</div>
+
+`;
+      }
+
+      function runRegression() {
+        let bike = document.getElementById("bike");
+
+        bike.style.left = "70%";
+
+        setTimeout(() => {
+          document.getElementById("actual").style.opacity = 1;
+
+          document.getElementById("reaction").style.opacity = 1;
+        }, 4000);
+
+        setTimeout(() => {
+          document.getElementById("errorArrow").style.opacity = 1;
+
+          document.getElementById("errorText").style.opacity = 1;
+
+          document.getElementById("output").innerHTML = `
+
+Prediction:
+20 mins
+
+<br><br>
+
+Actual:
+35 mins
+
+<br><br>
+
+❌ Customer became angry because pizza arrived late.
+
+<br><br>
+
+15 mins difference =
+PREDICTION ERROR
+
+<br><br>
+
+Loss Function measures this error.
+
+`;
+        }, 5200);
+      }
+
+      function maeScene() {
+        document.getElementById("message").innerHTML =
+          "📏 MAE = Calm And Fair Punishment";
+
+        document.getElementById("content").innerHTML = `
+
+<div style="text-align:center;margin-bottom:25px;">
+
+<button class="green"
+onclick="runMAE()">
+Start Deliveries
+</button>
+
+</div>
+
+<div class="scene">
+
+<div class="store">
+🏪
+</div>
+
+<div class="customer">
+🧑
+</div>
+
+<div class="road"></div>
+<div class="line"></div>
+
+<!-- DELIVERY 1 (small error) -->
+<div class="bike" id="maeBike1" style="top: 300px;">
+🏍️
+</div>
+
+<div class="ticket" id="maeTicket1" style="left: 58%; top: 180px;">
++2
+</div>
+
+<div class="customerReaction" id="maeReaction1" style="right: 110px; top: 120px;">
+😐
+</div>
+
+<!-- DELIVERY 2 (bigger error) -->
+<div class="bike" id="maeBike2" style="top: 450px;">
+🏍️
+</div>
+
+<div class="ticket" id="maeTicket2" style="left: 65%; top: 480px;">
++10
+</div>
+
+<div class="customerReaction" id="maeReaction2" style="right: 110px; top: 420px;">
+😡
+</div>
+
+<div class="bigText">
+MAE Punishes Proportionally
+</div>
+
+</div>
+
+<div class="lossBox"
+id="output">
+
+MAE = Mean Absolute Error
+<br><br>
+Watch two deliveries with different errors...
+
+</div>
+
+`;
+      }
+
+      function runMAE() {
+        // DELIVERY 1: Small error (2 mins)
+        document.getElementById("maeBike1").style.left = "60%";
+
+        setTimeout(() => {
+          document.getElementById("maeTicket1").style.opacity = 1;
+          document.getElementById("maeReaction1").style.opacity = 1;
+
+          document.getElementById("output").innerHTML = `
+
+Small mistake:
+2 mins late
+
+<br><br>
+
+MAE gives:
++2 punishment
+
+<br><br>
+
+Small mistake → Small punishment
+
+`;
+        }, 4000);
+
+        // DELIVERY 2: Bigger error (10 mins)
+        document.getElementById("maeBike2").style.left = "68%";
+
+        setTimeout(() => {
+          document.getElementById("maeTicket2").style.opacity = 1;
+          document.getElementById("maeReaction2").style.opacity = 1;
+
+          document.getElementById("output").innerHTML += `
+
+<br><br>
+
+Bigger mistake:
+10 mins late
+
+<br><br>
+
+MAE gives:
++10 punishment
+
+<br><br>
+
+MAE stays CALM and proportional.
+<br><br>
+Error doubles → Punishment doubles (fair!)
+
+`;
+        }, 6500);
+      }
+
+      function mseScene() {
+        document.getElementById("message").innerHTML =
+          "💥 MSE Overreacts To Huge Mistakes";
+
+        document.getElementById("content").innerHTML = `
+
+<div style="text-align:center;margin-bottom:25px;">
+
+<button class="orange"
+onclick="runMSE()">
+Start Deliveries
+</button>
+
+</div>
+
+<div class="scene">
+
+<div class="store">
+🏪
+</div>
+
+<div class="customer">
+🧑
+</div>
+
+<div class="road"></div>
+<div class="line"></div>
+
+<!-- DELIVERY 1 (small error, squared = 4) -->
+<div class="bike" id="mseBike1" style="top: 300px;">
+🏍️
+</div>
+
+<div class="ticket" id="mseSmallTicket" style="left: 58%; top: 180px;">
+4
+</div>
+
+<div class="customerReaction" id="mseReaction1" style="right: 110px; top: 120px;">
+😐
+</div>
+
+<!-- DELIVERY 2 (big error, squared = 400) -->
+<div class="bike" id="mseBike2" style="top: 450px;">
+🏍️
+</div>
+
+<div class="explosion" id="mseExplosion" style="right: 80px; top: 250px;">
+💥
+</div>
+
+<div class="customerReaction" id="mseReaction2" style="right: 110px; top: 420px; font-size: 120px;">
+🤬
+</div>
+
+<div class="bigText">
+MSE Punishes Huge Errors Aggressively
+</div>
+
+</div>
+
+<div class="lossBox"
+id="output">
+
+MSE = Mean Squared Error
+<br><br>
+Watch how punishment skyrockets with bigger errors...
+
+</div>
+
+`;
+      }
+
+      function runMSE() {
+        // DELIVERY 1: Small error (2 mins → 2² = 4)
+        document.getElementById("mseBike1").style.left = "60%";
+
+        setTimeout(() => {
+          document.getElementById("mseSmallTicket").style.opacity = 1;
+          document.getElementById("mseReaction1").style.opacity = 1;
+
+          document.getElementById("output").innerHTML = `
+
+2 mins late
+
+<br><br>
+
+2² = 4 punishment
+
+<br><br>
+
+Small error → Small punishment
+
+`;
+        }, 4000);
+
+        // DELIVERY 2: HUGE error (20 mins → 20² = 400)
+        document.getElementById("mseBike2").style.left = "82%";
+
+        setTimeout(() => {
+          document.getElementById("mseExplosion").style.opacity = 1;
+          document.getElementById("mseReaction2").style.opacity = 1;
+
+          document.getElementById("output").innerHTML += `
+
+<br><br>
+
+20 mins late
+
+<br><br>
+
+20² = 400 punishment 💥
+
+<br><br>
+
+Huge mistakes become MASSIVE.
+<br><br>
+Error is 10x bigger → Punishment is 100x bigger!
+<br><br>
+
+MSE strongly focuses on dangerous errors.
+
+`;
+        }, 6500);
+      }
+    </script>
+  </body>
+</html>

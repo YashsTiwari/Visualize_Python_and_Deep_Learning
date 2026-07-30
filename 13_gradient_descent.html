@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Gradient Descent & Learning Rate</title>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: Arial;
+        background: #f4f7fb;
+        padding: 25px;
+      }
+
+      .title {
+        text-align: center;
+        font-size: 52px;
+        margin-bottom: 30px;
+      }
+
+      .container {
+        background: white;
+        border-radius: 24px;
+        padding: 30px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+      }
+
+      .controls {
+        display: flex;
+        justify-content: center;
+        gap: 18px;
+        flex-wrap: wrap;
+        margin-bottom: 25px;
+      }
+
+      button {
+        padding: 14px 24px;
+        border: none;
+        border-radius: 14px;
+        font-size: 20px;
+        color: white;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      button:hover {
+        transform: scale(1.05);
+      }
+
+      .red {
+        background: #c62828;
+      }
+
+      .orange {
+        background: #ef6c00;
+      }
+
+      .green {
+        background: #2e7d32;
+      }
+
+      .blue {
+        background: #1565c0;
+      }
+
+      .message {
+        text-align: center;
+        font-size: 32px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        min-height: 60px;
+      }
+
+      .scene {
+        position: relative;
+        height: 700px;
+        background: #fafafa;
+        border-radius: 24px;
+        overflow: hidden;
+        padding: 20px;
+      }
+
+      svg {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      .ball {
+        position: absolute;
+        width: 54px;
+        height: 54px;
+        border-radius: 50%;
+        background: #1565c0;
+        border: 5px solid white;
+        box-shadow: 0 0 18px rgba(0, 0, 0, 0.35);
+        transition: all 1s ease;
+        z-index: 10;
+        transform: translate(-50%, -50%);
+      }
+
+      .trail {
+        position: absolute;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        opacity: 0.55;
+        transform: translate(-50%, -50%);
+      }
+
+      .lossBox {
+        margin-top: 25px;
+        background: #fff8e1;
+        border-left: 8px solid #ef6c00;
+        padding: 24px;
+        border-radius: 18px;
+        font-size: 24px;
+        line-height: 1.8;
+        min-height: 240px;
+      }
+
+      .stats {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        margin-top: 20px;
+        flex-wrap: wrap;
+      }
+
+      .statCard {
+        background: white;
+        padding: 20px;
+        border-radius: 20px;
+        border: 4px solid #1565c0;
+        min-width: 240px;
+        text-align: center;
+      }
+
+      .statTitle {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+
+      .statValue {
+        font-size: 38px;
+        font-weight: bold;
+        color: #1565c0;
+      }
+
+      .robot {
+        position: absolute;
+        font-size: 72px;
+        transition: all 1s ease;
+        z-index: 11;
+        transform: translate(-50%, -50%);
+      }
+
+      .goal {
+        position: absolute;
+        left: 50%;
+        bottom: 30px;
+        transform: translateX(-50%);
+        font-size: 80px;
+      }
+
+      .label {
+        position: absolute;
+        left: 50%;
+        bottom: 120px;
+        transform: translateX(-50%);
+        font-size: 26px;
+        font-weight: bold;
+        color: #2e7d32;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="title">⛰️ Gradient Descent & Learning Rate</div>
+
+    <div class="container">
+      <div class="controls">
+        <button class="red" onclick="largeLR()">1. Too Large LR</button>
+
+        <button class="orange" onclick="smallLR()">2. Too Small LR</button>
+
+        <button class="green" onclick="goodLR()">3. Balanced LR</button>
+
+        <button class="blue" onclick="resetDemo()">Reset</button>
+      </div>
+
+      <div class="message" id="message">
+        A blind robot is trying to reach the bottom of the valley.
+      </div>
+
+      <div class="scene" id="scene">
+        <!-- VALLEY -->
+
+        <svg width="100%" height="100%">
+          <path
+            id="valleyPath"
+            d="M 20 100 Q 500 680 980 100"
+            stroke="#424242"
+            stroke-width="16"
+            fill="none"
+            stroke-linecap="round"
+          />
+        </svg>
+
+        <!-- GOAL -->
+
+        <div class="goal">🎯</div>
+
+        <div class="label">Minimum Loss</div>
+
+        <!-- ROBOT -->
+
+        <div class="robot" id="robot">🤖</div>
+
+        <!-- BALL -->
+
+        <div class="ball" id="ball"></div>
+      </div>
+
+      <div class="stats">
+        <div class="statCard">
+          <div class="statTitle">Iteration</div>
+
+          <div class="statValue" id="iteration">0</div>
+        </div>
+
+        <div class="statCard">
+          <div class="statTitle">Loss</div>
+
+          <div class="statValue" id="loss">100</div>
+        </div>
+      </div>
+
+      <div class="lossBox" id="output">
+        Gradient Descent tries to MINIMIZE loss.
+
+        <br /><br />
+
+        The robot cannot see the whole valley.
+
+        <br /><br />
+
+        It only knows: "which direction goes downhill?"
+
+        <br /><br />
+
+        So it keeps improving step-by-step.
+      </div>
+    </div>
+
+    <script>
+      const valleyCenter = 500;
+
+      // ====================================
+      // GET POINT ON SVG QUADRATIC BEZIER PATH
+      // ====================================
+
+      function getPointOnPath(progress) {
+        // Path: M 20 100 Q 500 680 980 100
+        // P0 = start (20, 100)
+        // P1 = control point (500, 680)
+        // P2 = end (980, 100)
+
+        const t = Math.max(0, Math.min(1, progress));
+
+        const p0x = 20,
+          p0y = 100;
+        const p1x = 500,
+          p1y = 680;
+        const p2x = 980,
+          p2y = 100;
+
+        // Quadratic bezier formula: B(t) = (1-t)²P0 + 2(1-t)tP1 + t²P2
+
+        const oneMinusT = 1 - t;
+
+        const x =
+          oneMinusT * oneMinusT * p0x + 2 * oneMinusT * t * p1x + t * t * p2x;
+
+        const y =
+          oneMinusT * oneMinusT * p0y + 2 * oneMinusT * t * p1y + t * t * p2y;
+
+        return { x, y };
+      }
+
+      // ====================================
+      // X POSITION TO PATH PROGRESS (0 to 1)
+      // ====================================
+
+      function xToProgress(x) {
+        // Map x coordinate to progress along path
+        // x ranges from 20 to 980
+        // progress ranges from 0 to 1
+
+        return (x - 20) / (980 - 20);
+      }
+
+      // ====================================
+      // CREATE TRAIL
+      // ====================================
+
+      function createTrail(x, y, color) {
+        let trail = document.createElement("div");
+        trail.className = "trail";
+        trail.style.left = x + "px";
+        trail.style.top = y + "px";
+        trail.style.background = color;
+
+        document.getElementById("scene").appendChild(trail);
+      }
+
+      // ====================================
+      // RESET
+      // ====================================
+
+      function resetDemo() {
+        let ball = document.getElementById("ball");
+        let robot = document.getElementById("robot");
+
+        // Start on left side of valley
+        let progress = xToProgress(80);
+        let { x, y } = getPointOnPath(progress);
+
+        ball.style.left = x + "px";
+        ball.style.top = y + "px";
+
+        robot.style.left = x + "px";
+        robot.style.top = y - 90 + "px";
+
+        document.getElementById("iteration").innerHTML = "0";
+        document.getElementById("loss").innerHTML = "100";
+
+        document.getElementById("message").innerHTML =
+          "A blind robot is trying to reach the bottom of the valley.";
+
+        document.getElementById("output").innerHTML = `
+
+Gradient Descent tries to MINIMIZE loss.
+
+<br><br>
+
+The robot cannot see the whole valley.
+
+<br><br>
+
+It only knows:
+"which direction goes downhill?"
+
+<br><br>
+
+So it keeps improving step-by-step.
+
+`;
+
+        document.querySelectorAll(".trail").forEach((el) => el.remove());
+      }
+
+      // ====================================
+      // ANIMATION ENGINE
+      // ====================================
+
+      function animateXSteps(xSteps, color) {
+        let ball = document.getElementById("ball");
+        let robot = document.getElementById("robot");
+
+        xSteps.forEach((x, index) => {
+          setTimeout(() => {
+            let progress = xToProgress(x);
+            let { x: px, y: py } = getPointOnPath(progress);
+
+            // Loss based on distance from center
+            let distance = Math.abs(x - valleyCenter);
+            let loss = Math.max(2, Math.floor(distance / 5));
+
+            ball.style.left = px + "px";
+            ball.style.top = py + "px";
+
+            robot.style.left = px + "px";
+            robot.style.top = py - 90 + "px";
+
+            createTrail(px, py, color);
+
+            document.getElementById("iteration").innerHTML = index + 1;
+            document.getElementById("loss").innerHTML = loss;
+          }, index * 1400);
+        });
+      }
+
+      // ====================================
+      // TOO LARGE LR (Overshooting)
+      // ====================================
+
+      function largeLR() {
+        resetDemo();
+
+        document.getElementById("message").innerHTML =
+          "❌ Learning Rate Too Large";
+
+        document.getElementById("output").innerHTML = `
+
+Huge jumps are happening.
+
+<br><br>
+
+The robot keeps OVERSHOOTING the valley.
+
+<br><br>
+
+It jumps across the minimum again and again.
+
+<br><br>
+
+So learning NEVER converges properly.
+
+`;
+
+        let xSteps = [80, 300, 850, 150, 900, 100, 950];
+
+        animateXSteps(xSteps, "#c62828");
+      }
+
+      // ====================================
+      // TOO SMALL LR (Slow)
+      // ====================================
+
+      function smallLR() {
+        resetDemo();
+
+        document.getElementById("message").innerHTML =
+          "🐢 Learning Rate Too Small";
+
+        document.getElementById("output").innerHTML = `
+
+Tiny tiny improvements are happening.
+
+<br><br>
+
+The robot moves VERY slowly.
+
+<br><br>
+
+Loss decreases,
+but optimization takes FOREVER.
+
+<br><br>
+
+Training becomes impractical.
+
+`;
+
+        let xSteps = [
+          80, 120, 160, 200, 240, 280, 320, 360, 390, 420, 445, 465, 480, 490,
+          497, 500,
+        ];
+
+        animateXSteps(xSteps, "#ef6c00");
+      }
+
+      // ====================================
+      // GOOD LR (Balanced)
+      // ====================================
+
+      function goodLR() {
+        resetDemo();
+
+        document.getElementById("message").innerHTML =
+          "✅ Balanced Learning Rate";
+
+        document.getElementById("output").innerHTML = `
+
+Initially:
+BIG improvements happen.
+
+<br><br>
+
+Near the minimum:
+smaller careful steps happen.
+
+<br><br>
+
+The robot smoothly converges to the valley bottom.
+
+`;
+
+        let xSteps = [80, 200, 320, 420, 480, 505, 500];
+
+        animateXSteps(xSteps, "#2e7d32");
+      }
+
+      // INITIAL LOAD
+
+      resetDemo();
+    </script>
+  </body>
+</html>

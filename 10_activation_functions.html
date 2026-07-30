@@ -1,0 +1,938 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Activation Functions Story Demo</title>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: Arial;
+        background: #f4f7fb;
+        padding: 25px;
+      }
+
+      .title {
+        text-align: center;
+        font-size: 48px;
+        margin-bottom: 30px;
+      }
+
+      .container {
+        background: white;
+        border-radius: 24px;
+        padding: 30px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+      }
+
+      .controls {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-bottom: 25px;
+      }
+
+      button {
+        padding: 14px 22px;
+        border: none;
+        border-radius: 12px;
+        font-size: 20px;
+        color: white;
+        cursor: pointer;
+      }
+
+      .blue {
+        background: #1565c0;
+      }
+      .green {
+        background: #2e7d32;
+      }
+      .orange {
+        background: #ef6c00;
+      }
+      .red {
+        background: #c62828;
+      }
+      .purple {
+        background: #8e24aa;
+      }
+
+      .message {
+        text-align: center;
+        font-size: 30px;
+        font-weight: bold;
+        margin-bottom: 30px;
+        min-height: 50px;
+      }
+
+      .cards {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-bottom: 30px;
+      }
+
+      .card {
+        width: 180px;
+        background: white;
+        border: 4px solid #222;
+        border-radius: 18px;
+        padding: 16px;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      .card:hover {
+        transform: scale(1.05);
+      }
+
+      .selected {
+        border-color: #1565c0;
+        box-shadow: 0 0 20px #64b5f6;
+      }
+
+      .emoji {
+        text-align: center;
+        font-size: 50px;
+      }
+
+      .name {
+        text-align: center;
+        font-size: 24px;
+        font-weight: bold;
+        margin-top: 10px;
+      }
+
+      .info {
+        text-align: center;
+        margin-top: 10px;
+        font-size: 18px;
+        line-height: 1.5;
+      }
+
+      .scene {
+        position: relative;
+        height: 700px;
+        background: #fafafa;
+        border-radius: 24px;
+        overflow: hidden;
+      }
+
+      .room {
+        position: absolute;
+        width: 240px;
+        height: 180px;
+        border-radius: 24px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        font-size: 30px;
+        font-weight: bold;
+        padding: 20px;
+      }
+
+      .general {
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        background: #eeeeee;
+        border: 6px solid #757575;
+      }
+
+      .ai {
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        background: #e3f2fd;
+        border: 6px solid #1565c0;
+      }
+
+      .relu {
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        background: #fff3e0;
+        border: 6px solid #ef6c00;
+      }
+
+      .leaky {
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        background: #f3e5f5;
+        border: 6px solid #8e24aa;
+      }
+
+      .top-room {
+        top: 40px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #ffebee;
+        border: 6px solid #c62828;
+      }
+
+      .left-room {
+        bottom: 40px;
+        left: 60px;
+        background: #e8f5e9;
+        border: 6px solid #2e7d32;
+      }
+
+      .right-room {
+        bottom: 40px;
+        right: 60px;
+        background: #fff8e1;
+        border: 6px solid #ef6c00;
+      }
+
+      .patient {
+        width: 120px;
+        height: 120px;
+        background: white;
+        border-radius: 18px;
+        border: 5px solid #222;
+        position: absolute;
+        left: 20px;
+        top: 280px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-size: 22px;
+        font-weight: bold;
+        transition: 2s linear;
+      }
+
+      .doctor {
+        position: absolute;
+        font-size: 70px;
+        left: 50%;
+        top: 180px;
+        transform: translateX(-50%);
+      }
+
+      .medicine {
+        position: absolute;
+        font-size: 65px;
+        left: 48%;
+        top: 250px;
+        opacity: 0;
+        transition: 1.5s linear;
+      }
+
+      .reaction {
+        position: absolute;
+        font-size: 90px;
+        right: 70px;
+        top: 260px;
+        opacity: 0;
+        transition: 1s;
+      }
+
+      .graph {
+        position: absolute;
+        width: 320px;
+        height: 220px;
+        background: white;
+        right: 20px;
+        top: 20px;
+        border-left: 4px solid black;
+        border-bottom: 4px solid black;
+      }
+
+      .graph svg {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+      }
+
+      .dot {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: red;
+        position: absolute;
+        left: 20px;
+        top: 180px;
+        transition: 2s linear;
+      }
+
+      .output {
+        margin-top: 25px;
+        background: #fff8e1;
+        border-left: 8px solid #ef6c00;
+        padding: 24px;
+        border-radius: 18px;
+        font-size: 24px;
+        line-height: 1.8;
+        min-height: 180px;
+      }
+
+      .deadFace {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 90px;
+        z-index: 5;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="title">🧠 Activation Functions Through Story</div>
+
+    <div class="container">
+      <div class="controls">
+        <button class="blue" onclick="linearScene()">1. Linear Failure</button>
+
+        <button class="green" onclick="sigmoidScene()">2. Sigmoid</button>
+
+        <button class="orange" onclick="reluScene()">3. ReLU</button>
+
+        <button class="red" onclick="dyingScene()">4. Dying ReLU</button>
+
+        <button class="purple" onclick="leakyScene()">5. Leaky ReLU</button>
+      </div>
+
+      <div class="message" id="message">Choose a section</div>
+
+      <div id="content"></div>
+    </div>
+
+    <script>
+      let selected = null;
+
+      const patients = [
+        {
+          emoji: "❤️",
+          name: "Heart Attack",
+          score: 95,
+          problem: "Emergency",
+        },
+
+        {
+          emoji: "🦴",
+          name: "Broken Leg",
+          score: 60,
+          problem: "Fracture",
+        },
+
+        {
+          emoji: "🤒",
+          name: "Fever",
+          score: 20,
+          problem: "Fever",
+        },
+
+        {
+          emoji: "🤡",
+          name: "Fake Alert",
+          score: -20,
+          problem: "Fake",
+        },
+      ];
+
+      function createCards() {
+        let html = `<div class="cards">`;
+
+        patients.forEach((p, i) => {
+          html += `
+
+<div class="card"
+id="card${i}"
+onclick="selectPatient(${i})">
+
+<div class="emoji">${p.emoji}</div>
+
+<div class="name">${p.name}</div>
+
+<div class="info">
+Severity Score:
+${p.score}
+</div>
+
+</div>
+
+`;
+        });
+
+        html += `</div>`;
+
+        return html;
+      }
+
+      function selectPatient(i) {
+        selected = patients[i];
+
+        document
+          .querySelectorAll(".card")
+          .forEach((c) => c.classList.remove("selected"));
+
+        document.getElementById("card" + i).classList.add("selected");
+      }
+
+      function clearSceneObjects() {
+        document.querySelectorAll(".patient").forEach((p) => p.remove());
+      }
+
+      function createPatient() {
+        clearSceneObjects();
+
+        let patient = document.createElement("div");
+
+        patient.className = "patient";
+
+        patient.innerHTML = `
+${selected.emoji}
+<br>
+${selected.score}
+`;
+
+        document.getElementById("scene").appendChild(patient);
+
+        return patient;
+      }
+
+      function linearScene() {
+        document.getElementById("message").innerHTML =
+          "❌ Linear Systems Give SAME Treatment";
+
+        document.getElementById("content").innerHTML = `
+
+${createCards()}
+
+<div style="text-align:center;margin-bottom:25px;">
+
+<button class="blue"
+onclick="runLinear()">
+Run Patient
+</button>
+
+</div>
+
+<div class="scene" id="scene">
+
+<div class="room general">
+General Doctor
+</div>
+
+<div class="doctor">
+👨‍⚕️
+</div>
+
+<div class="medicine" id="medicine">
+💊
+</div>
+
+<div class="reaction" id="reaction">
+❌
+</div>
+
+</div>
+
+<div class="output" id="output">
+
+Everyone gets SAME treatment.
+
+</div>
+
+`;
+      }
+
+      function runLinear() {
+        if (!selected) {
+          alert("Select patient");
+          return;
+        }
+
+        let patient = createPatient();
+
+        document.getElementById("medicine").style.opacity = 0;
+        document.getElementById("reaction").style.opacity = 0;
+
+        setTimeout(() => {
+          patient.style.left = "40%";
+        }, 100);
+
+        setTimeout(() => {
+          document.getElementById("medicine").style.opacity = 1;
+          document.getElementById("medicine").style.left = "62%";
+        }, 2500);
+
+        setTimeout(() => {
+          document.getElementById("reaction").style.opacity = 1;
+
+          if (selected.problem === "Emergency") {
+            document.getElementById("reaction").innerHTML = "💀";
+
+            document.getElementById("output").innerHTML = `
+
+❤️ Heart patient ALSO got normal medicine.
+
+<br><br>
+
+Wrong treatment happened.
+
+`;
+          } else if (selected.problem === "Fracture") {
+            document.getElementById("reaction").innerHTML = "❌";
+
+            document.getElementById("output").innerHTML = `
+
+🦴 Broken leg ALSO got same medicine.
+
+<br><br>
+
+No intelligent routing.
+
+`;
+          } else {
+            document.getElementById("reaction").innerHTML = "✅";
+
+            document.getElementById("output").innerHTML = `
+
+🤒 Fever patient got same medicine too.
+
+<br><br>
+
+Worked only accidentally.
+
+`;
+          }
+        }, 4500);
+      }
+
+      function sigmoidScene() {
+        document.getElementById("message").innerHTML =
+          "✅ Sigmoid Creates Probability-Based Decisions";
+
+        document.getElementById("content").innerHTML = `
+
+${createCards()}
+
+<div style="text-align:center;margin-bottom:25px;">
+
+<button class="green"
+onclick="runSigmoid()">
+Evaluate Patient
+</button>
+
+</div>
+
+<div class="scene" id="scene">
+
+<div class="room ai">
+AI Reception
+</div>
+
+<div class="room top-room">
+🚑 ICU
+</div>
+
+<div class="room left-room">
+🤒 Fever
+</div>
+
+<div class="room right-room">
+🦴 Ortho
+</div>
+
+<div class="graph">
+
+<svg>
+
+<path d="
+M20 180
+C80 180,130 160,160 120
+C200 60,250 20,300 20
+"
+stroke="#1565c0"
+stroke-width="5"
+fill="none"/>
+
+</svg>
+
+<div class="dot" id="dot"></div>
+
+</div>
+
+</div>
+
+<div class="output" id="output">
+
+Reception calculates emergency probability.
+
+</div>
+
+`;
+      }
+
+      function runSigmoid() {
+        if (!selected) {
+          alert("Select patient");
+          return;
+        }
+
+        let patient = createPatient();
+
+        let dot = document.getElementById("dot");
+
+        dot.style.left = "20px";
+        dot.style.top = "180px";
+
+        setTimeout(() => {
+          patient.style.left = "40%";
+        }, 100);
+
+        let prob = (1 / (1 + Math.exp(-selected.score / 20))).toFixed(2);
+
+        setTimeout(() => {
+          let x = 40 + selected.score * 2;
+
+          if (x > 280) x = 280;
+          if (x < 20) x = 20;
+
+          let y = 180 - prob * 150;
+
+          dot.style.left = x + "px";
+          dot.style.top = y + "px";
+        }, 2500);
+
+        setTimeout(() => {
+          if (selected.problem === "Emergency") {
+            patient.style.top = "40px";
+
+            document.getElementById("output").innerHTML = `
+
+🚑 High emergency probability.
+
+<br><br>
+
+Patient sent to ICU.
+
+`;
+          } else if (selected.problem === "Fracture") {
+            patient.style.left = "78%";
+            patient.style.top = "430px";
+
+            document.getElementById("output").innerHTML = `
+
+🦴 Fracture detected.
+
+<br><br>
+
+Patient sent to Orthopedic.
+
+`;
+          } else {
+            patient.style.left = "8%";
+            patient.style.top = "430px";
+
+            document.getElementById("output").innerHTML = `
+
+🤒 Low emergency probability.
+
+<br><br>
+
+Patient sent to Fever Room.
+
+`;
+          }
+        }, 5000);
+      }
+
+      function reluScene() {
+        document.getElementById("message").innerHTML =
+          "⚡ ReLU Blocks Useless Signals";
+
+        document.getElementById("content").innerHTML = `
+
+${createCards()}
+
+<div style="text-align:center;margin-bottom:25px;">
+
+<button class="orange"
+onclick="runRelu()">
+Run Through Gate
+</button>
+
+</div>
+
+<div class="scene" id="scene">
+
+<div class="room relu">
+ReLU Gate
+</div>
+
+<div class="room top-room">
+Allowed
+</div>
+
+<div class="room left-room">
+Blocked
+</div>
+
+</div>
+
+<div class="output" id="output">
+
+Negative signals get blocked instantly.
+
+</div>
+
+`;
+      }
+
+      function runRelu() {
+        if (!selected) {
+          alert("Select patient");
+          return;
+        }
+
+        let patient = createPatient();
+
+        setTimeout(() => {
+          patient.style.left = "40%";
+        }, 100);
+
+        setTimeout(() => {
+          if (selected.score < 0) {
+            patient.style.left = "8%";
+            patient.style.top = "430px";
+
+            document.getElementById("output").innerHTML = `
+
+❌ Negative signal blocked.
+
+<br><br>
+
+Output became:
+0
+
+`;
+          } else {
+            patient.style.top = "40px";
+
+            document.getElementById("output").innerHTML = `
+
+✅ Positive signal passed.
+
+<br><br>
+
+Output:
+${selected.score}
+
+`;
+          }
+        }, 3000);
+      }
+
+      function dyingScene() {
+        document.getElementById("message").innerHTML = "💀 Dying ReLU Problem";
+
+        document.getElementById("content").innerHTML = `
+
+<div style="text-align:center;margin-bottom:25px;">
+
+<button class="red"
+onclick="runDying()">
+Start Animation
+</button>
+
+</div>
+
+<div class="scene" id="scene">
+
+<div class="room relu">
+ReLU Neuron
+</div>
+
+<div class="deadFace" id="deadFace">
+🙂
+</div>
+
+</div>
+
+<div class="output" id="output">
+
+Negative values repeatedly hit the neuron.
+
+</div>
+
+`;
+      }
+
+      function runDying() {
+        clearSceneObjects();
+
+        let scene = document.getElementById("scene");
+
+        let dead = document.getElementById("deadFace");
+
+        let output = document.getElementById("output");
+
+        let negatives = [-2, -5, -9, -7];
+
+        negatives.forEach((num, index) => {
+          setTimeout(() => {
+            clearSceneObjects();
+
+            let signal = document.createElement("div");
+
+            signal.className = "patient";
+
+            signal.style.width = "90px";
+            signal.style.height = "90px";
+
+            signal.innerHTML = `${num}`;
+
+            scene.appendChild(signal);
+
+            setTimeout(() => {
+              signal.style.left = "40%";
+            }, 100);
+
+            setTimeout(() => {
+              signal.style.left = "8%";
+              signal.style.top = "430px";
+
+              output.innerHTML = `
+
+Negative Signal:
+${num}
+
+<br><br>
+
+❌ ReLU blocked it completely.
+
+`;
+            }, 2200);
+
+            if (index === 1) {
+              dead.innerHTML = "😴";
+            }
+
+            if (index === 3) {
+              dead.innerHTML = "💀";
+
+              output.innerHTML += `
+
+<br><br>
+
+Neuron stopped learning completely.
+
+`;
+            }
+          }, index * 4500);
+        });
+      }
+
+      function leakyScene() {
+        document.getElementById("message").innerHTML =
+          "🚪 Leaky ReLU Allows Small Negative Flow";
+
+        document.getElementById("content").innerHTML = `
+
+${createCards()}
+
+<div style="text-align:center;margin-bottom:25px;">
+
+<button class="purple"
+onclick="runLeaky()">
+Run Through Gate
+</button>
+
+</div>
+
+<div class="scene" id="scene">
+
+<div class="room leaky">
+Leaky ReLU Gate
+</div>
+
+<div class="room top-room">
+Allowed
+</div>
+
+<div class="room left-room">
+Tiny Leakage
+</div>
+
+</div>
+
+<div class="output" id="output">
+
+Small negative flow survives.
+
+</div>
+
+`;
+      }
+
+      function runLeaky() {
+        if (!selected) {
+          alert("Select patient");
+          return;
+        }
+
+        let patient = createPatient();
+
+        setTimeout(() => {
+          patient.style.left = "40%";
+        }, 100);
+
+        setTimeout(() => {
+          if (selected.score < 0) {
+            patient.style.left = "12%";
+            patient.style.top = "430px";
+
+            patient.style.transform = "scale(0.45)";
+
+            let leak = (selected.score * 0.01).toFixed(2);
+
+            document.getElementById("output").innerHTML = `
+
+❌ Normal ReLU would kill this signal.
+
+<br><br>
+
+✅ Leaky ReLU allows SMALL information flow.
+
+<br><br>
+
+${selected.score}
+→
+${leak}
+
+`;
+          } else {
+            patient.style.top = "40px";
+
+            document.getElementById("output").innerHTML = `
+
+✅ Positive signal passed normally.
+
+<br><br>
+
+${selected.score}
+→
+${selected.score}
+
+`;
+          }
+        }, 3000);
+      }
+    </script>
+  </body>
+</html>

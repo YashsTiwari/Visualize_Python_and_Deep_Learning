@@ -1,0 +1,793 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>RNN Hidden State</title>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+      }
+
+      body {
+        background: #f4f7fb;
+        padding: 20px;
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .controls {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      button {
+        padding: 12px 18px;
+        margin: 5px;
+        border: none;
+        border-radius: 10px;
+        background: #1565c0;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+      }
+
+      .scene {
+        position: relative;
+
+        height: 800px;
+
+        background: white;
+
+        border-radius: 20px;
+
+        overflow: hidden;
+
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+      }
+
+      #message {
+        position: absolute;
+
+        top: 20px;
+
+        width: 100%;
+
+        text-align: center;
+
+        font-size: 28px;
+
+        font-weight: bold;
+
+        z-index: 1000;
+      }
+
+      /* =====================
+FCNN
+===================== */
+
+      #fcnn {
+        position: absolute;
+
+        left: 120px;
+
+        top: 220px;
+
+        font-size: 120px;
+
+        display: none;
+      }
+
+      #fcnnLabel {
+        position: absolute;
+
+        left: 130px;
+
+        top: 380px;
+
+        font-size: 24px;
+
+        font-weight: bold;
+
+        display: none;
+      }
+
+      #fcnnBubble {
+        position: absolute;
+
+        left: 250px;
+
+        top: 180px;
+
+        padding: 20px;
+
+        background: #ffebee;
+
+        border: 3px solid red;
+
+        border-radius: 15px;
+
+        font-size: 24px;
+
+        display: none;
+      }
+
+      /* =====================
+RNN
+===================== */
+
+      #rnn {
+        position: absolute;
+
+        right: 180px;
+
+        top: 220px;
+
+        font-size: 120px;
+
+        display: none;
+      }
+
+      #rnnLabel {
+        position: absolute;
+
+        right: 200px;
+
+        top: 380px;
+
+        font-size: 24px;
+
+        font-weight: bold;
+
+        display: none;
+      }
+
+      /* =====================
+NOTEBOOK
+===================== */
+
+      #notebook {
+        position: absolute;
+
+        right: 330px;
+
+        top: 230px;
+
+        width: 170px;
+
+        height: 200px;
+
+        background: #fff8e1;
+
+        border: 4px solid orange;
+
+        border-radius: 15px;
+
+        display: none;
+
+        font-size: 80px;
+
+        text-align: center;
+
+        padding-top: 15px;
+      }
+
+      #notebookText {
+        position: absolute;
+
+        bottom: 10px;
+
+        left: 50%;
+
+        transform: translateX(-50%);
+
+        font-size: 18px;
+
+        font-weight: bold;
+
+        white-space: nowrap;
+      }
+
+      /* =====================
+WORD CARDS
+===================== */
+
+      .wordCard {
+        position: absolute;
+
+        left: -250px;
+
+        width: 180px;
+
+        padding: 15px;
+
+        background: white;
+
+        border-radius: 12px;
+
+        box-shadow: 0 0 12px rgba(0, 0, 0, 0.15);
+
+        font-size: 24px;
+
+        font-weight: bold;
+
+        text-align: center;
+
+        display: none;
+
+        transition: all 1.5s;
+      }
+
+      #word1 {
+        top: 130px;
+      }
+      #word2 {
+        top: 220px;
+      }
+      #word3 {
+        top: 310px;
+      }
+      #word4 {
+        top: 400px;
+      }
+      #word5 {
+        top: 490px;
+      }
+      #word6 {
+        top: 580px;
+      }
+
+      /* =====================
+NOTE CONTENT
+===================== */
+
+      #notes {
+        position: absolute;
+
+        left: 50%;
+
+        bottom: 80px;
+
+        transform: translateX(-50%);
+
+        width: 500px;
+
+        min-height: 180px;
+
+        padding: 20px;
+
+        background: #e8f5e9;
+
+        border: 3px solid green;
+
+        border-radius: 15px;
+
+        font-size: 26px;
+
+        line-height: 1.8;
+
+        display: none;
+
+        white-space: pre-line;
+      }
+
+      /* =====================
+QUESTION
+===================== */
+
+      #question {
+        position: absolute;
+
+        left: 50%;
+
+        top: 110px;
+
+        transform: translateX(-50%);
+
+        padding: 20px 35px;
+
+        background: #fff8e1;
+
+        border: 3px solid orange;
+
+        border-radius: 15px;
+
+        font-size: 34px;
+
+        font-weight: bold;
+
+        display: none;
+      }
+
+      /* =====================
+ANSWER
+===================== */
+
+      #answer {
+        position: absolute;
+
+        left: 50%;
+
+        bottom: 70px;
+
+        transform: translateX(-50%);
+
+        padding: 20px 40px;
+
+        background: #e8f5e9;
+
+        border: 3px solid green;
+
+        border-radius: 15px;
+
+        font-size: 34px;
+
+        font-weight: bold;
+
+        display: none;
+      }
+
+      /* =====================
+FINAL CARD
+===================== */
+
+      #finalCard {
+        position: absolute;
+
+        left: 50%;
+
+        top: 50%;
+
+        transform: translate(-50%, -50%);
+
+        width: 700px;
+
+        padding: 40px;
+
+        background: white;
+
+        border-radius: 20px;
+
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+
+        font-size: 30px;
+
+        line-height: 2;
+
+        text-align: center;
+
+        display: none;
+      }
+
+      /* =====================
+HELPERS
+===================== */
+
+      .shake {
+        animation: shake 0.4s infinite;
+      }
+
+      @keyframes shake {
+        0% {
+          transform: translateX(-5px);
+        }
+
+        50% {
+          transform: translateX(5px);
+        }
+
+        100% {
+          transform: translateX(-5px);
+        }
+      }
+
+      .glow {
+        box-shadow:
+          0 0 20px gold,
+          0 0 40px gold;
+      }
+
+      .fade {
+        opacity: 0.15;
+      }
+
+      .success {
+        background: #e8f5e9;
+        border: 3px solid green;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>📒 How Does RNN Remember?</h1>
+
+    <div class="controls">
+      <button onclick="step1()">1️⃣ FCNN Confused</button>
+
+      <button onclick="step2()">2️⃣ Meet RNN</button>
+
+      <button onclick="step3()">3️⃣ Read Words</button>
+
+      <button onclick="step4()">4️⃣ Notebook Grows</button>
+
+      <button onclick="step5()">5️⃣ Answer Question</button>
+
+      <button onclick="step6()">6️⃣ Hidden State</button>
+    </div>
+
+    <div class="scene">
+      <div id="message">Press Step 1</div>
+
+      <!-- FCNN -->
+
+      <div id="fcnn">🤖</div>
+
+      <div id="fcnnLabel">FCNN</div>
+
+      <div id="fcnnBubble">Who was happy? 🤔</div>
+
+      <!-- RNN -->
+
+      <div id="rnn">🧑‍🎓</div>
+
+      <div id="rnnLabel">RNN</div>
+
+      <!-- NOTEBOOK -->
+
+      <div id="notebook">
+        📒
+
+        <div id="notebookText">Hidden State</div>
+      </div>
+
+      <!-- WORD CARDS -->
+
+      <div id="word1" class="wordCard">👦 Rahul</div>
+
+      <div id="word2" class="wordCard">📝 scored</div>
+
+      <div id="word3" class="wordCard">💯 95</div>
+
+      <div id="word4" class="wordCard">🏆 won</div>
+
+      <div id="word5" class="wordCard">🎁 prize</div>
+
+      <div id="word6" class="wordCard">😊 happy</div>
+
+      <!-- NOTEBOOK CONTENT -->
+
+      <div id="notes"></div>
+
+      <!-- QUESTION -->
+
+      <div id="question">❓ Who was happy?</div>
+
+      <!-- ANSWER -->
+
+      <div id="answer">✅ Rahul was happy!</div>
+
+      <!-- FINAL CARD -->
+
+      <div id="finalCard"></div>
+    </div>
+
+    <script>
+      const msg = document.getElementById("message");
+
+      function hideAll() {
+        document.getElementById("fcnn").style.display = "none";
+        document.getElementById("fcnnLabel").style.display = "none";
+        document.getElementById("fcnnBubble").style.display = "none";
+
+        document.getElementById("rnn").style.display = "none";
+        document.getElementById("rnnLabel").style.display = "none";
+
+        document.getElementById("notebook").style.display = "none";
+
+        document.getElementById("word1").style.display = "none";
+        document.getElementById("word2").style.display = "none";
+        document.getElementById("word3").style.display = "none";
+        document.getElementById("word4").style.display = "none";
+        document.getElementById("word5").style.display = "none";
+        document.getElementById("word6").style.display = "none";
+
+        document.getElementById("notes").style.display = "none";
+
+        document.getElementById("question").style.display = "none";
+
+        document.getElementById("answer").style.display = "none";
+
+        document.getElementById("finalCard").style.display = "none";
+
+        document.getElementById("notes").innerHTML = "";
+
+        const words = ["word1", "word2", "word3", "word4", "word5", "word6"];
+
+        words.forEach((id) => {
+          const el = document.getElementById(id);
+
+          el.style.left = "-250px";
+          el.style.opacity = "1";
+        });
+      }
+
+      function showBaseScene() {
+        document.getElementById("fcnn").style.display = "block";
+        document.getElementById("fcnnLabel").style.display = "block";
+        document.getElementById("fcnnBubble").style.display = "block";
+
+        document.getElementById("rnn").style.display = "block";
+        document.getElementById("rnnLabel").style.display = "block";
+
+        document.getElementById("notebook").style.display = "block";
+      }
+
+      /* ===========================
+STEP 1
+FCNN CONFUSED
+=========================== */
+
+      function step1() {
+        hideAll();
+
+        showBaseScene();
+
+        msg.innerHTML = "FCNN is still confused...";
+
+        document.getElementById("fcnnBubble").innerHTML = "Who was happy? 🤔";
+
+        document.getElementById("fcnn").classList.add("shake");
+      }
+
+      /* ===========================
+STEP 2
+MEET RNN
+=========================== */
+
+      function step2() {
+        hideAll();
+
+        showBaseScene();
+
+        msg.innerHTML = "RNN carries a notebook.";
+
+        document.getElementById("notes").style.display = "block";
+
+        document.getElementById("notes").innerHTML = "📒 Empty Notes";
+      }
+
+      /* ===========================
+STEP 3
+READ WORDS
+=========================== */
+
+      function step3() {
+        hideAll();
+
+        showBaseScene();
+
+        document.getElementById("notes").style.display = "block";
+
+        msg.innerHTML = "Every word updates the notebook.";
+
+        const words = [
+          {
+            id: "word1",
+            text: "👦 Rahul",
+          },
+          {
+            id: "word2",
+            text: "📝 scored",
+          },
+          {
+            id: "word3",
+            text: "💯 95",
+          },
+        ];
+
+        let notebook = "";
+
+        words.forEach((w, index) => {
+          setTimeout(() => {
+            const card = document.getElementById(w.id);
+
+            card.style.display = "block";
+
+            card.style.left = "350px";
+          }, index * 2500);
+
+          setTimeout(
+            () => {
+              const card = document.getElementById(w.id);
+
+              card.style.left = "720px";
+              card.style.opacity = "0";
+
+              notebook += w.text + "\n";
+
+              document.getElementById("notes").innerHTML = notebook;
+            },
+            index * 2500 + 1500,
+          );
+        });
+      }
+
+      /* ===========================
+STEP 4
+NOTEBOOK GROWS
+=========================== */
+
+      function step4() {
+        hideAll();
+
+        showBaseScene();
+
+        document.getElementById("notes").style.display = "block";
+
+        msg.innerHTML = "The notebook keeps growing.";
+
+        const words = [
+          "👦 Rahul",
+          "📝 scored",
+          "💯 95",
+          "🏆 won",
+          "🎁 prize",
+          "😊 happy",
+        ];
+
+        let notebook = "";
+
+        words.forEach((word, index) => {
+          setTimeout(() => {
+            const card = document.getElementById("word" + (index + 1));
+
+            card.style.display = "block";
+            card.style.left = "350px";
+          }, index * 1500);
+
+          setTimeout(
+            () => {
+              const card = document.getElementById("word" + (index + 1));
+
+              card.style.left = "720px";
+              card.style.opacity = "0";
+
+              notebook += word + "\n";
+
+              document.getElementById("notes").innerHTML = notebook;
+            },
+            index * 1500 + 800,
+          );
+        });
+
+        setTimeout(() => {
+          msg.innerHTML = "Hidden State = Running Notes";
+
+          document.getElementById("notes").classList.add("glow");
+        }, 10000);
+      }
+
+      /* ===========================
+STEP 5
+ANSWER QUESTION
+=========================== */
+
+      function step5() {
+        hideAll();
+
+        showBaseScene();
+
+        document.getElementById("notes").style.display = "block";
+
+        document.getElementById("question").style.display = "block";
+
+        document.getElementById("notes").innerHTML = `
+
+👦 Rahul
+<br>
+📝 scored
+<br>
+💯 95
+<br>
+🏆 won
+<br>
+🎁 prize
+<br>
+😊 happy
+
+`;
+
+        msg.innerHTML = "RNN looks at its notebook.";
+
+        setTimeout(() => {
+          document.getElementById("notes").classList.add("glow");
+        }, 1000);
+
+        setTimeout(() => {
+          msg.innerHTML = "RNN finds Rahul in memory.";
+        }, 2500);
+
+        setTimeout(() => {
+          document.getElementById("answer").style.display = "block";
+        }, 4000);
+      }
+
+      /* ===========================
+STEP 6
+FINAL LESSON
+=========================== */
+
+      function step6() {
+        hideAll();
+
+        document.getElementById("finalCard").style.display = "block";
+
+        document.getElementById("finalCard").innerHTML = `
+
+<h2>📒 Hidden State</h2>
+
+<br>
+
+Word arrives
+
+<br>
+
+↓
+
+<br>
+
+Notebook updated
+
+<br>
+
+↓
+
+<br>
+
+Word arrives
+
+<br>
+
+↓
+
+<br>
+
+Notebook updated
+
+<br><br>
+
+🤖 FCNN
+
+<br>
+
+❌ No Memory
+
+<br><br>
+
+🔄 RNN
+
+<br>
+
+✅ Carries Hidden State
+
+<br><br>
+
+Hidden State
+
+=
+
+Running Notes
+
+`;
+
+        msg.innerHTML = "RNN remembers previous information.";
+      }
+    </script>
+  </body>
+</html>

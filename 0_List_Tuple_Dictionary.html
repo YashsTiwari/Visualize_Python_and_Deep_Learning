@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Python Data Structures Visual Intuition</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:Arial, Helvetica, sans-serif;
+    background:#f4f7fb;
+    color:#222;
+    padding:40px;
+}
+
+.main-title{
+    text-align:center;
+    font-size:52px;
+    margin-bottom:50px;
+}
+
+.section{
+    background:white;
+    border-radius:24px;
+    padding:40px;
+    margin-bottom:50px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.08);
+}
+
+.section-title{
+    font-size:40px;
+    margin-bottom:30px;
+    text-align:center;
+}
+
+.row{
+    display:flex;
+    justify-content:center;
+    gap:20px;
+    flex-wrap:wrap;
+    margin-top:30px;
+}
+
+.box-wrapper{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+}
+
+.box{
+    width:120px;
+    height:120px;
+    border:4px solid #222;
+    border-radius:18px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:44px;
+    background:white;
+    transition:0.5s;
+}
+
+.index{
+    margin-top:10px;
+    font-size:24px;
+    color:#666;
+}
+
+button{
+    padding:16px 24px;
+    border:none;
+    border-radius:14px;
+    font-size:20px;
+    cursor:pointer;
+    transition:0.3s;
+    color:white;
+}
+
+button:hover{
+    transform:scale(1.05);
+}
+
+.green{
+    background:#2e7d32;
+}
+
+.red{
+    background:#c62828;
+}
+
+.blue{
+    background:#1565c0;
+}
+
+.orange{
+    background:#ef6c00;
+}
+
+.purple{
+    background:#6a1b9a;
+}
+
+.message{
+    margin-top:30px;
+    text-align:center;
+    font-size:28px;
+    min-height:40px;
+    font-weight:bold;
+}
+
+.code{
+    margin-top:30px;
+    background:#1e1e1e;
+    color:#00ff99;
+    padding:20px;
+    border-radius:16px;
+    font-size:22px;
+    line-height:1.7;
+    overflow-x:auto;
+}
+
+.highlight{
+    border-color:#ff9800;
+    box-shadow:0 0 25px #ff9800;
+    animation:pulse 1s infinite;
+}
+
+@keyframes pulse{
+    0%{transform:scale(1);}
+    50%{transform:scale(1.08);}
+    100%{transform:scale(1);}
+}
+
+.change{
+    animation:pop 0.5s;
+}
+
+@keyframes pop{
+    0%{
+        transform:scale(0.5);
+        opacity:0;
+    }
+    100%{
+        transform:scale(1);
+        opacity:1;
+    }
+}
+
+.shake{
+    animation:shake 0.5s;
+    border-color:#c62828;
+    background:#ffebee;
+}
+
+@keyframes shake{
+    0%{transform:translateX(0);}
+    25%{transform:translateX(-10px);}
+    50%{transform:translateX(10px);}
+    75%{transform:translateX(-10px);}
+    100%{transform:translateX(0);}
+}
+
+.dict-container{
+    display:flex;
+    flex-direction:column;
+    gap:25px;
+    margin-top:30px;
+    align-items:center;
+}
+
+.dict-row{
+    display:flex;
+    align-items:center;
+    gap:20px;
+    font-size:32px;
+}
+
+.key{
+    background:#1565c0;
+    color:white;
+    padding:12px 22px;
+    border-radius:12px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.key:hover{
+    transform:scale(1.05);
+}
+
+.arrow{
+    font-size:36px;
+}
+
+.value{
+    min-width:140px;
+    text-align:center;
+    padding:12px 22px;
+    border-radius:12px;
+    background:#f1f1f1;
+    opacity:0;
+    transition:0.5s;
+}
+
+.show{
+    opacity:1;
+    background:#dcedc8;
+}
+
+.controls{
+    display:flex;
+    gap:20px;
+    justify-content:center;
+    flex-wrap:wrap;
+    margin-top:30px;
+}
+
+.compare{
+    display:flex;
+    justify-content:center;
+    gap:60px;
+    flex-wrap:wrap;
+    margin-top:40px;
+}
+
+.compare-box{
+    background:#fafafa;
+    padding:25px;
+    border-radius:20px;
+    min-width:320px;
+}
+
+.compare-title{
+    font-size:30px;
+    margin-bottom:20px;
+    text-align:center;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="main-title">
+Python Data Structures Visual Intuition
+</div>
+
+<!-- ================= LISTS ================= -->
+
+<div class="section">
+
+<div class="section-title">
+📋 Lists (Mutable)
+</div>
+
+<div class="row" id="listRow">
+
+<div class="box-wrapper">
+<div class="box">🍎</div>
+<div class="index">0</div>
+</div>
+
+<div class="box-wrapper">
+<div class="box" id="listBox1">🍌</div>
+<div class="index">1</div>
+</div>
+
+<div class="box-wrapper">
+<div class="box">🥭</div>
+<div class="index">2</div>
+</div>
+
+</div>
+
+<div class="controls">
+
+<button class="blue" onclick="highlightList()">
+Show fruits[1]
+</button>
+
+<button class="green" onclick="changeList()">
+Change Banana → Orange
+</button>
+
+<button class="purple" onclick="addToList()">
+Add 🍇
+</button>
+
+<button class="red" onclick="removeFromList()">
+Remove Last Item
+</button>
+
+</div>
+
+<div class="message" id="listMessage"></div>
+
+<div class="code">
+fruits = ["🍎", "🍌", "🥭"]<br><br>
+
+fruits[1] = "🍊"<br>
+fruits.append("🍇")<br>
+fruits.pop()
+</div>
+
+</div>
+
+<!-- ================= TUPLES ================= -->
+
+<div class="section">
+
+<div class="section-title">
+🔒 Tuples (Immutable)
+</div>
+
+<div class="row" id="tupleRow">
+
+<div class="box-wrapper">
+<div class="box">🍎</div>
+<div class="index">0</div>
+</div>
+
+<div class="box-wrapper">
+<div class="box" id="tupleBox1">🍌</div>
+<div class="index">1</div>
+</div>
+
+<div class="box-wrapper">
+<div class="box">🥭</div>
+<div class="index">2</div>
+</div>
+
+</div>
+
+<div class="controls">
+
+<button class="orange" onclick="highlightTuple()">
+Show fruits[1]
+</button>
+
+<button class="red" onclick="changeTuple()">
+Try Changing Banana
+</button>
+
+<button class="red" onclick="addToTuple()">
+Try Adding 🍇
+</button>
+
+<button class="red" onclick="removeFromTuple()">
+Try Removing Item
+</button>
+
+</div>
+
+<div class="message" id="tupleMessage"></div>
+
+<div class="code">
+fruits = ("🍎", "🍌", "🥭")<br><br>
+
+fruits[1] = "🍊" ❌<br>
+fruits.append("🍇") ❌<br>
+fruits.pop() ❌
+</div>
+
+</div>
+
+<!-- ================= DICTIONARIES ================= -->
+
+<div class="section">
+
+<div class="section-title">
+📚 Dictionaries (Key → Value)
+</div>
+
+<div class="dict-container" id="dictContainer">
+
+<div class="dict-row" id="nameRow">
+<div class="key" onclick="showValue('nameValue')">
+Name
+</div>
+
+<div class="arrow">➡</div>
+
+<div class="value" id="nameValue">
+Rahul
+</div>
+</div>
+
+<div class="dict-row" id="ageRow">
+<div class="key" onclick="showValue('ageValue')">
+Age
+</div>
+
+<div class="arrow">➡</div>
+
+<div class="value" id="ageValue">
+21
+</div>
+</div>
+
+<div class="dict-row" id="cityRow">
+<div class="key" onclick="showValue('cityValue')">
+City
+</div>
+
+<div class="arrow">➡</div>
+
+<div class="value" id="cityValue">
+Delhi
+</div>
+</div>
+
+</div>
+
+<div class="controls">
+
+<button class="blue" onclick="addDictionaryItem()">
+Add Country
+</button>
+
+<button class="red" onclick="removeDictionaryItem()">
+Remove City
+</button>
+
+</div>
+
+<div class="message" id="dictMessage">
+Click a key to retrieve its value
+</div>
+
+<div class="code">
+student = {<br>
+&nbsp;&nbsp;"name": "Rahul",<br>
+&nbsp;&nbsp;"age": 21,<br>
+&nbsp;&nbsp;"city": "Delhi"<br>
+}<br><br>
+
+student["country"] = "India"<br>
+del student["city"]
+</div>
+
+<div class="compare">
+
+<div class="compare-box">
+
+<div class="compare-title">
+📋 List
+</div>
+
+<div style="font-size:26px; line-height:1.8;">
+[ Rahul ][ 21 ][ Delhi ]<br><br>
+Access using:<br>
+student[0]
+</div>
+
+</div>
+
+<div class="compare-box">
+
+<div class="compare-title">
+📚 Dictionary
+</div>
+
+<div style="font-size:26px; line-height:1.8;">
+Name → Rahul<br>
+Age → 21<br>
+City → Delhi<br><br>
+
+Access using:<br>
+student["name"]
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+function clearHighlights(){
+
+    document.querySelectorAll(".box").forEach(box=>{
+        box.classList.remove("highlight");
+        box.classList.remove("shake");
+    });
+}
+
+function highlightList(){
+
+    clearHighlights();
+
+    document.getElementById("listBox1")
+    .classList.add("highlight");
+
+    document.getElementById("listMessage")
+    .innerHTML = 'fruits[1] → 🍌';
+}
+
+function changeList(){
+
+    clearHighlights();
+
+    let box = document.getElementById("listBox1");
+
+    box.innerHTML = "🍊";
+
+    box.classList.remove("change");
+    void box.offsetWidth;
+    box.classList.add("change");
+
+    document.getElementById("listMessage")
+    .innerHTML = "✅ Lists are mutable";
+}
+
+function addToList(){
+
+    let row = document.getElementById("listRow");
+
+    let wrapper = document.createElement("div");
+    wrapper.className = "box-wrapper change";
+
+    wrapper.innerHTML = `
+        <div class="box">🍇</div>
+        <div class="index">3</div>
+    `;
+
+    row.appendChild(wrapper);
+
+    document.getElementById("listMessage")
+    .innerHTML = "✅ Added new item to list";
+}
+
+function removeFromList(){
+
+    let row = document.getElementById("listRow");
+
+    if(row.children.length > 0){
+        row.removeChild(row.lastElementChild);
+    }
+
+    document.getElementById("listMessage")
+    .innerHTML = "✅ Removed item from list";
+}
+
+function highlightTuple(){
+
+    clearHighlights();
+
+    document.getElementById("tupleBox1")
+    .classList.add("highlight");
+
+    document.getElementById("tupleMessage")
+    .innerHTML = 'fruits[1] → 🍌';
+}
+
+function changeTuple(){
+
+    clearHighlights();
+
+    let box = document.getElementById("tupleBox1");
+
+    box.classList.add("shake");
+
+    document.getElementById("tupleMessage")
+    .innerHTML = "❌ Tuples cannot change";
+}
+
+function addToTuple(){
+
+    let row = document.getElementById("tupleRow");
+
+    row.classList.add("shake");
+
+    document.getElementById("tupleMessage")
+    .innerHTML = "❌ Cannot add item to tuple";
+}
+
+function removeFromTuple(){
+
+    let row = document.getElementById("tupleRow");
+
+    row.classList.add("shake");
+
+    document.getElementById("tupleMessage")
+    .innerHTML = "❌ Cannot remove item from tuple";
+}
+
+function showValue(id){
+
+    document.querySelectorAll(".value").forEach(v=>{
+        v.classList.remove("show");
+    });
+
+    document.getElementById(id)
+    .classList.add("show");
+
+    document.getElementById("dictMessage")
+    .innerHTML = "✅ Value retrieved using key";
+}
+
+function addDictionaryItem(){
+
+    let container = document.getElementById("dictContainer");
+
+    if(document.getElementById("countryRow")) return;
+
+    let row = document.createElement("div");
+
+    row.className = "dict-row change";
+    row.id = "countryRow";
+
+    row.innerHTML = `
+        <div class="key">Country</div>
+        <div class="arrow">➡</div>
+        <div class="value show">India</div>
+    `;
+
+    container.appendChild(row);
+
+    document.getElementById("dictMessage")
+    .innerHTML = "✅ Added new key-value pair";
+}
+
+function removeDictionaryItem(){
+
+    let row = document.getElementById("cityRow");
+
+    if(row){
+        row.remove();
+    }
+
+    document.getElementById("dictMessage")
+    .innerHTML = "✅ Removed key-value pair";
+}
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,735 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>What is 256 Dimensions?</title>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+      }
+
+      body {
+        background: #f4f7fb;
+        padding: 20px;
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .controls {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      button {
+        padding: 12px 18px;
+        margin: 5px;
+        border: none;
+        border-radius: 10px;
+        background: #1565c0;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+      }
+
+      .scene {
+        position: relative;
+
+        height: 800px;
+
+        background: white;
+
+        border-radius: 20px;
+
+        overflow: hidden;
+
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+      }
+
+      #message {
+        position: absolute;
+
+        top: 20px;
+
+        width: 100%;
+
+        text-align: center;
+
+        font-size: 28px;
+
+        font-weight: bold;
+
+        z-index: 1000;
+      }
+
+      /* =======================
+1D
+======================= */
+
+      #line1d {
+        position: absolute;
+
+        left: 200px;
+
+        top: 380px;
+
+        width: 700px;
+
+        height: 4px;
+
+        background: black;
+
+        display: none;
+      }
+
+      #point1d {
+        position: absolute;
+
+        left: 520px;
+
+        top: 355px;
+
+        font-size: 40px;
+
+        display: none;
+
+        transition: all 1.5s;
+      }
+
+      #coord1d {
+        position: absolute;
+
+        left: 470px;
+
+        top: 430px;
+
+        font-size: 28px;
+
+        font-weight: bold;
+
+        display: none;
+      }
+
+      /* =======================
+2D
+======================= */
+
+      #plane2d {
+        position: absolute;
+
+        left: 180px;
+
+        top: 120px;
+
+        width: 800px;
+
+        height: 550px;
+
+        display: none;
+      }
+
+      #xAxis {
+        position: absolute;
+
+        left: 50px;
+
+        bottom: 80px;
+
+        width: 650px;
+
+        height: 3px;
+
+        background: black;
+      }
+
+      #yAxis {
+        position: absolute;
+
+        left: 50px;
+
+        top: 50px;
+
+        width: 3px;
+
+        height: 420px;
+
+        background: black;
+      }
+
+      #point2d {
+        position: absolute;
+
+        left: 300px;
+
+        top: 220px;
+
+        font-size: 40px;
+      }
+
+      #coord2d {
+        position: absolute;
+
+        left: 340px;
+
+        top: 220px;
+
+        font-size: 24px;
+
+        font-weight: bold;
+      }
+
+      /* =======================
+3D
+======================= */
+
+      #cube3d {
+        position: absolute;
+
+        left: 50%;
+
+        top: 50%;
+
+        transform: translate(-50%, -50%);
+
+        width: 350px;
+
+        height: 250px;
+
+        border: 4px solid #1565c0;
+
+        background: #e3f2fd;
+
+        border-radius: 15px;
+
+        display: none;
+      }
+
+      .cubeText {
+        position: absolute;
+
+        top: 50%;
+
+        left: 50%;
+
+        transform: translate(-50%, -50%);
+
+        font-size: 38px;
+
+        font-weight: bold;
+      }
+
+      /* =======================
+4D
+======================= */
+
+      #fourD {
+        position: absolute;
+
+        left: 50%;
+
+        top: 50%;
+
+        transform: translate(-50%, -50%);
+
+        width: 450px;
+
+        padding: 40px;
+
+        text-align: center;
+
+        font-size: 36px;
+
+        font-weight: bold;
+
+        background: #fff8e1;
+
+        border: 3px solid orange;
+
+        border-radius: 20px;
+
+        display: none;
+      }
+
+      /* =======================
+256D
+======================= */
+
+      #dimensionCard {
+        position: absolute;
+
+        left: 50%;
+
+        top: 50%;
+
+        transform: translate(-50%, -50%);
+
+        width: 700px;
+
+        min-height: 250px;
+
+        padding: 30px;
+
+        background: white;
+
+        border-radius: 20px;
+
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+
+        font-size: 24px;
+
+        line-height: 1.8;
+
+        text-align: center;
+
+        display: none;
+      }
+
+      /* =======================
+WORDS
+======================= */
+
+      #wordArea {
+        position: absolute;
+
+        left: 100px;
+
+        top: 180px;
+
+        width: 1000px;
+
+        display: none;
+
+        justify-content: space-around;
+      }
+
+      .wordBox {
+        width: 250px;
+
+        padding: 25px;
+
+        background: white;
+
+        border-radius: 15px;
+
+        box-shadow: 0 0 12px rgba(0, 0, 0, 0.15);
+
+        font-size: 28px;
+
+        font-weight: bold;
+
+        text-align: center;
+      }
+
+      /* =======================
+FINAL CARD
+======================= */
+
+      #finalCard {
+        position: absolute;
+
+        left: 50%;
+
+        top: 50%;
+
+        transform: translate(-50%, -50%);
+
+        width: 700px;
+
+        padding: 40px;
+
+        background: white;
+
+        border-radius: 20px;
+
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+
+        font-size: 30px;
+
+        line-height: 2;
+
+        text-align: center;
+
+        display: none;
+      }
+
+      /* =======================
+HELPERS
+======================= */
+
+      .glow {
+        box-shadow:
+          0 0 20px gold,
+          0 0 40px gold;
+      }
+
+      .fade {
+        opacity: 0.2;
+      }
+
+      .bigText {
+        font-size: 42px;
+        font-weight: bold;
+      }
+
+      .numberRain {
+        font-size: 22px;
+        line-height: 2;
+
+        font-family: monospace;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>📏 What Does 256 Dimensions Mean?</h1>
+
+    <div class="controls">
+      <button onclick="step1()">1️⃣ 1D</button>
+      <button onclick="step2()">2️⃣ 2D</button>
+      <button onclick="step3()">3️⃣ 3D</button>
+      <button onclick="step4()">4️⃣ 4D</button>
+      <button onclick="step5()">5️⃣ 256D</button>
+      <button onclick="step6()">6️⃣ Final Lesson</button>
+    </div>
+
+    <div class="scene">
+      <div id="message">Press Step 1</div>
+
+      <!-- 1D LINE -->
+
+      <div id="line1d"></div>
+
+      <div id="point1d">●</div>
+
+      <div id="coord1d">Position = 5</div>
+
+      <!-- 2D -->
+
+      <div id="plane2d">
+        <div id="xAxis"></div>
+
+        <div id="yAxis"></div>
+
+        <div id="point2d">●</div>
+
+        <div id="coord2d">(5,3)</div>
+      </div>
+
+      <!-- 3D -->
+
+      <div id="cube3d">
+        <div class="cubeText">(5,3,2)</div>
+      </div>
+
+      <!-- 4D -->
+
+      <div id="fourD">
+        (5,3,2,7)
+
+        <br /><br />
+
+        ✨ Extra Dimension
+      </div>
+
+      <!-- 256D -->
+
+      <div id="dimensionCard"></div>
+
+      <!-- WORDS -->
+
+      <div id="wordArea">
+        <div class="wordBox">
+          👑 KING
+
+          <br /><br />
+
+          [256 Numbers]
+        </div>
+
+        <div class="wordBox">
+          👑 QUEEN
+
+          <br /><br />
+
+          [256 Numbers]
+        </div>
+
+        <div class="wordBox">
+          🐶 DOG
+
+          <br /><br />
+
+          [256 Numbers]
+        </div>
+      </div>
+
+      <!-- FINAL CARD -->
+
+      <div id="finalCard"></div>
+    </div>
+
+    <script>
+      const msg = document.getElementById("message");
+
+      function hideAll() {
+        document.getElementById("line1d").style.display = "none";
+        document.getElementById("point1d").style.display = "none";
+        document.getElementById("coord1d").style.display = "none";
+
+        document.getElementById("plane2d").style.display = "none";
+
+        document.getElementById("cube3d").style.display = "none";
+
+        document.getElementById("fourD").style.display = "none";
+
+        document.getElementById("dimensionCard").style.display = "none";
+
+        document.getElementById("wordArea").style.display = "none";
+
+        document.getElementById("finalCard").style.display = "none";
+      }
+
+      /* =========================
+STEP 1
+1D
+========================= */
+
+      function step1() {
+        hideAll();
+
+        msg.innerHTML = "In 1 Dimension, we need only 1 number.";
+
+        document.getElementById("line1d").style.display = "block";
+        document.getElementById("point1d").style.display = "block";
+        document.getElementById("coord1d").style.display = "block";
+      }
+
+      /* =========================
+STEP 2
+2D
+========================= */
+
+      function step2() {
+        hideAll();
+
+        msg.innerHTML = "In 2 Dimensions, we need 2 numbers.";
+
+        document.getElementById("plane2d").style.display = "block";
+      }
+
+      /* =========================
+STEP 3
+3D
+========================= */
+
+      function step3() {
+        hideAll();
+
+        msg.innerHTML = "In 3 Dimensions, we need 3 numbers.";
+
+        document.getElementById("cube3d").style.display = "block";
+      }
+
+      /* =========================
+STEP 4
+4D
+========================= */
+
+      function step4() {
+        hideAll();
+
+        msg.innerHTML = "We can imagine 1D, 2D and 3D...";
+
+        document.getElementById("fourD").style.display = "block";
+
+        setTimeout(() => {
+          msg.innerHTML = "But visualizing 4D becomes difficult.";
+        }, 2500);
+      }
+
+      /* =========================
+STEP 5
+256D
+========================= */
+
+      function step5() {
+        hideAll();
+
+        const card = document.getElementById("dimensionCard");
+
+        card.style.display = "block";
+
+        msg.innerHTML = "What about 256 Dimensions?";
+
+        setTimeout(() => {
+          card.innerHTML = `
+
+<div class="bigText">
+
+(5)
+
+</div>
+
+`;
+        }, 500);
+
+        setTimeout(() => {
+          card.innerHTML = `
+
+<div class="bigText">
+
+(5, 3)
+
+</div>
+
+`;
+        }, 1500);
+
+        setTimeout(() => {
+          card.innerHTML = `
+
+<div class="bigText">
+
+(5, 3, 2)
+
+</div>
+
+`;
+        }, 2500);
+
+        setTimeout(() => {
+          card.innerHTML = `
+
+<div class="bigText">
+
+(5, 3, 2, 7)
+
+</div>
+
+`;
+        }, 3500);
+
+        setTimeout(() => {
+          card.innerHTML = `
+
+<div class="bigText">
+
+(5, 3, 2, 7, 1, 8, 4, 9, ...)
+
+</div>
+
+`;
+        }, 4500);
+
+        setTimeout(() => {
+          card.innerHTML = `
+
+<div class="numberRain">
+
+[0.21, -0.45, 1.33, 0.92,
+-1.22, 0.55, 0.87, -0.12,
+1.76, -0.31, 0.44, 0.81,
+0.29, -1.04, 0.56, 0.91,
+0.67, -0.11, 0.38, 1.12,
+...]
+
+</div>
+
+`;
+        }, 6500);
+
+        setTimeout(() => {
+          msg.innerHTML =
+            "A 256-dimensional embedding simply means 256 numbers.";
+        }, 8500);
+
+        setTimeout(() => {
+          card.innerHTML = `
+
+<div class="bigText">
+
+256 Dimensions
+
+<br><br>
+
+=
+
+<br><br>
+
+256 Numbers
+
+</div>
+
+`;
+        }, 10000);
+      }
+
+      /* =========================
+STEP 6
+FINAL LESSON
+========================= */
+
+      function step6() {
+        hideAll();
+
+        msg.innerHTML =
+          "Dimensions are just numbers used to describe something.";
+
+        document.getElementById("wordArea").style.display = "flex";
+
+        setTimeout(() => {
+          document.querySelectorAll(".wordBox")[0].classList.add("glow");
+        }, 1000);
+
+        setTimeout(() => {
+          document.querySelectorAll(".wordBox")[1].classList.add("glow");
+        }, 2000);
+
+        setTimeout(() => {
+          document.querySelectorAll(".wordBox")[2].classList.add("glow");
+        }, 3000);
+
+        setTimeout(() => {
+          document.getElementById("finalCard").style.display = "block";
+
+          document.getElementById("finalCard").innerHTML = `
+
+<div class="bigText">
+
+1D = 1 Number
+
+<br><br>
+
+2D = 2 Numbers
+
+<br><br>
+
+3D = 3 Numbers
+
+<br><br>
+
+...
+
+<br><br>
+
+256D = 256 Numbers
+
+</div>
+
+<br>
+
+Dimensions = Numbers used
+to describe a word.
+
+`;
+        }, 4500);
+      }
+    </script>
+  </body>
+</html>

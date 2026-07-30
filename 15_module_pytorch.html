@@ -1,0 +1,783 @@
+```html
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>nn.Module House Story</title>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+      }
+
+      body {
+        background: #f4f7fb;
+        padding: 20px;
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .controls {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      button {
+        padding: 12px 18px;
+        margin: 5px;
+        border: none;
+        border-radius: 10px;
+        background: #1565c0;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+      }
+
+      .scene {
+        position: relative;
+
+        height: 800px;
+
+        background: white;
+
+        border-radius: 20px;
+
+        overflow: hidden;
+
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+      }
+
+      #message {
+        position: absolute;
+
+        top: 20px;
+
+        width: 100%;
+
+        text-align: center;
+
+        font-size: 28px;
+
+        font-weight: bold;
+
+        z-index: 1000;
+      }
+
+      /* ===================
+      STUDENT
+      =================== */
+
+      #student {
+        position: absolute;
+
+        left: 120px;
+
+        top: 320px;
+
+        font-size: 90px;
+
+        display: none;
+
+        transition: all 1.5s;
+      }
+
+      /* ===================
+      HOUSE
+      =================== */
+
+      #moduleHouse {
+        position: absolute;
+
+        left: 50%;
+
+        top: 52%;
+
+        transform: translate(-50%, -50%);
+
+        width: 520px;
+
+        height: 450px;
+
+        background: #e8f5e9;
+
+        border: 5px solid #2e7d32;
+
+        border-radius: 20px;
+
+        display: none;
+      }
+
+      #houseTitle {
+        text-align: center;
+
+        font-size: 36px;
+
+        font-weight: bold;
+
+        margin-top: 15px;
+      }
+
+      /* ===================
+      ROOMS
+      =================== */
+
+      .room {
+        position: absolute;
+
+        width: 150px;
+
+        height: 70px;
+
+        background: white;
+
+        border: 3px solid #2e7d32;
+
+        border-radius: 12px;
+
+        display: flex;
+
+        justify-content: center;
+
+        align-items: center;
+
+        font-size: 20px;
+
+        font-weight: bold;
+      }
+
+      #reluRoom {
+        left: 30px;
+        top: 100px;
+      }
+
+      #sigmoidRoom {
+        right: 30px;
+        top: 100px;
+      }
+
+      #mseRoom {
+        left: 30px;
+        top: 220px;
+      }
+
+      #bceRoom {
+        right: 30px;
+        top: 220px;
+      }
+
+      #linearRoom {
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 40px;
+      }
+
+      /* ===================
+      TOOLS
+      =================== */
+
+      .tool {
+        position: absolute;
+
+        padding: 12px;
+
+        background: white;
+
+        border-radius: 12px;
+
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+
+        font-size: 26px;
+
+        display: none;
+
+        transition: all 1.5s;
+
+        z-index: 500;
+      }
+
+      #reluTool {
+        left: 420px;
+        top: 230px;
+      }
+
+      #sigmoidTool {
+        left: 720px;
+        top: 230px;
+      }
+
+      #mseTool {
+        left: 420px;
+        top: 350px;
+      }
+
+      #bceTool {
+        left: 720px;
+        top: 350px;
+      }
+
+      #linearTool {
+        left: 560px;
+        top: 500px;
+      }
+
+      /* ===================
+      ROBOT
+      =================== */
+
+      #robot {
+        position: absolute;
+
+        right: 80px;
+
+        top: 260px;
+
+        font-size: 120px;
+
+        display: none;
+
+        transition: all 1.5s;
+      }
+
+      #robotLabel {
+        position: absolute;
+
+        right: 30px;
+
+        top: 420px;
+
+        font-size: 26px;
+
+        font-weight: bold;
+
+        display: none;
+      }
+
+      /* ===================
+      WISHLIST
+      =================== */
+
+      #wishlist {
+        position: absolute;
+
+        right: 70px;
+
+        top: 130px;
+
+        font-size: 24px;
+
+        line-height: 1.8;
+
+        display: none;
+      }
+
+      /* ===================
+      HAMMER
+      =================== */
+
+      #hammer {
+        position: absolute;
+
+        left: 120px;
+
+        top: 280px;
+
+        font-size: 90px;
+
+        display: none;
+
+        transition: all 1s;
+      }
+
+      /* ===================
+      MANUAL BUILD
+      =================== */
+
+      #manualArea {
+        position: absolute;
+
+        left: 320px;
+
+        top: 180px;
+
+        width: 450px;
+
+        padding: 20px;
+
+        border: 4px dashed red;
+
+        border-radius: 20px;
+
+        display: none;
+      }
+
+      .manualTitle {
+        font-size: 28px;
+
+        font-weight: bold;
+
+        margin-bottom: 20px;
+
+        text-align: center;
+      }
+
+      #manualRelu,
+      #manualLinear,
+      #manualBCE {
+        font-size: 32px;
+
+        margin: 25px;
+
+        display: none;
+      }
+
+      /* ===================
+      CODE
+      =================== */
+
+      #codeBlock {
+        position: absolute;
+
+        left: 50%;
+
+        bottom: 40px;
+
+        transform: translateX(-50%);
+
+        padding: 20px 40px;
+
+        background: #f5f5f5;
+
+        border-radius: 15px;
+
+        font-size: 30px;
+
+        font-family: monospace;
+
+        display: none;
+      }
+
+      /* ===================
+      FINAL REVEAL
+      =================== */
+
+      #finalReveal {
+        position: absolute;
+
+        left: 50%;
+
+        top: 50%;
+
+        transform: translate(-50%, -50%);
+
+        background: white;
+
+        padding: 40px;
+
+        border-radius: 20px;
+
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+
+        text-align: center;
+
+        font-size: 28px;
+
+        display: none;
+      }
+
+      .revealTitle {
+        font-size: 36px;
+
+        font-weight: bold;
+
+        margin-bottom: 20px;
+      }
+
+      .revealItems {
+        line-height: 2;
+      }
+
+      .bigArrow {
+        font-size: 70px;
+
+        margin: 15px;
+      }
+
+      .networkReveal {
+        font-size: 36px;
+
+        font-weight: bold;
+      }
+
+      /* ===================
+      HELPER
+      =================== */
+
+      .glow {
+        box-shadow:
+          0 0 25px gold,
+          0 0 40px gold;
+      }
+
+      .fade {
+        opacity: 0.2;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>🏠 Understanding nn.Module</h1>
+
+    <div class="controls">
+      <button onclick="step1()">1️⃣ Problem</button>
+
+      <button onclick="step2()">2️⃣ nn.Module House</button>
+
+      <button onclick="step3()">3️⃣ Network Needs Tools</button>
+
+      <button onclick="step4()">4️⃣ Inherit nn.Module</button>
+
+      <button onclick="step5()">5️⃣ Without Inheritance</button>
+
+      <button onclick="step6()">6️⃣ Final Reveal</button>
+    </div>
+
+    <div class="scene">
+      <div id="message">Press Step 1</div>
+
+      <!-- STUDENT -->
+
+      <div id="student">😵</div>
+
+      <!-- HOUSE -->
+
+      <div id="moduleHouse">
+        <div id="houseTitle">🏠 nn.Module House</div>
+
+        <div id="reluRoom" class="room">⚡ ReLU</div>
+
+        <div id="sigmoidRoom" class="room">📈 Sigmoid</div>
+
+        <div id="mseRoom" class="room">📉 MSELoss</div>
+
+        <div id="bceRoom" class="room">🎯 BCELoss</div>
+
+        <div id="linearRoom" class="room">📦 Linear</div>
+      </div>
+
+      <!-- TOOLS -->
+
+      <div id="reluTool" class="tool">⚡ ReLU</div>
+
+      <div id="sigmoidTool" class="tool">📈 Sigmoid</div>
+
+      <div id="mseTool" class="tool">📉 MSELoss</div>
+
+      <div id="bceTool" class="tool">🎯 BCELoss</div>
+
+      <div id="linearTool" class="tool">📦 Linear</div>
+
+      <!-- ROBOT -->
+
+      <div id="robot">🤖</div>
+
+      <div id="robotLabel">My Neural Network</div>
+
+      <!-- WISHLIST -->
+
+      <div id="wishlist">
+        Needs:
+
+        <br /><br />
+
+        ⚡ ReLU
+
+        <br />
+
+        📦 Linear
+
+        <br />
+
+        🎯 BCELoss
+      </div>
+
+      <!-- MANUAL BUILD -->
+
+      <div id="hammer">🔨</div>
+
+      <div id="manualArea">
+        <div class="manualTitle">Build Everything Yourself</div>
+
+        <div id="manualRelu">⚡ ReLU</div>
+
+        <div id="manualLinear">📦 Linear</div>
+
+        <div id="manualBCE">🎯 BCELoss</div>
+      </div>
+
+      <!-- CODE -->
+
+      <div id="codeBlock">class MyNetwork(nn.Module)</div>
+
+      <!-- REVEAL -->
+
+      <div id="finalReveal">
+        <div class="revealTitle">🏠 nn.Module House</div>
+
+        <div class="revealItems">
+          ⚡ ReLU
+
+          <br />
+
+          📈 Sigmoid
+
+          <br />
+
+          📉 MSELoss
+
+          <br />
+
+          🎯 BCELoss
+
+          <br />
+
+          📦 Linear
+        </div>
+
+        <div class="bigArrow">⬇️</div>
+
+        <div class="networkReveal">
+          🤖 My Neural Network
+
+          <br /><br />
+
+          class MyNetwork(nn.Module)
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function hideEverything() {
+        document.getElementById("student").style.display = "none";
+
+        document.getElementById("moduleHouse").style.display = "none";
+
+        document.getElementById("reluTool").style.display = "none";
+        document.getElementById("sigmoidTool").style.display = "none";
+        document.getElementById("mseTool").style.display = "none";
+        document.getElementById("bceTool").style.display = "none";
+        document.getElementById("linearTool").style.display = "none";
+
+        document.getElementById("robot").style.display = "none";
+        document.getElementById("robotLabel").style.display = "none";
+
+        document.getElementById("wishlist").style.display = "none";
+
+        document.getElementById("hammer").style.display = "none";
+
+        document.getElementById("manualArea").style.display = "none";
+
+        document.getElementById("manualRelu").style.display = "none";
+        document.getElementById("manualLinear").style.display = "none";
+        document.getElementById("manualBCE").style.display = "none";
+
+        document.getElementById("codeBlock").style.display = "none";
+
+        document.getElementById("finalReveal").style.display = "none";
+
+        document.getElementById("robot").innerHTML = "🤖";
+
+        document
+          .querySelectorAll(".room")
+          .forEach((r) => r.classList.remove("glow"));
+      }
+
+      function step1() {
+        hideEverything();
+
+        document.getElementById("message").innerHTML =
+          "Imagine building every AI tool yourself...";
+
+        const student = document.getElementById("student");
+
+        student.style.display = "block";
+
+        setTimeout(() => {
+          document.getElementById("reluTool").style.display = "block";
+        }, 500);
+
+        setTimeout(() => {
+          document.getElementById("sigmoidTool").style.display = "block";
+        }, 1200);
+
+        setTimeout(() => {
+          document.getElementById("mseTool").style.display = "block";
+        }, 1900);
+
+        setTimeout(() => {
+          document.getElementById("bceTool").style.display = "block";
+        }, 2600);
+
+        setTimeout(() => {
+          document.getElementById("linearTool").style.display = "block";
+        }, 3300);
+
+        setTimeout(() => {
+          student.innerHTML = "🤯";
+
+          document.getElementById("message").innerHTML =
+            "Too many things to build!";
+        }, 4500);
+      }
+
+      function step2() {
+        hideEverything();
+
+        document.getElementById("message").innerHTML =
+          "Good news! They already exist inside nn.Module.";
+
+        document.getElementById("moduleHouse").style.display = "block";
+
+        setTimeout(() => {
+          document.getElementById("reluRoom").classList.add("glow");
+        }, 800);
+
+        setTimeout(() => {
+          document.getElementById("sigmoidRoom").classList.add("glow");
+        }, 1600);
+
+        setTimeout(() => {
+          document.getElementById("mseRoom").classList.add("glow");
+        }, 2400);
+
+        setTimeout(() => {
+          document.getElementById("bceRoom").classList.add("glow");
+        }, 3200);
+
+        setTimeout(() => {
+          document.getElementById("linearRoom").classList.add("glow");
+        }, 4000);
+      }
+
+      function step3() {
+        hideEverything();
+
+        document.getElementById("moduleHouse").style.display = "block";
+
+        document.getElementById("robot").style.display = "block";
+
+        document.getElementById("robotLabel").style.display = "block";
+
+        document.getElementById("wishlist").style.display = "block";
+
+        document.getElementById("message").innerHTML =
+          "My Neural Network needs some tools.";
+      }
+
+      function step4() {
+        hideEverything();
+
+        document.getElementById("moduleHouse").style.display = "block";
+
+        document.getElementById("robot").style.display = "block";
+
+        document.getElementById("robotLabel").style.display = "block";
+
+        document.getElementById("codeBlock").style.display = "block";
+
+        document.getElementById("message").innerHTML =
+          "MyNetwork inherits nn.Module";
+
+        const relu = document.getElementById("reluTool");
+
+        const linear = document.getElementById("linearTool");
+
+        const bce = document.getElementById("bceTool");
+
+        relu.style.display = "block";
+        linear.style.display = "block";
+        bce.style.display = "block";
+
+        relu.style.left = "420px";
+        relu.style.top = "230px";
+
+        linear.style.left = "560px";
+        linear.style.top = "500px";
+
+        bce.style.left = "720px";
+        bce.style.top = "350px";
+
+        document.getElementById("reluRoom").classList.add("glow");
+
+        setTimeout(() => {
+          relu.style.left = "980px";
+          relu.style.top = "260px";
+        }, 1000);
+
+        setTimeout(() => {
+          document.getElementById("linearRoom").classList.add("glow");
+
+          linear.style.left = "980px";
+          linear.style.top = "340px";
+        }, 2800);
+
+        setTimeout(() => {
+          document.getElementById("bceRoom").classList.add("glow");
+
+          bce.style.left = "980px";
+          bce.style.top = "420px";
+        }, 4500);
+
+        setTimeout(() => {
+          document.getElementById("robot").innerHTML = "🤖✨";
+
+          document.getElementById("message").innerHTML =
+            "Tools arrived automatically!";
+        }, 6500);
+      }
+
+      function step5() {
+        hideEverything();
+
+        document.getElementById("message").innerHTML = "Without Inheritance...";
+
+        document.getElementById("hammer").style.display = "block";
+
+        document.getElementById("manualArea").style.display = "block";
+
+        setTimeout(() => {
+          document.getElementById("manualRelu").style.display = "block";
+        }, 1200);
+
+        setTimeout(() => {
+          document.getElementById("manualLinear").style.display = "block";
+        }, 2500);
+
+        setTimeout(() => {
+          document.getElementById("manualBCE").style.display = "block";
+        }, 3800);
+
+        setTimeout(() => {
+          document.getElementById("message").innerHTML =
+            "😫 Building everything manually.";
+        }, 5000);
+      }
+
+      function step6() {
+        hideEverything();
+
+        document.getElementById("finalReveal").style.display = "block";
+
+        document.getElementById("codeBlock").style.display = "block";
+
+        document.getElementById("message").innerHTML =
+          "nn.Module = Parent Class";
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,653 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>BCE & Cross Entropy Story Demo</title>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: Arial;
+        background: #f4f7fb;
+        padding: 25px;
+      }
+
+      .title {
+        text-align: center;
+        font-size: 50px;
+        margin-bottom: 30px;
+      }
+
+      .container {
+        background: white;
+        border-radius: 24px;
+        padding: 30px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+      }
+
+      .controls {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-bottom: 25px;
+      }
+
+      button {
+        padding: 14px 22px;
+        border: none;
+        border-radius: 12px;
+        font-size: 20px;
+        color: white;
+        cursor: pointer;
+      }
+
+      .green {
+        background: #2e7d32;
+      }
+
+      .orange {
+        background: #ef6c00;
+      }
+
+      .message {
+        text-align: center;
+        font-size: 30px;
+        font-weight: bold;
+        margin-bottom: 25px;
+        min-height: 50px;
+      }
+
+      .scene {
+        position: relative;
+        height: 850px;
+        background: #fafafa;
+        border-radius: 24px;
+        overflow: hidden;
+        padding: 20px;
+      }
+
+      .scanner {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 320px;
+        height: 240px;
+        background: #eeeeee;
+        border: 6px solid #757575;
+        border-radius: 24px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        font-size: 34px;
+        font-weight: bold;
+      }
+
+      .bag {
+        position: absolute;
+        left: 40px;
+        font-size: 120px;
+        transition: 4s linear;
+      }
+
+      .safeGate {
+        position: absolute;
+        right: 40px;
+        top: 180px;
+        width: 240px;
+        height: 180px;
+        background: #e8f5e9;
+        border: 6px solid #2e7d32;
+        border-radius: 24px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        font-size: 34px;
+        font-weight: bold;
+      }
+
+      .dangerGate {
+        position: absolute;
+        right: 40px;
+        bottom: 120px;
+        width: 240px;
+        height: 180px;
+        background: #ffebee;
+        border: 6px solid #c62828;
+        border-radius: 24px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        font-size: 34px;
+        font-weight: bold;
+      }
+
+      .meter {
+        position: absolute;
+        left: 40px;
+        top: 60px;
+        width: 560px;
+        height: 110px;
+        background: white;
+        border-radius: 30px;
+        border: 6px solid #1565c0;
+        overflow: hidden;
+      }
+
+      .fill {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(to right, #2e7d32, #ffeb3b, #c62828);
+        transition: 3s;
+      }
+
+      .percent {
+        position: absolute;
+        left: 40px;
+        top: 28px;
+        font-size: 38px;
+        font-weight: bold;
+        color: black;
+        z-index: 5;
+        white-space: nowrap;
+      }
+
+      .reaction {
+        position: absolute;
+        right: 280px;
+        top: 140px;
+        font-size: 120px;
+        opacity: 0;
+        transition: 1s;
+      }
+
+      .lossBox {
+        margin-top: 25px;
+        background: #fff8e1;
+        border-left: 8px solid #ef6c00;
+        padding: 24px;
+        border-radius: 18px;
+        font-size: 24px;
+        line-height: 1.8;
+        min-height: 260px;
+      }
+
+      .multiBox {
+        position: absolute;
+        right: 40px;
+        top: 100px;
+        width: 360px;
+        background: white;
+        padding: 20px;
+        border-radius: 20px;
+        border: 5px solid #1565c0;
+      }
+
+      .row {
+        margin-bottom: 20px;
+      }
+
+      .label {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+
+      .bar {
+        height: 35px;
+        border-radius: 12px;
+        background: #90caf9;
+        width: 0%;
+        transition: 2s;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="title">🧠 BCE & Cross Entropy Through Story</div>
+
+    <div class="container">
+      <div class="controls">
+        <button class="green" onclick="bceScene()">1. BCE Demo</button>
+
+        <button class="orange" onclick="ceScene()">
+          2. Cross Entropy Demo
+        </button>
+      </div>
+
+      <div class="message" id="message">Choose a section</div>
+
+      <div id="content"></div>
+    </div>
+
+    <script>
+      // =======================
+      // BCE SECTION
+      // =======================
+
+      function bceScene() {
+        document.getElementById("message").innerHTML =
+          "🧳 BCE = Binary Classification";
+
+        document.getElementById("content").innerHTML = `
+
+<div style="text-align:center;margin-bottom:25px;">
+
+<button class="green"
+onclick="runBCE()">
+Start Security Check
+</button>
+
+</div>
+
+<div class="scene">
+
+<div class="scanner">
+Binary Scanner
+</div>
+
+<div class="safeGate">
+✅ SAFE
+</div>
+
+<div class="dangerGate">
+🚨 DANGER
+</div>
+
+<!-- SAFE BAG -->
+
+<div class="bag"
+id="safeBag"
+style="top:250px;">
+🧳👕
+</div>
+
+<!-- DANGER BAG -->
+
+<div class="bag"
+id="dangerBag"
+style="top:520px;">
+🧳💣
+</div>
+
+<!-- PROBABILITY METER -->
+
+<div class="meter">
+
+<div class="fill"
+id="bceFill">
+</div>
+
+<div class="percent"
+id="bcePercent">
+Danger Probability: 0%
+</div>
+
+</div>
+
+<!-- RESULT -->
+
+<div class="reaction"
+id="bceReaction">
+🙂
+</div>
+
+</div>
+
+<div class="lossBox"
+id="output">
+
+BCE handles ONLY TWO classes:
+
+<br><br>
+
+✅ SAFE
+<br>
+🚨 DANGEROUS
+
+<br><br>
+
+The model predicts:
+"How dangerous is this object?"
+
+</div>
+
+`;
+      }
+
+      function runBCE() {
+        let safeBag = document.getElementById("safeBag");
+
+        let dangerBag = document.getElementById("dangerBag");
+
+        // RESET
+
+        safeBag.style.left = "40px";
+        dangerBag.style.left = "40px";
+
+        document.getElementById("bceReaction").style.opacity = 0;
+
+        // =====================
+        // SAFE BAG
+        // =====================
+
+        safeBag.style.left = "40%";
+
+        setTimeout(() => {
+          document.getElementById("bceFill").style.width = "5%";
+
+          document.getElementById("bcePercent").innerHTML =
+            "Danger Probability: 2%";
+        }, 2500);
+
+        setTimeout(() => {
+          safeBag.style.top = "180px";
+          safeBag.style.left = "80%";
+
+          document.getElementById("bceReaction").innerHTML = "✅";
+
+          document.getElementById("bceReaction").style.opacity = 1;
+
+          document.getElementById("output").innerHTML = `
+
+Bag 1:
+🧳👕
+
+<br><br>
+
+Danger Probability:
+2%
+
+<br><br>
+
+Correctly classified as:
+✅ SAFE
+
+<br><br>
+
+BCE chooses between ONLY TWO classes.
+
+`;
+        }, 5000);
+
+        // =====================
+        // DANGEROUS BAG
+        // =====================
+
+        setTimeout(() => {
+          document.getElementById("bceReaction").style.opacity = 0;
+
+          dangerBag.style.left = "40%";
+        }, 8500);
+
+        setTimeout(() => {
+          document.getElementById("bceFill").style.width = "95%";
+
+          document.getElementById("bcePercent").innerHTML =
+            "Danger Probability: 98%";
+        }, 11000);
+
+        setTimeout(() => {
+          dangerBag.style.top = "520px";
+          dangerBag.style.left = "80%";
+
+          document.getElementById("bceReaction").innerHTML = "🚨";
+
+          document.getElementById("bceReaction").style.opacity = 1;
+
+          document.getElementById("output").innerHTML += `
+
+<br><br>
+<hr>
+<br>
+
+Bag 2:
+🧳💣
+
+<br><br>
+
+Danger Probability:
+98%
+
+<br><br>
+
+Correctly classified as:
+🚨 DANGEROUS
+
+`;
+        }, 13500);
+      }
+
+      // =======================
+      // CROSS ENTROPY SECTION
+      // =======================
+
+      function ceScene() {
+        document.getElementById("message").innerHTML =
+          "🎯 Cross Entropy = Multi-Class Classification";
+
+        document.getElementById("content").innerHTML = `
+
+<div style="text-align:center;margin-bottom:25px;">
+
+<button class="orange"
+onclick="runCE()">
+Start Classification
+</button>
+
+</div>
+
+<div class="scene">
+
+<div class="scanner">
+Multi-Class Scanner
+</div>
+
+<!-- BAG 1 -->
+
+<div class="bag"
+id="bag1"
+style="top:240px;">
+🧳💻
+</div>
+
+<!-- BAG 2 -->
+
+<div class="bag"
+id="bag2"
+style="top:520px;">
+🧳🍎
+</div>
+
+<!-- CLASS PROBABILITIES -->
+
+<div class="multiBox">
+
+<div class="row">
+
+<div class="label">
+💣 Explosive
+</div>
+
+<div class="bar"
+id="bar1">
+</div>
+
+</div>
+
+<div class="row">
+
+<div class="label">
+💻 Electronics
+</div>
+
+<div class="bar"
+id="bar2">
+</div>
+
+</div>
+
+<div class="row">
+
+<div class="label">
+👕 Clothes
+</div>
+
+<div class="bar"
+id="bar3">
+</div>
+
+</div>
+
+<div class="row">
+
+<div class="label">
+🍎 Food
+</div>
+
+<div class="bar"
+id="bar4">
+</div>
+
+</div>
+
+</div>
+
+<div class="reaction"
+id="ceReaction">
+🙂
+</div>
+
+</div>
+
+<div class="lossBox"
+id="output">
+
+Cross Entropy handles MANY classes.
+
+<br><br>
+
+The model chooses:
+which category is MOST likely.
+
+</div>
+
+`;
+      }
+
+      function runCE() {
+        let bag1 = document.getElementById("bag1");
+
+        let bag2 = document.getElementById("bag2");
+
+        // RESET
+
+        bag1.style.left = "40px";
+        bag2.style.left = "40px";
+
+        document.getElementById("ceReaction").style.opacity = 0;
+
+        // ======================
+        // ELECTRONICS BAG
+        // ======================
+
+        bag1.style.left = "40%";
+
+        setTimeout(() => {
+          document.getElementById("bar1").style.width = "5%";
+
+          document.getElementById("bar2").style.width = "92%";
+
+          document.getElementById("bar3").style.width = "8%";
+
+          document.getElementById("bar4").style.width = "3%";
+        }, 2500);
+
+        setTimeout(() => {
+          document.getElementById("ceReaction").innerHTML = "💻";
+
+          document.getElementById("ceReaction").style.opacity = 1;
+
+          document.getElementById("output").innerHTML = `
+
+Bag 1:
+🧳💻
+
+<br><br>
+
+Highest probability:
+💻 Electronics (92%)
+
+<br><br>
+
+Correctly classified as:
+💻 Electronics
+
+<br><br>
+
+Cross Entropy chooses among MANY classes.
+
+`;
+        }, 5000);
+
+        // ======================
+        // FOOD BAG
+        // ======================
+
+        setTimeout(() => {
+          document.getElementById("ceReaction").style.opacity = 0;
+
+          bag2.style.left = "40%";
+        }, 8500);
+
+        setTimeout(() => {
+          document.getElementById("bar1").style.width = "2%";
+
+          document.getElementById("bar2").style.width = "6%";
+
+          document.getElementById("bar3").style.width = "10%";
+
+          document.getElementById("bar4").style.width = "95%";
+        }, 11000);
+
+        setTimeout(() => {
+          document.getElementById("ceReaction").innerHTML = "🍎";
+
+          document.getElementById("ceReaction").style.opacity = 1;
+
+          document.getElementById("output").innerHTML += `
+
+<br><br>
+<hr>
+<br>
+
+Bag 2:
+🧳🍎
+
+<br><br>
+
+Highest probability:
+🍎 Food (95%)
+
+<br><br>
+
+Correctly classified as:
+🍎 Food
+
+`;
+        }, 13500);
+      }
+    </script>
+  </body>
+</html>

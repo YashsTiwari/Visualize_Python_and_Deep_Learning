@@ -1,0 +1,692 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Autoencoder Overview</title>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+      }
+
+      body {
+        background: #f4f7fb;
+        padding: 20px;
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .controls {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      button {
+        padding: 12px 18px;
+        margin: 5px;
+        border: none;
+        border-radius: 10px;
+        background: #1565c0;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+      }
+
+      .scene {
+        position: relative;
+
+        height: 800px;
+
+        background: white;
+
+        border-radius: 20px;
+
+        overflow: hidden;
+
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+      }
+
+      #message {
+        position: absolute;
+
+        top: 20px;
+
+        width: 100%;
+
+        text-align: center;
+
+        font-size: 28px;
+
+        font-weight: bold;
+
+        z-index: 1000;
+      }
+
+      /* =====================
+FACE
+===================== */
+
+      #face {
+        position: absolute;
+
+        left: 100px;
+
+        top: 280px;
+
+        font-size: 120px;
+
+        transition: all 2s ease;
+
+        display: none;
+
+        z-index: 5;
+      }
+
+      #faceLabel {
+        position: absolute;
+
+        left: 70px;
+
+        top: 430px;
+
+        font-size: 24px;
+
+        font-weight: bold;
+
+        display: none;
+      }
+
+      /* =====================
+ENCODER
+===================== */
+
+      #encoder {
+        position: absolute;
+
+        left: 320px;
+
+        top: 280px;
+
+        width: 180px;
+
+        height: 120px;
+
+        background: #e3f2fd;
+
+        border: 4px solid #1565c0;
+
+        border-radius: 15px;
+
+        display: none;
+
+        font-size: 30px;
+
+        font-weight: bold;
+
+        text-align: center;
+
+        line-height: 110px;
+      }
+
+      /* =====================
+TUNNEL
+===================== */
+
+      #tunnel {
+        position: absolute;
+
+        left: 500px;
+
+        top: 320px;
+
+        width: 140px;
+
+        height: 40px;
+
+        background: #ccc;
+
+        clip-path: polygon(0% 0%, 100% 35%, 100% 65%, 0% 100%);
+
+        display: none;
+      }
+
+      /* =====================
+LATENT
+===================== */
+
+      #latent {
+        position: absolute;
+
+        left: 680px;
+
+        top: 290px;
+
+        padding: 20px;
+
+        background: #fff8e1;
+
+        border: 3px solid orange;
+
+        border-radius: 15px;
+
+        font-size: 34px;
+
+        font-weight: bold;
+
+        display: none;
+      }
+
+      #latentLabel {
+        position: absolute;
+
+        left: 650px;
+
+        top: 390px;
+
+        font-size: 22px;
+
+        font-weight: bold;
+
+        display: none;
+      }
+
+      /* =====================
+DECODER
+===================== */
+
+      #decoder {
+        position: absolute;
+
+        left: 900px;
+
+        top: 280px;
+
+        width: 180px;
+
+        height: 120px;
+
+        background: #e8f5e9;
+
+        border: 4px solid green;
+
+        border-radius: 15px;
+
+        display: none;
+
+        font-size: 30px;
+
+        font-weight: bold;
+
+        text-align: center;
+
+        line-height: 110px;
+      }
+
+      /* =====================
+RECONSTRUCTED
+===================== */
+
+      #reconstructed {
+        position: absolute;
+
+        left: 1120px;
+
+        top: 280px;
+
+        font-size: 120px;
+
+        transition: all 2s ease;
+
+        display: none;
+      }
+
+      #reconstructedLabel {
+        position: absolute;
+
+        left: 1080px;
+
+        top: 430px;
+
+        font-size: 24px;
+
+        font-weight: bold;
+
+        display: none;
+      }
+
+      /* =====================
+COMPARE
+===================== */
+
+      #compareArea {
+        position: absolute;
+
+        left: 50%;
+
+        top: 50%;
+
+        transform: translate(-50%, -50%);
+
+        display: none;
+
+        gap: 120px;
+      }
+
+      .compareBox {
+        width: 280px;
+
+        padding: 30px;
+
+        background: white;
+
+        border-radius: 20px;
+
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
+
+        font-size: 40px;
+
+        font-weight: bold;
+
+        text-align: center;
+      }
+
+      /* =====================
+FINAL CARD
+===================== */
+
+      #finalCard {
+        position: absolute;
+
+        left: 50%;
+
+        top: 50%;
+
+        transform: translate(-50%, -50%);
+
+        width: 750px;
+
+        padding: 40px;
+
+        background: white;
+
+        border-radius: 20px;
+
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+
+        font-size: 30px;
+
+        line-height: 2;
+
+        text-align: center;
+
+        display: none;
+      }
+
+      /* =====================
+HELPERS
+===================== */
+
+      .glow {
+        box-shadow:
+          0 0 20px gold,
+          0 0 40px gold;
+      }
+
+      .shrink {
+        transform: scale(0.3);
+      }
+
+      .fade {
+        opacity: 0.15;
+      }
+
+      .bigText {
+        font-size: 42px;
+        font-weight: bold;
+      }
+
+      .success {
+        background: #e8f5e9;
+        border: 3px solid green;
+      }
+
+      .pulse {
+        animation: pulse 1s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+
+        50% {
+          transform: scale(1.08);
+        }
+
+        100% {
+          transform: scale(1);
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>🧠 Autoencoder Intuition</h1>
+
+    <div class="controls">
+      <button onclick="step1()">1️⃣ Original Image</button>
+
+      <button onclick="step2()">2️⃣ Encoder</button>
+
+      <button onclick="step3()">3️⃣ Bottleneck</button>
+
+      <button onclick="step4()">4️⃣ Decoder</button>
+
+      <button onclick="step5()">5️⃣ Compare</button>
+
+      <button onclick="step6()">6️⃣ Final Lesson</button>
+    </div>
+
+    <div class="scene">
+      <div id="message">Press Step 1</div>
+
+      <!-- ORIGINAL FACE -->
+
+      <div id="face">😀</div>
+
+      <div id="faceLabel">Original Face Image</div>
+
+      <!-- ENCODER -->
+
+      <div id="encoder">Encoder</div>
+
+      <!-- TUNNEL -->
+
+      <div id="tunnel"></div>
+
+      <!-- LATENT -->
+
+      <div id="latent">[1.7 , -0.8]</div>
+
+      <div id="latentLabel">Compressed Information</div>
+
+      <!-- DECODER -->
+
+      <div id="decoder">Decoder</div>
+
+      <!-- RECONSTRUCTED -->
+
+      <div id="reconstructed">😀</div>
+
+      <div id="reconstructedLabel">Reconstructed Face</div>
+
+      <!-- COMPARE -->
+
+      <div id="compareArea">
+        <div class="compareBox">
+          😀
+
+          <br /><br />
+
+          Original
+        </div>
+
+        <div class="compareBox">
+          😀
+
+          <br /><br />
+
+          Reconstructed
+        </div>
+      </div>
+
+      <!-- FINAL -->
+
+      <div id="finalCard"></div>
+    </div>
+
+    <script>
+      const msg = document.getElementById("message");
+
+      function hideAll() {
+        document.getElementById("face").style.display = "none";
+        document.getElementById("faceLabel").style.display = "none";
+
+        document.getElementById("encoder").style.display = "none";
+        document.getElementById("tunnel").style.display = "none";
+
+        document.getElementById("latent").style.display = "none";
+        document.getElementById("latentLabel").style.display = "none";
+
+        document.getElementById("decoder").style.display = "none";
+
+        document.getElementById("reconstructed").style.display = "none";
+        document.getElementById("reconstructedLabel").style.display = "none";
+
+        document.getElementById("compareArea").style.display = "none";
+
+        document.getElementById("finalCard").style.display = "none";
+
+        document.getElementById("face").classList.remove("shrink");
+        document.getElementById("latent").classList.remove("pulse");
+
+        document.getElementById("face").style.left = "100px";
+        document.getElementById("face").style.top = "280px";
+      }
+
+      /* ==========================
+STEP 1
+ORIGINAL IMAGE
+========================== */
+
+      function step1() {
+        hideAll();
+
+        msg.innerHTML = "This is our original face image.";
+
+        document.getElementById("face").style.display = "block";
+        document.getElementById("faceLabel").style.display = "block";
+      }
+
+      /* ==========================
+STEP 2
+ENCODER
+========================== */
+
+      function step2() {
+        hideAll();
+
+        document.getElementById("face").style.display = "block";
+        document.getElementById("faceLabel").style.display = "block";
+
+        document.getElementById("encoder").style.display = "block";
+        document.getElementById("tunnel").style.display = "block";
+
+        msg.innerHTML = "Encoder compresses the information.";
+
+        setTimeout(() => {
+          document.getElementById("face").style.left = "340px";
+        }, 1000);
+
+        setTimeout(() => {
+          document.getElementById("face").classList.add("shrink");
+
+          msg.innerHTML = "Only important information is kept.";
+        }, 3000);
+      }
+
+      /* ==========================
+STEP 3
+BOTTLENECK
+========================== */
+
+      function step3() {
+        hideAll();
+
+        document.getElementById("encoder").style.display = "block";
+        document.getElementById("tunnel").style.display = "block";
+
+        document.getElementById("latent").style.display = "block";
+        document.getElementById("latentLabel").style.display = "block";
+
+        msg.innerHTML = "The entire face is compressed.";
+
+        setTimeout(() => {
+          document.getElementById("latent").classList.add("pulse");
+        }, 1000);
+
+        setTimeout(() => {
+          msg.innerHTML = "Now the face is represented by only 2 numbers.";
+        }, 2500);
+      }
+
+      /* ==========================
+STEP 4
+DECODER
+========================== */
+
+      function step4() {
+        hideAll();
+
+        document.getElementById("encoder").style.display = "block";
+        document.getElementById("tunnel").style.display = "block";
+
+        document.getElementById("latent").style.display = "block";
+        document.getElementById("latentLabel").style.display = "block";
+
+        document.getElementById("decoder").style.display = "block";
+
+        msg.innerHTML = "Decoder tries to reconstruct the image.";
+
+        setTimeout(() => {
+          document.getElementById("latent").classList.add("pulse");
+        }, 1000);
+
+        setTimeout(() => {
+          document.getElementById("reconstructed").style.display = "block";
+
+          document.getElementById("reconstructed").innerHTML = "🙂";
+        }, 2500);
+
+        setTimeout(() => {
+          document.getElementById("reconstructed").innerHTML = "😀";
+
+          document.getElementById("reconstructedLabel").style.display = "block";
+
+          msg.innerHTML = "The image is reconstructed.";
+        }, 4500);
+      }
+
+      /* ==========================
+STEP 5
+COMPARE
+========================== */
+
+      function step5() {
+        hideAll();
+
+        document.getElementById("compareArea").style.display = "flex";
+
+        msg.innerHTML = "Compare the original and reconstructed image.";
+
+        setTimeout(() => {
+          document.querySelectorAll(".compareBox")[0].classList.add("glow");
+        }, 1000);
+
+        setTimeout(() => {
+          document.querySelectorAll(".compareBox")[1].classList.add("glow");
+        }, 2000);
+
+        setTimeout(() => {
+          msg.innerHTML = "Most information has been preserved.";
+        }, 3500);
+      }
+
+      /* ==========================
+STEP 6
+FINAL LESSON
+========================== */
+
+      function step6() {
+        hideAll();
+
+        document.getElementById("finalCard").style.display = "block";
+
+        document.getElementById("finalCard").innerHTML = `
+
+<h2>🧠 Autoencoder</h2>
+
+<br>
+
+😀 Original Image
+
+<br>
+
+↓
+
+<br>
+
+Encoder
+
+<br>
+
+↓
+
+<br>
+
+[1.7 , -0.8]
+
+<br>
+
+Compressed Information
+
+<br>
+
+↓
+
+<br>
+
+Decoder
+
+<br>
+
+↓
+
+<br>
+
+😀 Reconstructed Image
+
+<br><br>
+
+Compress
+
+<br>
+
+↓
+
+<br>
+
+Store Important Information
+
+<br>
+
+↓
+
+<br>
+
+Reconstruct
+
+`;
+
+        msg.innerHTML =
+          "Autoencoders learn to compress and reconstruct information.";
+      }
+    </script>
+  </body>
+</html>

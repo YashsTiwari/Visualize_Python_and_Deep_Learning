@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Conditions Real World Demo</title>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+        background: #f4f7fb;
+        padding: 40px;
+        color: #222;
+      }
+
+      .main-title {
+        text-align: center;
+        font-size: 52px;
+        margin-bottom: 50px;
+      }
+
+      .section {
+        background: white;
+        border-radius: 24px;
+        padding: 40px;
+        margin-bottom: 50px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      }
+
+      .section-title {
+        text-align: center;
+        font-size: 38px;
+        margin-bottom: 40px;
+      }
+
+      .controls {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-bottom: 40px;
+      }
+
+      button {
+        padding: 16px 24px;
+        border: none;
+        border-radius: 14px;
+        font-size: 22px;
+        color: white;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      button:hover {
+        transform: scale(1.05);
+      }
+
+      .blue {
+        background: #1565c0;
+      }
+
+      .green {
+        background: #2e7d32;
+      }
+
+      .red {
+        background: #c62828;
+      }
+
+      .orange {
+        background: #ef6c00;
+      }
+
+      .area {
+        position: relative;
+        height: 350px;
+        border-radius: 24px;
+        background: #fafafa;
+        overflow: hidden;
+      }
+
+      .person {
+        position: absolute;
+        width: 120px;
+        height: 120px;
+        border-radius: 20px;
+        border: 4px solid #222;
+        background: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-size: 50px;
+        transition: 2s;
+        left: 40px;
+        top: 110px;
+      }
+
+      .person-name {
+        font-size: 22px;
+        margin-top: 5px;
+      }
+
+      .person-age {
+        font-size: 20px;
+        color: #666;
+      }
+
+      .gate {
+        position: absolute;
+        left: 50%;
+        top: 80px;
+        transform: translateX(-50%);
+        width: 180px;
+        height: 180px;
+        border-radius: 20px;
+        border: 6px solid #222;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 80px;
+        background: white;
+      }
+
+      .allowed-zone {
+        position: absolute;
+        right: 40px;
+        top: 30px;
+        width: 240px;
+        height: 120px;
+        border-radius: 20px;
+        background: #dcedc8;
+        border: 4px solid #2e7d32;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 28px;
+      }
+
+      .rejected-zone {
+        position: absolute;
+        right: 40px;
+        bottom: 30px;
+        width: 240px;
+        height: 120px;
+        border-radius: 20px;
+        background: #ffcdd2;
+        border: 4px solid #c62828;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 28px;
+      }
+
+      .message {
+        margin-top: 30px;
+        text-align: center;
+        font-size: 30px;
+        font-weight: bold;
+        min-height: 40px;
+      }
+
+      .code {
+        margin-top: 40px;
+        background: #1e1e1e;
+        color: #00ff99;
+        padding: 24px;
+        border-radius: 18px;
+        font-size: 24px;
+        line-height: 1.8;
+        overflow-x: auto;
+      }
+
+      .flow-area {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 30px;
+        flex-wrap: wrap;
+        margin-top: 40px;
+      }
+
+      .flow-box {
+        width: 220px;
+        min-height: 120px;
+        border-radius: 20px;
+        border: 4px solid #222;
+        background: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 20px;
+        font-size: 26px;
+        transition: 0.5s;
+      }
+
+      .arrow {
+        font-size: 60px;
+      }
+
+      .highlight {
+        border-color: #ff9800;
+        box-shadow: 0 0 25px #ff9800;
+        transform: scale(1.05);
+      }
+
+      .success {
+        background: #dcedc8;
+        border-color: #2e7d32;
+      }
+
+      .fail {
+        background: #ffcdd2;
+        border-color: #c62828;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="main-title">🤔 Conditions Real World Intuition</div>
+
+    <!-- ================= IF ELSE ================= -->
+
+    <div class="section">
+      <div class="section-title">🗳 Voting Eligibility (if / else)</div>
+
+      <div class="controls">
+        <button class="green" onclick="checkPerson('🧑 Rahul', 22, true)">
+          Rahul (22)
+        </button>
+
+        <button class="red" onclick="checkPerson('👩 Riya', 15, false)">
+          Riya (15)
+        </button>
+
+        <button class="green" onclick="checkPerson('🧔 Aman', 31, true)">
+          Aman (31)
+        </button>
+
+        <button class="red" onclick="checkPerson('👦 Karan', 12, false)">
+          Karan (12)
+        </button>
+      </div>
+
+      <div class="area">
+        <div class="person" id="person">
+          <div id="emoji">🧑</div>
+
+          <div class="person-name" id="personName">Rahul</div>
+
+          <div class="person-age" id="personAge">Age: 22</div>
+        </div>
+
+        <div class="gate" id="gate">🚪</div>
+
+        <div class="allowed-zone">✅ Allowed</div>
+
+        <div class="rejected-zone">❌ Rejected</div>
+      </div>
+
+      <div class="message" id="voteMessage">
+        Click a person to check voting eligibility
+      </div>
+
+      <div class="code">
+        if age >= 18:<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;allow_inside()<br />
+        else:<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;reject_person()
+      </div>
+    </div>
+
+    <!-- ================= LOGICAL FLOW ================= -->
+
+    <div class="section">
+      <div class="section-title">🧠 Logical Flow (YES / NO Path)</div>
+
+      <div class="controls">
+        <button class="blue" onclick="runRainFlow(true)">
+          🌧 YES (Raining)
+        </button>
+
+        <button class="orange" onclick="runRainFlow(false)">
+          ☀ NO (Not Raining)
+        </button>
+      </div>
+
+      <div class="flow-area">
+        <div class="flow-box" id="f1">Is it raining?</div>
+
+        <div class="arrow">➡</div>
+
+        <div class="flow-box" id="f2">Decision</div>
+
+        <div class="arrow">➡</div>
+
+        <div class="flow-box" id="f3">Result</div>
+      </div>
+
+      <div class="message" id="logicMessage">
+        Computers follow logical paths
+      </div>
+
+      <div class="code">
+        if raining:<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;take_umbrella()<br />
+        else:<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;go_normally()
+      </div>
+    </div>
+
+    <script>
+      async function sleep(ms) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+      }
+
+      async function checkPerson(name, age, allowed) {
+        let person = document.getElementById("person");
+
+        person.style.transition = "0s";
+
+        person.style.left = "40px";
+        person.style.top = "110px";
+
+        await sleep(50);
+
+        let emoji = name.split(" ")[0];
+        let actualName = name.split(" ")[1];
+
+        document.getElementById("emoji").innerHTML = emoji;
+        document.getElementById("personName").innerHTML = actualName;
+        document.getElementById("personAge").innerHTML = "Age: " + age;
+
+        document.getElementById("voteMessage").innerHTML =
+          "Checking if age >= 18";
+
+        person.style.transition = "2s";
+
+        person.style.left = "42%";
+
+        await sleep(2200);
+
+        if (allowed) {
+          document.getElementById("gate").innerHTML = "✅";
+
+          document.getElementById("voteMessage").innerHTML =
+            age + " >= 18 → Allowed inside";
+
+          person.style.left = "78%";
+          person.style.top = "40px";
+        } else {
+          document.getElementById("gate").innerHTML = "❌";
+
+          document.getElementById("voteMessage").innerHTML =
+            age + " < 18 → Rejected";
+
+          person.style.left = "78%";
+          person.style.top = "190px";
+        }
+
+        await sleep(2000);
+
+        document.getElementById("gate").innerHTML = "🚪";
+      }
+
+      async function runRainFlow(raining) {
+        let f1 = document.getElementById("f1");
+        let f2 = document.getElementById("f2");
+        let f3 = document.getElementById("f3");
+
+        [f1, f2, f3].forEach((box) => {
+          box.className = "flow-box";
+        });
+
+        f1.classList.add("highlight");
+
+        document.getElementById("logicMessage").innerHTML =
+          "Checking condition...";
+
+        await sleep(1200);
+
+        f1.classList.remove("highlight");
+
+        f2.classList.add("highlight");
+
+        if (raining) {
+          f2.innerHTML = "YES 🌧";
+
+          document.getElementById("logicMessage").innerHTML =
+            "Condition became TRUE";
+
+          await sleep(1200);
+
+          f2.classList.remove("highlight");
+
+          f3.innerHTML = "☂ Take Umbrella";
+          f3.classList.add("success");
+        } else {
+          f2.innerHTML = "NO ☀";
+
+          document.getElementById("logicMessage").innerHTML =
+            "Condition became FALSE";
+
+          await sleep(1200);
+
+          f2.classList.remove("highlight");
+
+          f3.innerHTML = "🚶 Go Normally";
+          f3.classList.add("fail");
+        }
+
+        document.getElementById("logicMessage").innerHTML =
+          "Computer followed logical flow step-by-step";
+      }
+    </script>
+  </body>
+</html>

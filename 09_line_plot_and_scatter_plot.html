@@ -1,0 +1,523 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Data Visualization Intuition</title>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+        background: #f4f7fb;
+        padding: 40px;
+        color: #222;
+      }
+
+      .main-title {
+        text-align: center;
+        font-size: 56px;
+        margin-bottom: 50px;
+      }
+
+      .section {
+        background: white;
+        border-radius: 24px;
+        padding: 40px;
+        margin-bottom: 50px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      }
+
+      .section-title {
+        text-align: center;
+        font-size: 42px;
+        margin-bottom: 20px;
+      }
+
+      .subtitle {
+        text-align: center;
+        font-size: 24px;
+        color: #555;
+        margin-bottom: 40px;
+      }
+
+      .controls {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-bottom: 40px;
+      }
+
+      button {
+        padding: 14px 26px;
+        border: none;
+        border-radius: 14px;
+        font-size: 22px;
+        color: white;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      button:hover {
+        transform: scale(1.05);
+      }
+
+      .blue {
+        background: #1565c0;
+      }
+
+      .green {
+        background: #2e7d32;
+      }
+
+      .orange {
+        background: #ef6c00;
+      }
+
+      .red {
+        background: #c62828;
+      }
+
+      .graph {
+        position: relative;
+        width: 950px;
+        height: 520px;
+        margin: auto;
+        background: white;
+        border-left: 5px solid black;
+        border-bottom: 5px solid black;
+        overflow: hidden;
+      }
+
+      .axis-label {
+        position: absolute;
+        font-size: 22px;
+        font-weight: bold;
+      }
+
+      .x-label {
+        bottom: -40px;
+        left: 420px;
+      }
+
+      .y-label {
+        left: -60px;
+        top: 220px;
+        transform: rotate(-90deg);
+      }
+
+      .point {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        position: absolute;
+        transform: translate(-50%, 50%);
+        transition: 1s;
+      }
+
+      .red-point {
+        background: #e53935;
+      }
+
+      .blue-point {
+        background: #1565c0;
+      }
+
+      .line {
+        position: absolute;
+        height: 5px;
+        background: #1565c0;
+        transform-origin: left center;
+      }
+
+      .boundary {
+        position: absolute;
+        width: 5px;
+        height: 460px;
+        background: black;
+        left: 470px;
+        bottom: 20px;
+      }
+
+      .label {
+        position: absolute;
+        font-size: 18px;
+        font-weight: bold;
+      }
+
+      .message {
+        margin-top: 35px;
+        text-align: center;
+        font-size: 30px;
+        font-weight: bold;
+        min-height: 50px;
+      }
+
+      .code {
+        margin-top: 40px;
+        background: #1e1e1e;
+        color: #00ff99;
+        padding: 24px;
+        border-radius: 18px;
+        font-size: 24px;
+        line-height: 1.8;
+        overflow-x: auto;
+      }
+
+      .info-box {
+        margin-top: 35px;
+        background: #f1f5ff;
+        border-left: 8px solid #1565c0;
+        padding: 22px;
+        border-radius: 16px;
+        font-size: 24px;
+        line-height: 1.8;
+      }
+
+      .legend {
+        display: flex;
+        justify-content: center;
+        gap: 40px;
+        margin-top: 25px;
+        font-size: 24px;
+        font-weight: bold;
+      }
+
+      .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .legend-color {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="main-title">📊 Data Visualization Intuition</div>
+
+    <!-- ================================================= -->
+    <!-- LINE PLOT -->
+    <!-- ================================================= -->
+
+    <div class="section">
+      <div class="section-title">📈 Line Plot</div>
+
+      <div class="subtitle">Line Plot = Connected Data Points</div>
+
+      <div class="controls">
+        <button class="blue" onclick="nextLineStep()">Next Step</button>
+
+        <button class="red" onclick="resetLineDemo()">Reset</button>
+      </div>
+
+      <div class="graph" id="lineGraph">
+        <div class="axis-label x-label">Days</div>
+
+        <div class="axis-label y-label">Temperature</div>
+      </div>
+
+      <div class="message" id="lineMessage">
+        A line plot helps us see change over time
+      </div>
+
+      <div class="info-box">
+        ✅ Use line plots when:
+        <br /><br />
+
+        • data changes over time
+        <br />
+
+        • trends are important
+        <br />
+
+        • we want to see increase/decrease
+        <br /><br />
+
+        Examples:
+        <br />
+
+        🌡 Temperature
+        <br />
+
+        📈 Stock prices
+        <br />
+
+        📉 Training loss in Deep Learning
+      </div>
+
+      <div class="code">
+        days = [1,2,3,4]
+        <br />
+        temp = [20,25,22,30]
+        <br /><br />
+
+        plt.plot(days,temp)
+      </div>
+    </div>
+
+    <!-- ================================================= -->
+    <!-- SCATTER PLOT -->
+    <!-- ================================================= -->
+
+    <div class="section">
+      <div class="section-title">🎯 Scatter Plot</div>
+
+      <div class="subtitle">
+        Scatter plots help visualize different groups/classes
+      </div>
+
+      <div class="controls">
+        <button class="green" onclick="showScatterPoints()">
+          Show Data Points
+        </button>
+
+        <button class="orange" onclick="showBoundary()">Show Separation</button>
+
+        <button class="red" onclick="resetScatterDemo()">Reset</button>
+      </div>
+
+      <div class="graph" id="scatterGraph">
+        <div class="axis-label x-label">Weight</div>
+
+        <div class="axis-label y-label">Height</div>
+      </div>
+
+      <div class="legend">
+        <div class="legend-item">
+          <div class="legend-color" style="background: #e53935"></div>
+
+          Apples
+        </div>
+
+        <div class="legend-item">
+          <div class="legend-color" style="background: #1565c0"></div>
+
+          Oranges
+        </div>
+      </div>
+
+      <div class="message" id="scatterMessage">
+        Scatter plots show relationships between data points
+      </div>
+
+      <div class="info-box">
+        ✅ Use scatter plots when:
+        <br /><br />
+
+        • visualizing data points
+        <br />
+
+        • comparing groups/classes
+        <br />
+
+        • understanding clustering
+        <br />
+
+        • seeing separation between categories
+        <br /><br />
+
+        This becomes VERY important in:
+        <br />
+
+        🤖 Classification
+        <br />
+
+        🧠 Neural Networks
+        <br />
+
+        🎯 Decision Boundaries
+      </div>
+
+      <div class="code">plt.scatter(x,y)</div>
+    </div>
+
+    <script>
+      /* ================================================= */
+      /* LINE PLOT */
+      /* ================================================= */
+
+      let lineStep = 0;
+
+      const linePoints = [
+        { x: 120, y: 120, temp: 20, day: 1 },
+        { x: 300, y: 240, temp: 25, day: 2 },
+        { x: 500, y: 180, temp: 22, day: 3 },
+        { x: 720, y: 360, temp: 30, day: 4 },
+      ];
+
+      function resetLineDemo() {
+        lineStep = 0;
+
+        document.getElementById("lineGraph").innerHTML = `
+    
+    <div class="axis-label x-label">
+        Days
+    </div>
+
+    <div class="axis-label y-label">
+        Temperature
+    </div>
+
+    `;
+
+        document.getElementById("lineMessage").innerHTML =
+          "A line plot helps us see change over time";
+      }
+
+      function drawPoint(p) {
+        let point = document.createElement("div");
+
+        point.className = "point red-point";
+
+        point.style.left = p.x + "px";
+
+        point.style.bottom = p.y + "px";
+
+        let label = document.createElement("div");
+
+        label.className = "label";
+
+        label.style.left = p.x - 10 + "px";
+
+        label.style.bottom = p.y + 35 + "px";
+
+        label.innerHTML = p.temp + "°";
+
+        document.getElementById("lineGraph").appendChild(point);
+
+        document.getElementById("lineGraph").appendChild(label);
+      }
+
+      function drawLine(p1, p2) {
+        let line = document.createElement("div");
+
+        line.className = "line";
+
+        let dx = p2.x - p1.x;
+        let dy = p2.y - p1.y;
+
+        let length = Math.sqrt(dx * dx + dy * dy);
+
+        let angle = (Math.atan2(-dy, dx) * 180) / Math.PI;
+
+        line.style.width = length + "px";
+
+        line.style.left = p1.x + "px";
+
+        line.style.bottom = p1.y + "px";
+
+        line.style.transform = `rotate(${angle}deg)`;
+
+        document.getElementById("lineGraph").appendChild(line);
+      }
+
+      function nextLineStep() {
+        if (lineStep < linePoints.length) {
+          drawPoint(linePoints[lineStep]);
+
+          document.getElementById("lineMessage").innerHTML =
+            "Plotting temperature point";
+
+          if (lineStep > 0) {
+            drawLine(linePoints[lineStep - 1], linePoints[lineStep]);
+
+            document.getElementById("lineMessage").innerHTML =
+              "Now connecting points";
+          }
+
+          lineStep++;
+        } else {
+          document.getElementById("lineMessage").innerHTML =
+            "✅ Line plot = connected data points";
+        }
+      }
+
+      /* ================================================= */
+      /* SCATTER PLOT */
+      /* ================================================= */
+
+      const redPoints = [
+        { x: 150, y: 120 },
+        { x: 220, y: 180 },
+        { x: 280, y: 140 },
+        { x: 320, y: 260 },
+        { x: 370, y: 220 },
+      ];
+
+      const bluePoints = [
+        { x: 620, y: 140 },
+        { x: 680, y: 240 },
+        { x: 740, y: 180 },
+        { x: 800, y: 300 },
+        { x: 850, y: 220 },
+      ];
+
+      function resetScatterDemo() {
+        document.getElementById("scatterGraph").innerHTML = `
+    
+    <div class="axis-label x-label">
+        Weight
+    </div>
+
+    <div class="axis-label y-label">
+        Height
+    </div>
+
+    `;
+
+        document.getElementById("scatterMessage").innerHTML =
+          "Scatter plots show relationships between data points";
+      }
+
+      function addScatterPoint(x, y, color) {
+        let point = document.createElement("div");
+
+        point.className = "point " + color;
+
+        point.style.left = x + "px";
+
+        point.style.bottom = y + "px";
+
+        document.getElementById("scatterGraph").appendChild(point);
+      }
+
+      function showScatterPoints() {
+        resetScatterDemo();
+
+        redPoints.forEach((p) => {
+          addScatterPoint(p.x, p.y, "red-point");
+        });
+
+        bluePoints.forEach((p) => {
+          addScatterPoint(p.x, p.y, "blue-point");
+        });
+
+        document.getElementById("scatterMessage").innerHTML =
+          "Different colors represent different classes";
+      }
+
+      function showBoundary() {
+        let boundary = document.createElement("div");
+
+        boundary.className = "boundary";
+
+        document.getElementById("scatterGraph").appendChild(boundary);
+
+        document.getElementById("scatterMessage").innerHTML =
+          "Machine Learning tries to separate groups/classes";
+      }
+    </script>
+  </body>
+</html>

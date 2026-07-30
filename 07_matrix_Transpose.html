@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Matrix Transpose Intuition</title>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+        background: #f4f7fb;
+        padding: 40px;
+        color: #222;
+      }
+
+      .main-title {
+        text-align: center;
+        font-size: 54px;
+        margin-bottom: 50px;
+      }
+
+      .section {
+        background: white;
+        border-radius: 24px;
+        padding: 40px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      }
+
+      .section-title {
+        text-align: center;
+        font-size: 40px;
+        margin-bottom: 20px;
+      }
+
+      .subtitle {
+        text-align: center;
+        font-size: 26px;
+        color: #555;
+        margin-bottom: 40px;
+      }
+
+      .controls {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-bottom: 40px;
+      }
+
+      button {
+        padding: 16px 28px;
+        border: none;
+        border-radius: 14px;
+        font-size: 22px;
+        color: white;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      button:hover {
+        transform: scale(1.05);
+      }
+
+      .blue {
+        background: #1565c0;
+      }
+
+      .green {
+        background: #2e7d32;
+      }
+
+      .red {
+        background: #c62828;
+      }
+
+      .demo-area {
+        min-height: 760px;
+        border-radius: 24px;
+        background: #fafafa;
+        position: relative;
+        overflow: hidden;
+        padding: 40px;
+      }
+
+      .matrix-section {
+        display: flex;
+        justify-content: space-around;
+        align-items: flex-start;
+        margin-top: 40px;
+      }
+
+      .matrix-container {
+        text-align: center;
+      }
+
+      .matrix-label {
+        font-size: 32px;
+        font-weight: bold;
+        margin-bottom: 30px;
+      }
+
+      .matrix {
+        display: grid;
+        gap: 12px;
+        justify-content: center;
+      }
+
+      .matrix-2x3 {
+        grid-template-columns: repeat(3, 90px);
+      }
+
+      .matrix-3x2 {
+        grid-template-columns: repeat(2, 90px);
+        grid-template-rows: repeat(3, 90px);
+        gap: 18px;
+      }
+
+      .box {
+        width: 90px;
+        height: 90px;
+        border-radius: 16px;
+        border: 4px solid #222;
+        background: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 34px;
+        font-weight: bold;
+        transition: 1s;
+      }
+
+      .red-box {
+        background: #ffcdd2;
+        border-color: #c62828;
+      }
+
+      .blue-box {
+        background: #bbdefb;
+        border-color: #1565c0;
+      }
+
+      .highlight {
+        transform: scale(1.12);
+        box-shadow: 0 0 25px #ff9800;
+      }
+
+      .arrow {
+        font-size: 80px;
+        margin-top: 120px;
+      }
+
+      .message {
+        margin-top: 40px;
+        text-align: center;
+        font-size: 32px;
+        font-weight: bold;
+        min-height: 50px;
+      }
+
+      .code {
+        margin-top: 40px;
+        background: #1e1e1e;
+        color: #00ff99;
+        padding: 24px;
+        border-radius: 18px;
+        font-size: 24px;
+        line-height: 1.8;
+        overflow-x: auto;
+      }
+
+      .info {
+        text-align: center;
+        font-size: 28px;
+        margin-top: 30px;
+        color: #555;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="main-title">🔄 Matrix Transpose Intuition</div>
+
+    <div class="section">
+      <div class="section-title">Rows Become Columns</div>
+
+      <div class="subtitle">Transpose rotates matrix structure visually</div>
+
+      <div class="controls">
+        <button class="blue" onclick="runTranspose()">Run Transpose</button>
+
+        <button class="green" onclick="runExample2()">Example 2</button>
+
+        <button class="red" onclick="resetDemo()">Reset</button>
+      </div>
+
+      <div class="demo-area">
+        <div class="matrix-section">
+          <!-- ORIGINAL -->
+
+          <div class="matrix-container">
+            <div class="matrix-label">Original Matrix</div>
+
+            <div class="matrix matrix-2x3">
+              <div class="box red-box" id="a1">1</div>
+              <div class="box red-box" id="a2">2</div>
+              <div class="box red-box" id="a3">3</div>
+
+              <div class="box blue-box" id="a4">4</div>
+              <div class="box blue-box" id="a5">5</div>
+              <div class="box blue-box" id="a6">6</div>
+            </div>
+
+            <div class="info">2 × 3 Matrix</div>
+          </div>
+
+          <div class="arrow">➡️</div>
+
+          <!-- TRANSPOSE -->
+
+          <div class="matrix-container">
+            <div class="matrix-label">Transpose Matrix</div>
+
+            <div class="matrix matrix-3x2">
+              <div class="box" id="t1">?</div>
+              <div class="box" id="t2">?</div>
+
+              <div class="box" id="t3">?</div>
+              <div class="box" id="t4">?</div>
+
+              <div class="box" id="t5">?</div>
+              <div class="box" id="t6">?</div>
+            </div>
+
+            <div class="info">3 × 2 Matrix</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="message" id="mainMessage">
+        Click Run Transpose to visualize
+      </div>
+
+      <div class="code">
+        A = [ [1,2,3], [4,5,6] ] Aᵀ = [ [1,4], [2,5], [3,6] ]
+      </div>
+    </div>
+
+    <script>
+      function sleep(ms) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+      }
+
+      function resetDemo() {
+        let transposeBoxes = ["t1", "t2", "t3", "t4", "t5", "t6"];
+
+        transposeBoxes.forEach((id) => {
+          let el = document.getElementById(id);
+
+          el.innerHTML = "?";
+
+          el.classList.remove("red-box", "blue-box", "highlight");
+        });
+
+        document.getElementById("mainMessage").innerHTML =
+          "Click Run Transpose to visualize";
+      }
+
+      async function animateMove(
+        sourceId,
+        targetId,
+        value,
+        colorClass,
+        message,
+      ) {
+        let source = document.getElementById(sourceId);
+
+        let target = document.getElementById(targetId);
+
+        document.getElementById("mainMessage").innerHTML = message;
+
+        source.classList.add("highlight");
+
+        let sourceRect = source.getBoundingClientRect();
+
+        let targetRect = target.getBoundingClientRect();
+
+        let clone = document.createElement("div");
+
+        clone.className = source.className;
+
+        clone.innerHTML = value;
+
+        clone.style.position = "fixed";
+
+        clone.style.left = sourceRect.left + "px";
+
+        clone.style.top = sourceRect.top + "px";
+
+        clone.style.width = sourceRect.width + "px";
+
+        clone.style.height = sourceRect.height + "px";
+
+        clone.style.zIndex = "9999";
+
+        clone.style.transition = "all 1.8s ease-in-out";
+
+        document.body.appendChild(clone);
+
+        await sleep(100);
+
+        clone.style.left = targetRect.left + "px";
+
+        clone.style.top = targetRect.top + "px";
+
+        clone.style.transform = "rotate(360deg) scale(1.08)";
+
+        await sleep(1900);
+
+        target.innerHTML = value;
+
+        target.classList.add(colorClass);
+
+        target.classList.add("highlight");
+
+        clone.remove();
+
+        source.classList.remove("highlight");
+
+        await sleep(700);
+
+        target.classList.remove("highlight");
+      }
+
+      async function runTranspose() {
+        resetDemo();
+
+        document.getElementById("mainMessage").innerHTML =
+          "🔴 First ROW becomes first COLUMN";
+
+        await animateMove(
+          "a1",
+          "t1",
+          "1",
+          "red-box",
+          "1 moves into first column",
+        );
+
+        await animateMove("a2", "t3", "2", "red-box", "2 moves downward");
+
+        await animateMove(
+          "a3",
+          "t5",
+          "3",
+          "red-box",
+          "3 completes first column",
+        );
+
+        document.getElementById("mainMessage").innerHTML =
+          "🔵 Second ROW becomes second COLUMN";
+
+        await animateMove(
+          "a4",
+          "t2",
+          "4",
+          "blue-box",
+          "4 starts second column",
+        );
+
+        await animateMove("a5", "t4", "5", "blue-box", "5 moves downward");
+
+        await animateMove(
+          "a6",
+          "t6",
+          "6",
+          "blue-box",
+          "6 completes second column",
+        );
+
+        document.getElementById("mainMessage").innerHTML =
+          "✅ Rows successfully became columns";
+      }
+
+      async function runExample2() {
+        resetDemo();
+
+        document.getElementById("a1").innerHTML = "7";
+        document.getElementById("a2").innerHTML = "8";
+        document.getElementById("a3").innerHTML = "9";
+
+        document.getElementById("a4").innerHTML = "1";
+        document.getElementById("a5").innerHTML = "2";
+        document.getElementById("a6").innerHTML = "3";
+
+        document.getElementById("mainMessage").innerHTML =
+          "🔴 First ROW rotating into first COLUMN";
+
+        await animateMove(
+          "a1",
+          "t1",
+          "7",
+          "red-box",
+          "7 moves into first column",
+        );
+
+        await animateMove("a2", "t3", "8", "red-box", "8 moves downward");
+
+        await animateMove(
+          "a3",
+          "t5",
+          "9",
+          "red-box",
+          "9 completes first column",
+        );
+
+        document.getElementById("mainMessage").innerHTML =
+          "🔵 Second ROW rotating into second COLUMN";
+
+        await animateMove(
+          "a4",
+          "t2",
+          "1",
+          "blue-box",
+          "1 moves into second column",
+        );
+
+        await animateMove("a5", "t4", "2", "blue-box", "2 moves downward");
+
+        await animateMove(
+          "a6",
+          "t6",
+          "3",
+          "blue-box",
+          "3 completes second column",
+        );
+
+        document.getElementById("mainMessage").innerHTML =
+          "✅ Transpose visualized successfully";
+      }
+    </script>
+  </body>
+</html>

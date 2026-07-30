@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lists vs Tuples - Interactive Animation</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        margin: 0;
+        padding: 20px;
+        color: #333;
+      }
+      .container {
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+      h1 {
+        text-align: center;
+        color: #2c3e50;
+        margin-bottom: 30px;
+      }
+
+      .section {
+        display: flex;
+        gap: 40px;
+        margin-bottom: 60px;
+        flex-wrap: wrap;
+      }
+      .panel {
+        flex: 1;
+        min-width: 480px;
+        background: white;
+        border-radius: 16px;
+        padding: 25px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      }
+      .panel h2 {
+        text-align: center;
+        margin-top: 0;
+        color: #2980b9;
+        border-bottom: 3px solid #3498db;
+        padding-bottom: 10px;
+      }
+      .list-container {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin: 30px 0;
+        flex-wrap: wrap;
+      }
+      .box {
+        width: 110px;
+        height: 110px;
+        border: 4px solid #34495e;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 17px;
+        font-weight: bold;
+        transition: all 0.4s ease;
+        background: white;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        position: relative;
+      }
+      .tuple-box {
+        border: 4px solid #e74c3c;
+        background: #fff5f5;
+      }
+      .index-label {
+        position: absolute;
+        bottom: -28px;
+        font-size: 14px;
+        color: #7f8c8d;
+      }
+      .item {
+        animation: dropIn 0.8s ease forwards;
+      }
+      @keyframes dropIn {
+        0% {
+          transform: translateY(-150px);
+          opacity: 0;
+        }
+        100% {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+      .highlight {
+        animation: highlightPulse 1.5s ease;
+        border-color: #f39c12 !important;
+        box-shadow: 0 0 0 8px rgba(243, 156, 18, 0.3);
+      }
+      @keyframes highlightPulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.08);
+        }
+      }
+      .locked::after {
+        content: "🔒";
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        font-size: 24px;
+      }
+      button {
+        background: #3498db;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        margin: 8px;
+      }
+      button:hover {
+        background: #2980b9;
+        transform: translateY(-2px);
+      }
+      .error {
+        color: #e74c3c;
+        font-weight: bold;
+        animation: shake 0.4s;
+      }
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        25% {
+          transform: translateX(-8px);
+        }
+        75% {
+          transform: translateX(8px);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🐍 Lists vs Tuples — Visual Intuition</h1>
+
+      <div class="section">
+        <!-- LIST -->
+        <div class="panel">
+          <h2>📋 List (Mutable) - Can Change</h2>
+          <div class="list-container" id="list-container"></div>
+          <div style="text-align: center">
+            <button onclick="addToList()">➕ Add Fruit</button>
+            <button onclick="changeListItem()">🍌 → 🍊 Change Banana</button>
+            <button onclick="resetList()">Reset List</button>
+          </div>
+        </div>
+
+        <!-- TUPLE -->
+        <div class="panel">
+          <h2>📦 Tuple (Immutable) - Cannot Change</h2>
+          <div class="list-container" id="tuple-container"></div>
+          <div style="text-align: center">
+            <button onclick="tryChangeTuple()" style="background: #e74c3c">
+              Try to Change Tuple
+            </button>
+            <button onclick="resetTuple()">Reset Tuple</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const fruits = ["🍎 Apple", "🍌 Banana", "🥭 Mango"];
+
+      function createBoxes(containerId, isTuple = false) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = "";
+        fruits.forEach((fruit, i) => {
+          const box = document.createElement("div");
+          box.className = `box ${isTuple ? "tuple-box locked" : ""} item`;
+          box.innerHTML = `${fruit}<div class="index-label">${i}</div>`;
+          container.appendChild(box);
+        });
+      }
+
+      function addToList() {
+        const container = document.getElementById("list-container");
+        const newBox = document.createElement("div");
+        newBox.className = "box item";
+        newBox.innerHTML = `🍊 Orange<div class="index-label">${fruits.length}</div>`;
+        container.appendChild(newBox);
+        newBox.classList.add("highlight");
+        setTimeout(() => newBox.classList.remove("highlight"), 1500);
+      }
+
+      function changeListItem() {
+        const boxes = document.querySelectorAll("#list-container .box");
+        if (boxes.length > 1) {
+          const target = boxes[1];
+          target.style.opacity = "0";
+          setTimeout(() => {
+            target.innerHTML = `🍊 Orange<div class="index-label">1</div>`;
+            target.style.opacity = "1";
+            target.classList.add("highlight");
+            setTimeout(() => target.classList.remove("highlight"), 1200);
+          }, 600);
+        }
+      }
+
+      function tryChangeTuple() {
+        const boxes = document.querySelectorAll("#tuple-container .box");
+        if (boxes.length > 1) {
+          const box = boxes[1];
+          box.classList.add("error");
+          const msg = document.createElement("div");
+          msg.className = "error";
+          msg.style.marginTop = "15px";
+          msg.textContent =
+            "❌ TypeError: 'tuple' object does not support item assignment";
+          box.parentNode.appendChild(msg);
+          setTimeout(() => {
+            msg.remove();
+            box.classList.remove("error");
+          }, 3000);
+        }
+      }
+
+      function resetList() {
+        createBoxes("list-container", false);
+      }
+      function resetTuple() {
+        createBoxes("tuple-container", true);
+      }
+
+      window.onload = () => {
+        createBoxes("list-container", false);
+        createBoxes("tuple-container", true);
+      };
+    </script>
+  </body>
+</html>

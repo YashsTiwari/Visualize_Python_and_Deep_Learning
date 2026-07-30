@@ -1,0 +1,677 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Encoder Compression</title>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+      }
+
+      body {
+        background: #f4f7fb;
+        padding: 20px;
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .controls {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      button {
+        padding: 12px 18px;
+        margin: 5px;
+        border: none;
+        border-radius: 10px;
+        background: #1565c0;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+      }
+
+      .scene {
+        position: relative;
+
+        height: 800px;
+
+        background: white;
+
+        border-radius: 20px;
+
+        overflow: hidden;
+
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+      }
+
+      #message {
+        position: absolute;
+
+        top: 20px;
+
+        width: 100%;
+
+        text-align: center;
+
+        font-size: 28px;
+
+        font-weight: bold;
+
+        z-index: 1000;
+      }
+
+      /* ====================
+DATA BALL
+==================== */
+
+      #dataBall {
+        position: absolute;
+
+        left: 70px;
+
+        top: 340px;
+
+        padding: 18px 25px;
+
+        background: #fff8e1;
+
+        border: 3px solid orange;
+
+        border-radius: 15px;
+
+        font-size: 28px;
+
+        font-weight: bold;
+
+        display: none;
+
+        transition: all 1.5s ease;
+
+        z-index: 10;
+      }
+
+      /* ====================
+STAGES
+==================== */
+
+      .stage {
+        position: absolute;
+
+        text-align: center;
+
+        font-size: 90px;
+
+        display: none;
+
+        transition: all 1s ease;
+      }
+
+      #stage1 {
+        left: 120px;
+
+        top: 220px;
+      }
+
+      #stage2 {
+        left: 360px;
+
+        top: 240px;
+
+        transform: scale(0.8);
+      }
+
+      #stage3 {
+        left: 590px;
+
+        top: 270px;
+
+        transform: scale(0.65);
+      }
+
+      #stage4 {
+        left: 800px;
+
+        top: 300px;
+
+        transform: scale(0.5);
+      }
+
+      #stage5 {
+        left: 1010px;
+
+        top: 330px;
+
+        transform: scale(0.4);
+      }
+
+      .stageLabel {
+        font-size: 22px;
+
+        font-weight: bold;
+
+        margin-top: 10px;
+      }
+
+      /* ====================
+ARROWS
+==================== */
+
+      .arrow {
+        position: absolute;
+
+        font-size: 40px;
+
+        display: none;
+      }
+
+      #arrow1 {
+        left: 280px;
+
+        top: 310px;
+      }
+
+      #arrow2 {
+        left: 510px;
+
+        top: 310px;
+      }
+
+      #arrow3 {
+        left: 720px;
+
+        top: 310px;
+      }
+
+      #arrow4 {
+        left: 930px;
+
+        top: 310px;
+      }
+
+      /* ====================
+FLOW DIAGRAM
+==================== */
+
+      #flowDiagram {
+        position: absolute;
+
+        right: 70px;
+
+        top: 120px;
+
+        width: 180px;
+
+        padding: 25px;
+
+        background: white;
+
+        border-radius: 20px;
+
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
+
+        font-size: 32px;
+
+        font-weight: bold;
+
+        text-align: center;
+
+        line-height: 1.8;
+
+        display: none;
+      }
+
+      /* ====================
+FINAL CARD
+==================== */
+
+      #finalCard {
+        position: absolute;
+
+        left: 50%;
+
+        top: 50%;
+
+        transform: translate(-50%, -50%);
+
+        width: 750px;
+
+        padding: 40px;
+
+        background: white;
+
+        border-radius: 20px;
+
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+
+        font-size: 30px;
+
+        line-height: 2;
+
+        text-align: center;
+
+        display: none;
+      }
+
+      /* ====================
+HELPERS
+==================== */
+
+      .glow {
+        box-shadow:
+          0 0 20px gold,
+          0 0 40px gold;
+      }
+
+      .pulse {
+        animation: pulse 1s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+
+        50% {
+          transform: scale(1.08);
+        }
+
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .fade {
+        opacity: 0.2;
+      }
+
+      .success {
+        background: #e8f5e9;
+        border: 3px solid green;
+      }
+
+      .bigText {
+        font-size: 42px;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>🧠 Encoder Compression</h1>
+
+    <div class="controls">
+      <button onclick="step1()">1️⃣ 784 Features</button>
+
+      <button onclick="step2()">2️⃣ 128 Features</button>
+
+      <button onclick="step3()">3️⃣ 32 Features</button>
+
+      <button onclick="step4()">4️⃣ 8 Features</button>
+
+      <button onclick="step5()">5️⃣ Bottleneck (2)</button>
+
+      <button onclick="step6()">6️⃣ Final Lesson</button>
+    </div>
+
+    <div class="scene">
+      <div id="message">Press Step 1</div>
+
+      <!-- DATA BALL -->
+
+      <div id="dataBall">📄 Data</div>
+
+      <!-- STAGES -->
+
+      <div id="stage1" class="stage">
+        🧳
+
+        <div class="stageLabel">784 Features</div>
+      </div>
+
+      <div id="stage2" class="stage">
+        🧳
+
+        <div class="stageLabel">128 Features</div>
+      </div>
+
+      <div id="stage3" class="stage">
+        👜
+
+        <div class="stageLabel">32 Features</div>
+      </div>
+
+      <div id="stage4" class="stage">
+        🎒
+
+        <div class="stageLabel">8 Features</div>
+      </div>
+
+      <div id="stage5" class="stage">
+        📦
+
+        <div class="stageLabel">2 Features</div>
+      </div>
+
+      <!-- ARROWS -->
+
+      <div id="arrow1" class="arrow">➡️</div>
+      <div id="arrow2" class="arrow">➡️</div>
+      <div id="arrow3" class="arrow">➡️</div>
+      <div id="arrow4" class="arrow">➡️</div>
+
+      <!-- FLOW -->
+
+      <div id="flowDiagram">
+        784
+
+        <br />
+
+        ↓
+
+        <br />
+
+        128
+
+        <br />
+
+        ↓
+
+        <br />
+
+        32
+
+        <br />
+
+        ↓
+
+        <br />
+
+        8
+
+        <br />
+
+        ↓
+
+        <br />
+
+        2
+      </div>
+
+      <!-- FINAL -->
+
+      <div id="finalCard"></div>
+    </div>
+
+    <script>
+      const msg = document.getElementById("message");
+
+      function hideAll() {
+        document.getElementById("dataBall").style.display = "none";
+
+        document.getElementById("stage1").style.display = "none";
+        document.getElementById("stage2").style.display = "none";
+        document.getElementById("stage3").style.display = "none";
+        document.getElementById("stage4").style.display = "none";
+        document.getElementById("stage5").style.display = "none";
+
+        document.getElementById("arrow1").style.display = "none";
+        document.getElementById("arrow2").style.display = "none";
+        document.getElementById("arrow3").style.display = "none";
+        document.getElementById("arrow4").style.display = "none";
+
+        document.getElementById("flowDiagram").style.display = "none";
+
+        document.getElementById("finalCard").style.display = "none";
+
+        document.getElementById("dataBall").style.left = "70px";
+        document.getElementById("dataBall").style.top = "340px";
+
+        document.getElementById("stage1").classList.remove("glow");
+        document.getElementById("stage2").classList.remove("glow");
+        document.getElementById("stage3").classList.remove("glow");
+        document.getElementById("stage4").classList.remove("glow");
+        document.getElementById("stage5").classList.remove("glow");
+      }
+
+      /* =========================
+STEP 1
+784 FEATURES
+========================= */
+
+      function step1() {
+        hideAll();
+
+        msg.innerHTML = "We start with a lot of information.";
+
+        document.getElementById("stage1").style.display = "block";
+
+        document.getElementById("stage1").classList.add("glow");
+
+        document.getElementById("dataBall").style.display = "block";
+      }
+
+      /* =========================
+STEP 2
+128 FEATURES
+========================= */
+
+      function step2() {
+        hideAll();
+
+        document.getElementById("stage1").style.display = "block";
+        document.getElementById("stage2").style.display = "block";
+
+        document.getElementById("arrow1").style.display = "block";
+
+        document.getElementById("dataBall").style.display = "block";
+
+        msg.innerHTML = "Encoder removes some unnecessary details.";
+
+        setTimeout(() => {
+          document.getElementById("dataBall").style.left = "380px";
+        }, 1000);
+
+        setTimeout(() => {
+          document.getElementById("stage2").classList.add("glow");
+
+          msg.innerHTML = "784 → 128 Features";
+        }, 2500);
+      }
+
+      /* =========================
+STEP 3
+32 FEATURES
+========================= */
+
+      function step3() {
+        hideAll();
+
+        document.getElementById("stage1").style.display = "block";
+        document.getElementById("stage2").style.display = "block";
+        document.getElementById("stage3").style.display = "block";
+
+        document.getElementById("arrow1").style.display = "block";
+        document.getElementById("arrow2").style.display = "block";
+
+        document.getElementById("dataBall").style.display = "block";
+
+        msg.innerHTML = "Compression continues.";
+
+        setTimeout(() => {
+          document.getElementById("dataBall").style.left = "380px";
+        }, 1000);
+
+        setTimeout(() => {
+          document.getElementById("dataBall").style.left = "610px";
+        }, 3000);
+
+        setTimeout(() => {
+          document.getElementById("stage3").classList.add("glow");
+
+          msg.innerHTML = "128 → 32 Features";
+        }, 4500);
+      }
+
+      /* =========================
+STEP 4
+8 FEATURES
+========================= */
+
+      function step4() {
+        hideAll();
+
+        document.getElementById("stage1").style.display = "block";
+        document.getElementById("stage2").style.display = "block";
+        document.getElementById("stage3").style.display = "block";
+        document.getElementById("stage4").style.display = "block";
+
+        document.getElementById("arrow1").style.display = "block";
+        document.getElementById("arrow2").style.display = "block";
+        document.getElementById("arrow3").style.display = "block";
+
+        document.getElementById("dataBall").style.display = "block";
+
+        msg.innerHTML = "Only important information remains.";
+
+        setTimeout(() => {
+          document.getElementById("dataBall").style.left = "380px";
+        }, 1000);
+
+        setTimeout(() => {
+          document.getElementById("dataBall").style.left = "610px";
+        }, 2500);
+
+        setTimeout(() => {
+          document.getElementById("dataBall").style.left = "820px";
+        }, 4000);
+
+        setTimeout(() => {
+          document.getElementById("stage4").classList.add("glow");
+
+          msg.innerHTML = "32 → 8 Features";
+        }, 5500);
+      }
+
+      /* =========================
+STEP 5
+BOTTLENECK
+========================= */
+
+      function step5() {
+        hideAll();
+
+        document.getElementById("stage1").style.display = "block";
+        document.getElementById("stage2").style.display = "block";
+        document.getElementById("stage3").style.display = "block";
+        document.getElementById("stage4").style.display = "block";
+        document.getElementById("stage5").style.display = "block";
+
+        document.getElementById("arrow1").style.display = "block";
+        document.getElementById("arrow2").style.display = "block";
+        document.getElementById("arrow3").style.display = "block";
+        document.getElementById("arrow4").style.display = "block";
+
+        document.getElementById("flowDiagram").style.display = "block";
+
+        document.getElementById("dataBall").style.display = "block";
+
+        msg.innerHTML =
+          "The bottleneck contains the compressed representation.";
+
+        setTimeout(() => {
+          document.getElementById("dataBall").style.left = "380px";
+        }, 1000);
+
+        setTimeout(() => {
+          document.getElementById("dataBall").style.left = "610px";
+        }, 2200);
+
+        setTimeout(() => {
+          document.getElementById("dataBall").style.left = "820px";
+        }, 3400);
+
+        setTimeout(() => {
+          document.getElementById("dataBall").style.left = "1030px";
+        }, 4600);
+
+        setTimeout(() => {
+          document.getElementById("stage5").classList.add("glow");
+
+          msg.innerHTML = "784 → 128 → 32 → 8 → 2";
+        }, 6000);
+      }
+
+      /* =========================
+STEP 6
+FINAL LESSON
+========================= */
+
+      function step6() {
+        hideAll();
+
+        document.getElementById("finalCard").style.display = "block";
+
+        document.getElementById("finalCard").innerHTML = `
+
+<h2>🧠 Encoder Compression</h2>
+
+<br>
+
+🧳 784 Features
+
+<br>
+
+↓
+
+<br>
+
+🧳 128 Features
+
+<br>
+
+↓
+
+<br>
+
+👜 32 Features
+
+<br>
+
+↓
+
+<br>
+
+🎒 8 Features
+
+<br>
+
+↓
+
+<br>
+
+📦 2 Features
+
+<br><br>
+
+Encoder keeps the most
+important information.
+
+<br><br>
+
+Unnecessary details are removed.
+
+`;
+
+        msg.innerHTML = "Encoder gradually compresses information.";
+      }
+    </script>
+  </body>
+</html>
