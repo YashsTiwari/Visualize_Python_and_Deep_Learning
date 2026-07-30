@@ -1,0 +1,1695 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DINO v1 — One Training Iteration</title>
+    <style>
+      :root {
+        --gray: #6b7280;
+        --gray-bg: #eef0f2;
+        --gray-ink: #374151;
+        --blue: #2563eb;
+        --blue-bg: #dbeafe;
+        --blue-ink: #1e40af;
+        --orange: #f97316;
+        --orange-bg: #ffedd5;
+        --orange-ink: #9a3412;
+        --purple: #7c3aed;
+        --purple-bg: #f5f3ff;
+        --purple-ink: #5b21b6;
+        --green: #059669;
+        --green-bg: #ecfdf5;
+        --green-ink: #065f46;
+        --cyan: #0891b2;
+        --cyan-bg: #cffafe;
+        --cyan-ink: #155e75;
+        --yellow: #d97706;
+        --yellow-bg: #fef3c7;
+        --yellow-ink: #92400e;
+        --red: #dc2626;
+        --red-bg: #fee2e2;
+        --red-ink: #991b1b;
+        --darkpurple: #4c1d95;
+        --darkpurple-bg: #ede7fb;
+        --ink: #111827;
+        --paper: #ffffff;
+        --muted: #9ca3af;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        background: var(--paper);
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto,
+          Helvetica, Arial, sans-serif;
+        color: var(--ink);
+        overflow-x: hidden;
+      }
+      .app {
+        max-width: 1500px;
+        margin: 0 auto;
+        padding: 22px 20px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .app-header {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .app-header h1 {
+        font-size: 17px;
+        font-weight: 600;
+        letter-spacing: 0.2px;
+        color: var(--ink);
+        margin: 0;
+      }
+      .app-header .hint {
+        font-size: 12px;
+        color: var(--muted);
+        font-weight: 500;
+      }
+      .stage-wrapper {
+        width: 100%;
+        overflow: hidden;
+        border-radius: 20px;
+        background: radial-gradient(circle at 15% 10%, #fafafb 0%, #ffffff 55%);
+        border: 1px solid #f0f1f3;
+        position: relative;
+      }
+      #stage {
+        position: relative;
+        transform-origin: top left;
+      }
+      svg#arrowLayer {
+        position: absolute;
+        left: 0;
+        top: 0;
+        z-index: 1;
+        overflow: visible;
+        pointer-events: none;
+      }
+      .node {
+        position: absolute;
+        border-radius: 18px;
+        border-width: 2.5px;
+        border-style: solid;
+        background: var(--paper);
+        box-shadow: 0 3px 10px rgba(17, 24, 39, 0.06);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 6px 10px;
+        font-weight: 600;
+        line-height: 1.25;
+        z-index: 3;
+        opacity: 0;
+        transform-origin: center center;
+        will-change: opacity, transform;
+      }
+      .node.small-text {
+        font-size: 14px;
+      }
+      .node.mid-text {
+        font-size: 15.5px;
+      }
+      .node.big-text {
+        font-size: 17px;
+      }
+
+      .n-original {
+        border-color: var(--gray);
+        background: var(--gray-bg);
+        color: var(--gray-ink);
+      }
+      .n-global {
+        border-color: var(--blue);
+        background: var(--blue-bg);
+        color: var(--blue-ink);
+      }
+      .n-local {
+        border-color: var(--orange);
+        background: var(--orange-bg);
+        color: var(--orange-ink);
+        font-size: 12.5px;
+      }
+      .n-vit {
+        font-size: 14.5px;
+      }
+      .n-proj {
+        font-size: 14.5px;
+      }
+      .n-teacher-sub {
+        border-color: var(--purple);
+        background: #ffffff;
+        color: var(--purple-ink);
+      }
+      .n-student-sub {
+        border-color: var(--green);
+        background: #ffffff;
+        color: var(--green-ink);
+      }
+      .n-emb {
+        border-color: var(--cyan);
+        background: var(--cyan-bg);
+        color: var(--cyan-ink);
+      }
+      .n-dist {
+        border-color: var(--yellow);
+        background: var(--yellow-bg);
+        color: var(--yellow-ink);
+      }
+      .n-loss {
+        border-color: var(--red);
+        background: var(--red-bg);
+        color: var(--red-ink);
+        font-size: 18px;
+        font-weight: 700;
+      }
+
+      .container-box {
+        position: absolute;
+        border-radius: 26px;
+        border-width: 2px;
+        border-style: dashed;
+        z-index: 2;
+        opacity: 0;
+        transform-origin: center center;
+      }
+      .container-teacher {
+        border-color: #c4b5fd;
+        background: rgba(124, 58, 237, 0.035);
+      }
+      .container-student {
+        border-color: #a7f3d0;
+        background: rgba(5, 150, 105, 0.035);
+      }
+      .container-title {
+        position: absolute;
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        top: 14px;
+        left: 20px;
+      }
+      .title-teacher {
+        color: var(--purple);
+      }
+      .title-student {
+        color: var(--green);
+      }
+
+      .group-label {
+        position: absolute;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+        z-index: 3;
+        opacity: 0;
+      }
+      .label-global {
+        color: var(--blue);
+      }
+      .label-local {
+        color: var(--orange);
+      }
+
+      .pill-label {
+        position: absolute;
+        font-size: 14px;
+        font-weight: 700;
+        padding: 7px 16px;
+        border-radius: 999px;
+        z-index: 4;
+        opacity: 0;
+        white-space: nowrap;
+        transform: translate(-50%, -50%);
+        box-shadow: 0 3px 10px rgba(17, 24, 39, 0.1);
+      }
+      .pill-update {
+        background: var(--red-bg);
+        color: var(--red-ink);
+        border: 1.5px solid var(--red);
+      }
+      .pill-ema {
+        background: var(--darkpurple-bg);
+        color: var(--darkpurple);
+        border: 1.5px solid var(--darkpurple);
+      }
+      .pill-next {
+        background: #111827;
+        color: #fff;
+        border: 1.5px solid #111827;
+        font-size: 15px;
+        padding: 9px 20px;
+      }
+
+      .icon-wrap {
+        position: absolute;
+        inset: 0;
+      }
+      .icon-wrap svg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      /* ---------------- Controls ---------------- */
+      .controls {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+        background: #fafafa;
+        border: 1px solid #efeff1;
+        border-radius: 16px;
+        padding: 12px 16px;
+      }
+      .ctrl-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        border: 1px solid #e5e7eb;
+        background: #fff;
+        color: #111827;
+        cursor: pointer;
+        font-size: 15px;
+        transition:
+          background 0.15s ease,
+          border-color 0.15s ease,
+          transform 0.1s ease;
+      }
+      .ctrl-btn:hover {
+        background: #f3f4f6;
+      }
+      .ctrl-btn:active {
+        transform: scale(0.94);
+      }
+      .ctrl-btn.play {
+        width: 44px;
+        height: 44px;
+        font-size: 17px;
+        background: #111827;
+        color: #fff;
+        border-color: #111827;
+      }
+      .ctrl-btn.play:hover {
+        background: #1f2937;
+      }
+
+      .step-counter {
+        font-size: 12.5px;
+        color: var(--muted);
+        font-weight: 600;
+        min-width: 46px;
+        text-align: center;
+      }
+
+      .timeline {
+        flex: 1 1 260px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 180px;
+      }
+      input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 6px;
+        border-radius: 999px;
+        background: linear-gradient(
+          to right,
+          #111827 var(--fill, 0%),
+          #e5e7eb var(--fill, 0%)
+        );
+        outline: none;
+        cursor: pointer;
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #111827;
+        border: 2px solid #fff;
+        box-shadow: 0 0 0 1px #111827;
+        cursor: pointer;
+        margin-top: 0;
+      }
+      input[type="range"]::-moz-range-thumb {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #111827;
+        border: 2px solid #fff;
+        box-shadow: 0 0 0 1px #111827;
+        cursor: pointer;
+      }
+      .time-label {
+        font-size: 11.5px;
+        color: var(--muted);
+        font-variant-numeric: tabular-nums;
+        min-width: 38px;
+      }
+
+      .speed-group {
+        display: flex;
+        gap: 4px;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 3px;
+      }
+      .speed-btn {
+        border: none;
+        background: transparent;
+        padding: 6px 10px;
+        font-size: 12.5px;
+        font-weight: 600;
+        color: #6b7280;
+        border-radius: 7px;
+        cursor: pointer;
+      }
+      .speed-btn.active {
+        background: #111827;
+        color: #fff;
+      }
+
+      @media (max-width: 720px) {
+        .app-header .hint {
+          display: none;
+        }
+        .step-counter {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <div class="app-header">
+        <h1>DINO v1 — One Training Iteration</h1>
+        <span class="hint"
+          >Space play/pause · ← previous step · → next step</span
+        >
+      </div>
+
+      <div class="stage-wrapper" id="stageWrapper">
+        <div id="stage">
+          <svg id="arrowLayer">
+            <defs>
+              <marker
+                id="mk-blue"
+                markerWidth="18"
+                markerHeight="18"
+                refX="15"
+                refY="9"
+                viewBox="0 0 18 18"
+                orient="auto"
+              >
+                <path d="M2,2 L16,9 L2,16 Z" fill="var(--blue)"></path>
+              </marker>
+              <marker
+                id="mk-orange"
+                markerWidth="18"
+                markerHeight="18"
+                refX="15"
+                refY="9"
+                viewBox="0 0 18 18"
+                orient="auto"
+              >
+                <path d="M2,2 L16,9 L2,16 Z" fill="var(--orange)"></path>
+              </marker>
+              <marker
+                id="mk-purple"
+                markerWidth="18"
+                markerHeight="18"
+                refX="15"
+                refY="9"
+                viewBox="0 0 18 18"
+                orient="auto"
+              >
+                <path d="M2,2 L16,9 L2,16 Z" fill="var(--purple)"></path>
+              </marker>
+              <marker
+                id="mk-green"
+                markerWidth="18"
+                markerHeight="18"
+                refX="15"
+                refY="9"
+                viewBox="0 0 18 18"
+                orient="auto"
+              >
+                <path d="M2,2 L16,9 L2,16 Z" fill="var(--green)"></path>
+              </marker>
+              <marker
+                id="mk-cyan"
+                markerWidth="18"
+                markerHeight="18"
+                refX="15"
+                refY="9"
+                viewBox="0 0 18 18"
+                orient="auto"
+              >
+                <path d="M2,2 L16,9 L2,16 Z" fill="var(--cyan)"></path>
+              </marker>
+              <marker
+                id="mk-yellow"
+                markerWidth="18"
+                markerHeight="18"
+                refX="15"
+                refY="9"
+                viewBox="0 0 18 18"
+                orient="auto"
+              >
+                <path d="M2,2 L16,9 L2,16 Z" fill="var(--yellow)"></path>
+              </marker>
+              <marker
+                id="mk-red"
+                markerWidth="18"
+                markerHeight="18"
+                refX="15"
+                refY="9"
+                viewBox="0 0 18 18"
+                orient="auto"
+              >
+                <path d="M2,2 L16,9 L2,16 Z" fill="var(--red)"></path>
+              </marker>
+              <marker
+                id="mk-darkpurple"
+                markerWidth="18"
+                markerHeight="18"
+                refX="15"
+                refY="9"
+                viewBox="0 0 18 18"
+                orient="auto"
+              >
+                <path d="M2,2 L16,9 L2,16 Z" fill="var(--darkpurple)"></path>
+              </marker>
+            </defs>
+
+            <!-- teacher feed -->
+            <path
+              id="p-teacherFeed1"
+              d="M420,160 C470,155 495,150 520,150"
+              stroke="var(--blue)"
+              stroke-width="3.5"
+              fill="none"
+            ></path>
+            <path
+              id="p-teacherFeed2"
+              d="M420,310 C470,290 500,250 520,230"
+              stroke="var(--blue)"
+              stroke-width="3.5"
+              fill="none"
+            ></path>
+
+            <!-- student feed -->
+            <path
+              id="p-studentFeed-g1"
+              d="M420,160 C500,300 500,500 520,650"
+              stroke="var(--blue)"
+              stroke-width="3.5"
+              fill="none"
+            ></path>
+            <path
+              id="p-studentFeed-g2"
+              d="M420,310 C480,450 500,600 520,700"
+              stroke="var(--blue)"
+              stroke-width="3.5"
+              fill="none"
+            ></path>
+            <path
+              id="p-studentFeed-l1"
+              d="M385,445 C450,550 480,680 520,750"
+              stroke="var(--orange)"
+              stroke-width="3"
+              fill="none"
+            ></path>
+            <path
+              id="p-studentFeed-l2"
+              d="M385,550 C440,620 480,720 520,790"
+              stroke="var(--orange)"
+              stroke-width="3"
+              fill="none"
+            ></path>
+            <path
+              id="p-studentFeed-l3"
+              d="M385,655 C430,700 470,780 520,820"
+              stroke="var(--orange)"
+              stroke-width="3"
+              fill="none"
+            ></path>
+            <path
+              id="p-studentFeed-l4"
+              d="M385,760 C420,790 460,830 520,850"
+              stroke="var(--orange)"
+              stroke-width="3"
+              fill="none"
+            ></path>
+
+            <!-- internal teacher / student plumbing -->
+            <path
+              id="p-tVitProj"
+              d="M635,190 C635,213 635,227 635,250"
+              stroke="var(--purple)"
+              stroke-width="3"
+              fill="none"
+            ></path>
+            <path
+              id="p-sVitProj"
+              d="M635,710 C635,733 635,747 635,770"
+              stroke="var(--green)"
+              stroke-width="3"
+              fill="none"
+            ></path>
+
+            <path
+              id="p-tProjEmb"
+              d="M710,285 C830,285 900,285 1000,285"
+              stroke="var(--purple)"
+              stroke-width="3"
+              fill="none"
+            ></path>
+            <path
+              id="p-sProjEmb"
+              d="M710,805 C830,805 900,805 1000,805"
+              stroke="var(--green)"
+              stroke-width="3"
+              fill="none"
+            ></path>
+
+            <path
+              id="p-tEmbDist"
+              d="M1150,285 C1175,285 1195,285 1220,285"
+              stroke="var(--cyan)"
+              stroke-width="3"
+              fill="none"
+            ></path>
+            <path
+              id="p-sEmbDist"
+              d="M1150,805 C1175,805 1195,805 1220,805"
+              stroke="var(--cyan)"
+              stroke-width="3"
+              fill="none"
+            ></path>
+
+            <!-- distributions into loss -->
+            <path
+              id="p-tDistLoss"
+              d="M1410,285 C1450,330 1468,410 1480,520"
+              stroke="var(--yellow)"
+              stroke-width="3.5"
+              fill="none"
+            ></path>
+            <path
+              id="p-sDistLoss"
+              d="M1410,805 C1450,760 1468,660 1480,580"
+              stroke="var(--yellow)"
+              stroke-width="3.5"
+              fill="none"
+            ></path>
+
+            <!-- backprop -->
+            <path
+              id="p-backprop"
+              d="M1520,605 C1280,700 1120,755 920,758"
+              stroke="var(--red)"
+              stroke-width="3"
+              fill="none"
+              stroke-dasharray="10 7"
+              marker-end="url(#mk-red)"
+              opacity="0"
+            ></path>
+
+            <!-- ema: a clean outer loop around the bottom-right, well clear of every other box -->
+            <path
+              id="p-ema"
+              d="M720,860 C720,905 860,890 1150,890 L1600,890 C1730,890 1800,870 1800,760 L1800,160 C1800,60 1730,40 1600,40 L900,40 C800,40 720,50 720,60"
+              stroke="var(--darkpurple)"
+              stroke-width="3.5"
+              fill="none"
+            ></path>
+
+            <!-- particles -->
+            <circle
+              id="pt-teacherFeed1"
+              r="6"
+              fill="var(--blue)"
+              opacity="0"
+            ></circle>
+            <circle
+              id="pt-teacherFeed2"
+              r="6"
+              fill="var(--blue)"
+              opacity="0"
+            ></circle>
+            <circle
+              id="pt-studentFeed-g1"
+              r="6"
+              fill="var(--blue)"
+              opacity="0"
+            ></circle>
+            <circle
+              id="pt-studentFeed-g2"
+              r="6"
+              fill="var(--blue)"
+              opacity="0"
+            ></circle>
+            <circle
+              id="pt-studentFeed-l1"
+              r="5"
+              fill="var(--orange)"
+              opacity="0"
+            ></circle>
+            <circle
+              id="pt-studentFeed-l2"
+              r="5"
+              fill="var(--orange)"
+              opacity="0"
+            ></circle>
+            <circle
+              id="pt-studentFeed-l3"
+              r="5"
+              fill="var(--orange)"
+              opacity="0"
+            ></circle>
+            <circle
+              id="pt-studentFeed-l4"
+              r="5"
+              fill="var(--orange)"
+              opacity="0"
+            ></circle>
+            <circle
+              id="pt-tDistLoss"
+              r="6"
+              fill="var(--yellow)"
+              opacity="0"
+            ></circle>
+            <circle
+              id="pt-sDistLoss"
+              r="6"
+              fill="var(--yellow)"
+              opacity="0"
+            ></circle>
+            <circle
+              id="pt-backprop"
+              r="6.5"
+              fill="var(--red)"
+              opacity="0"
+            ></circle>
+            <circle
+              id="pt-ema"
+              r="7"
+              fill="var(--darkpurple)"
+              opacity="0"
+            ></circle>
+          </svg>
+
+          <!-- ============ NODES ============ -->
+
+          <div
+            class="node n-original"
+            id="originalImage"
+            style="left: 60px; top: 375px; width: 150px; height: 150px"
+          >
+            <div class="icon-wrap">
+              <svg id="iconA" viewBox="0 0 100 100" style="opacity: 1">
+                <circle
+                  cx="70"
+                  cy="26"
+                  r="10"
+                  fill="none"
+                  stroke="var(--gray)"
+                  stroke-width="4"
+                ></circle>
+                <path
+                  d="M8,78 L36,42 L54,64 L68,48 L92,78 Z"
+                  fill="none"
+                  stroke="var(--gray)"
+                  stroke-width="4"
+                  stroke-linejoin="round"
+                  stroke-linecap="round"
+                ></path>
+              </svg>
+              <svg id="iconB" viewBox="0 0 100 100" style="opacity: 0">
+                <path
+                  d="M50,14 C66,14 82,32 82,52 C82,74 66,86 50,86 C34,86 18,74 18,52 C18,32 34,14 50,14 Z"
+                  fill="none"
+                  stroke="var(--gray)"
+                  stroke-width="4"
+                ></path>
+                <path
+                  d="M50,30 C58,42 58,62 50,74 C42,62 42,42 50,30 Z"
+                  fill="none"
+                  stroke="var(--gray)"
+                  stroke-width="3.5"
+                ></path>
+              </svg>
+            </div>
+            <span
+              style="
+                position: absolute;
+                bottom: -30px;
+                left: 50%;
+                transform: translateX(-50%);
+                font-size: 13.5px;
+                font-weight: 700;
+                color: var(--gray-ink);
+                white-space: nowrap;
+              "
+              >Original Image</span
+            >
+          </div>
+
+          <div
+            class="node n-global"
+            id="global1"
+            style="width: 150px; height: 150px"
+          ></div>
+          <div
+            class="node n-global"
+            id="global2"
+            style="width: 150px; height: 150px"
+          ></div>
+          <div
+            class="node n-local"
+            id="local1"
+            style="width: 150px; height: 150px"
+          ></div>
+          <div
+            class="node n-local"
+            id="local2"
+            style="width: 150px; height: 150px"
+          ></div>
+          <div
+            class="node n-local"
+            id="local3"
+            style="width: 150px; height: 150px"
+          ></div>
+          <div
+            class="node n-local"
+            id="local4"
+            style="width: 150px; height: 150px"
+          ></div>
+
+          <span
+            class="group-label label-global"
+            id="globalLabel"
+            style="left: 280px; top: 74px"
+            >Global Views</span
+          >
+          <span
+            class="group-label label-local"
+            id="localLabel"
+            style="left: 295px; top: 382px"
+            >Local Views</span
+          >
+
+          <div
+            class="container-box container-teacher"
+            id="teacherContainer"
+            style="left: 520px; top: 60px; width: 400px; height: 280px"
+          >
+            <span class="container-title title-teacher">Teacher</span>
+          </div>
+          <div
+            class="container-box container-student"
+            id="studentContainer"
+            style="left: 520px; top: 580px; width: 400px; height: 280px"
+          >
+            <span class="container-title title-student">Student</span>
+          </div>
+
+          <div
+            class="node n-teacher-sub n-vit"
+            id="teacherVit"
+            style="left: 560px; top: 120px; width: 150px; height: 70px"
+          >
+            Vision<br />Transformer
+          </div>
+          <div
+            class="node n-teacher-sub n-proj"
+            id="teacherProj"
+            style="left: 560px; top: 250px; width: 150px; height: 70px"
+          >
+            Projection<br />Head
+          </div>
+          <div
+            class="node n-emb"
+            id="teacherEmb"
+            style="left: 1000px; top: 245px; width: 150px; height: 80px"
+          ></div>
+          <div
+            class="node n-dist mid-text"
+            id="teacherDist"
+            style="left: 1220px; top: 245px; width: 190px; height: 80px"
+          >
+            Teacher<br />Distribution
+          </div>
+
+          <div
+            class="node n-student-sub n-vit"
+            id="studentVit"
+            style="left: 560px; top: 640px; width: 150px; height: 70px"
+          >
+            Vision<br />Transformer
+          </div>
+          <div
+            class="node n-student-sub n-proj"
+            id="studentProj"
+            style="left: 560px; top: 770px; width: 150px; height: 70px"
+          >
+            Projection<br />Head
+          </div>
+          <div
+            class="node n-emb"
+            id="studentEmb"
+            style="left: 1000px; top: 765px; width: 150px; height: 80px"
+          ></div>
+          <div
+            class="node n-dist mid-text"
+            id="studentDist"
+            style="left: 1220px; top: 765px; width: 190px; height: 80px"
+          >
+            Student<br />Distribution
+          </div>
+
+          <div
+            class="node n-loss"
+            id="lossBox"
+            style="left: 1480px; top: 475px; width: 180px; height: 150px"
+          >
+            Cross<br />Entropy<br />Loss
+          </div>
+
+          <span
+            class="pill-label pill-update"
+            id="updateLabel"
+            style="left: 1150px; top: 686px"
+            >Update Student</span
+          >
+          <span
+            class="pill-label pill-ema"
+            id="emaLabel"
+            style="left: 1800px; top: 460px"
+            >EMA Update</span
+          >
+          <span
+            class="pill-label pill-next"
+            id="nextLabel"
+            style="left: 910px; top: 925px"
+            >Next Mini Batch</span
+          >
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="ctrl-btn" id="restartBtn" title="Restart">↺</button>
+        <button class="ctrl-btn play" id="playBtn" title="Play / Pause">
+          ▶
+        </button>
+        <button class="ctrl-btn" id="prevBtn" title="Previous step">⏮</button>
+        <button class="ctrl-btn" id="nextBtn" title="Next step">⏭</button>
+        <span class="step-counter" id="stepCounter">1 / 9</span>
+
+        <div class="timeline">
+          <span class="time-label" id="timeNow">0:00</span>
+          <input
+            type="range"
+            id="scrubber"
+            min="0"
+            max="1000"
+            value="0"
+            step="1"
+          />
+          <span class="time-label" id="timeTotal">0:00</span>
+        </div>
+
+        <div class="speed-group" id="speedGroup">
+          <button class="speed-btn" data-speed="0.5">0.5x</button>
+          <button class="speed-btn active" data-speed="1">1x</button>
+          <button class="speed-btn" data-speed="1.5">1.5x</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        /* ============================================================
+     TIMELINE DEFINITION
+     ============================================================ */
+        let _t = 0;
+        const _order = [];
+        function phase(name, dur) {
+          const start = _t;
+          _t += dur;
+          const w = [start, _t];
+          _order.push(name);
+          return w;
+        }
+
+        const P = {};
+        P.imgIn = phase("imgIn", 2.0);
+        P.imgHold = phase("imgHold", 3.0);
+        P.g1 = phase("g1", 0.9);
+        P.g2 = phase("g2", 0.9);
+        P.l1 = phase("l1", 0.8);
+        P.l2 = phase("l2", 0.8);
+        P.l3 = phase("l3", 0.8);
+        P.l4 = phase("l4", 0.8);
+        P.augHold = phase("augHold", 3.0);
+        P.feedDraw = phase("feedDraw", 1.5);
+        P.feedFlow = phase("feedFlow", 2.5);
+        P.feedGlow = phase("feedGlow", 1.0);
+        P.feedHold = phase("feedHold", 2.8);
+        P.vitIn = phase("vitIn", 1.0);
+        P.vitProjArrow = phase("vitProjArrow", 0.8);
+        P.projIn = phase("projIn", 1.0);
+        P.projEmbArrow = phase("projEmbArrow", 1.0);
+        P.embIn = phase("embIn", 1.2);
+        P.embHold = phase("embHold", 2.8);
+        P.distArrow = phase("distArrow", 1.2);
+        P.distIn = phase("distIn", 1.2);
+        P.distHold = phase("distHold", 2.8);
+        P.lossArrow = phase("lossArrow", 1.6);
+        P.lossFlow = phase("lossFlow", 1.6);
+        P.lossGlow = phase("lossGlow", 1.4);
+        P.lossHold = phase("lossHold", 2.8);
+        P.backpropArrow = phase("backpropArrow", 1.6);
+        P.backpropFlow = phase("backpropFlow", 1.6);
+        P.studentGlow = phase("studentGlow", 1.6);
+        P.updateHold = phase("updateHold", 2.8);
+        P.emaArrow = phase("emaArrow", 3.6);
+        P.emaFlow = phase("emaFlow", 4.4);
+        P.teacherGlow = phase("teacherGlow", 1.4);
+        P.emaHold = phase("emaHold", 3.0);
+        P.nextLabelIn = phase("nextLabelIn", 1.4);
+        P.imgSwap = phase("imgSwap", 1.2);
+        P.nextHold = phase("nextHold", 1.4);
+        P.rep1 = phase("rep1", 1.3);
+        P.rep2 = phase("rep2", 1.3);
+        P.rep3 = phase("rep3", 1.3);
+        P.rep4 = phase("rep4", 1.3);
+        P.rep5 = phase("rep5", 1.3);
+        P.rep6 = phase("rep6", 1.3);
+        P.finalHold = phase("finalHold", 2.4);
+
+        const TOTAL = _t;
+
+        const STEP_MARKERS = [
+          0,
+          P.g1[0],
+          P.feedDraw[0],
+          P.vitIn[0],
+          P.distArrow[0],
+          P.lossArrow[0],
+          P.backpropArrow[0],
+          P.emaArrow[0],
+          P.nextLabelIn[0],
+        ];
+
+        /* ============================================================
+     HELPERS
+     ============================================================ */
+        function clamp01(x) {
+          return x < 0 ? 0 : x > 1 ? 1 : x;
+        }
+        function prog(t, w) {
+          if (w[1] <= w[0]) return t >= w[1] ? 1 : 0;
+          return clamp01((t - w[0]) / (w[1] - w[0]));
+        }
+        function easeInOutCubic(x) {
+          return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+        }
+        function eprog(t, w) {
+          return easeInOutCubic(prog(t, w));
+        }
+        function lerp(a, b, x) {
+          return a + (b - a) * x;
+        }
+        function hexToRgb(hex) {
+          hex = hex.replace("#", "");
+          const n = parseInt(hex, 16);
+          return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+        }
+        function lerpColor(hexA, hexB, x) {
+          const a = hexToRgb(hexA),
+            b = hexToRgb(hexB);
+          const r = Math.round(lerp(a[0], b[0], x));
+          const g = Math.round(lerp(a[1], b[1], x));
+          const bl = Math.round(lerp(a[2], b[2], x));
+          return "rgb(" + r + "," + g + "," + bl + ")";
+        }
+        function bump(t, w) {
+          const p = prog(t, w);
+          return Math.sin(p * Math.PI);
+        } // 0 -> 1 -> 0
+
+        /* ============================================================
+     DOM REFERENCES
+     ============================================================ */
+        const $ = (id) => document.getElementById(id);
+        const stage = $("stage");
+        const stageWrapper = $("stageWrapper");
+
+        const STAGE_W = 1900,
+          STAGE_H = 960;
+        stage.style.width = STAGE_W + "px";
+        stage.style.height = STAGE_H + "px";
+        const svg = $("arrowLayer");
+        svg.setAttribute("viewBox", "0 0 " + STAGE_W + " " + STAGE_H);
+        svg.setAttribute("width", STAGE_W);
+        svg.setAttribute("height", STAGE_H);
+
+        const nodes = {
+          originalImage: $("originalImage"),
+          iconA: $("iconA"),
+          iconB: $("iconB"),
+          global1: $("global1"),
+          global2: $("global2"),
+          local1: $("local1"),
+          local2: $("local2"),
+          local3: $("local3"),
+          local4: $("local4"),
+          globalLabel: $("globalLabel"),
+          localLabel: $("localLabel"),
+          teacherContainer: $("teacherContainer"),
+          studentContainer: $("studentContainer"),
+          teacherVit: $("teacherVit"),
+          teacherProj: $("teacherProj"),
+          teacherEmb: $("teacherEmb"),
+          teacherDist: $("teacherDist"),
+          studentVit: $("studentVit"),
+          studentProj: $("studentProj"),
+          studentEmb: $("studentEmb"),
+          studentDist: $("studentDist"),
+          lossBox: $("lossBox"),
+          updateLabel: $("updateLabel"),
+          emaLabel: $("emaLabel"),
+          nextLabel: $("nextLabel"),
+        };
+
+        /* ============================================================
+     VIEW BOX SPECS (augmentation)
+     ============================================================ */
+        const ORIGIN = { x: 60, y: 375, w: 150, h: 150 };
+        const viewSpecs = {
+          global1: {
+            el: nodes.global1,
+            win: P.g1,
+            x: 280,
+            y: 100,
+            w: 140,
+            h: 120,
+            bg: "#DBEAFE",
+            border: "#2563EB",
+          },
+          global2: {
+            el: nodes.global2,
+            win: P.g2,
+            x: 280,
+            y: 250,
+            w: 140,
+            h: 120,
+            bg: "#DBEAFE",
+            border: "#2563EB",
+          },
+          local1: {
+            el: nodes.local1,
+            win: P.l1,
+            x: 295,
+            y: 400,
+            w: 90,
+            h: 90,
+            bg: "#FFEDD5",
+            border: "#F97316",
+          },
+          local2: {
+            el: nodes.local2,
+            win: P.l2,
+            x: 295,
+            y: 505,
+            w: 90,
+            h: 90,
+            bg: "#FFEDD5",
+            border: "#F97316",
+          },
+          local3: {
+            el: nodes.local3,
+            win: P.l3,
+            x: 295,
+            y: 610,
+            w: 90,
+            h: 90,
+            bg: "#FFEDD5",
+            border: "#F97316",
+          },
+          local4: {
+            el: nodes.local4,
+            win: P.l4,
+            x: 295,
+            y: 715,
+            w: 90,
+            h: 90,
+            bg: "#FFEDD5",
+            border: "#F97316",
+          },
+        };
+        const GRAY_BG = "#EEF0F2",
+          GRAY_BORDER = "#6B7280";
+
+        function renderViewBox(spec, t) {
+          const p = eprog(t, spec.win);
+          const el = spec.el;
+          if (p <= 0) {
+            el.style.opacity = 0;
+            return;
+          }
+          const x = lerp(ORIGIN.x, spec.x, p);
+          const y = lerp(ORIGIN.y, spec.y, p);
+          const w = lerp(ORIGIN.w, spec.w, p);
+          const h = lerp(ORIGIN.h, spec.h, p);
+          el.style.left = x + "px";
+          el.style.top = y + "px";
+          el.style.width = w + "px";
+          el.style.height = h + "px";
+          el.style.background = lerpColor(GRAY_BG, spec.bg, p);
+          el.style.borderColor = lerpColor(GRAY_BORDER, spec.border, p);
+          // opacity: quick fade in over first 25% of its own window, then fully visible
+          el.style.opacity = clamp01(p / 0.25);
+        }
+
+        /* ============================================================
+     GENERIC FADE-IN NODES (container / sub-box style)
+     ============================================================ */
+        const fadeNodes = [
+          {
+            el: nodes.teacherContainer,
+            win: [P.feedDraw[0] - 0.4, P.feedDraw[0] + 0.5],
+          },
+          {
+            el: nodes.studentContainer,
+            win: [P.feedDraw[0] - 0.4, P.feedDraw[0] + 0.5],
+          },
+          { el: nodes.teacherVit, win: P.vitIn },
+          { el: nodes.studentVit, win: P.vitIn },
+          { el: nodes.teacherProj, win: P.projIn },
+          { el: nodes.studentProj, win: P.projIn },
+          { el: nodes.teacherEmb, win: P.embIn },
+          { el: nodes.studentEmb, win: P.embIn },
+          { el: nodes.teacherDist, win: P.distIn },
+          { el: nodes.studentDist, win: P.distIn },
+          { el: nodes.lossBox, win: P.distIn },
+        ];
+
+        function renderFadeNodes(t) {
+          fadeNodes.forEach(function (f) {
+            const p = eprog(t, f.win);
+            f.el.style.opacity = p;
+            f.el.style.transform = "scale(" + (0.86 + 0.14 * p) + ")";
+          });
+        }
+
+        /* group + pill labels (simple fade only) */
+        const simpleLabels = [
+          { el: nodes.globalLabel, win: [P.g2[0], P.g2[1] + 0.6] },
+          { el: nodes.localLabel, win: [P.l4[0], P.l4[1] + 0.6] },
+        ];
+        function renderSimpleLabels(t) {
+          simpleLabels.forEach(function (s) {
+            s.el.style.opacity = eprog(t, s.win);
+          });
+        }
+
+        /* ============================================================
+     ARROW "DRAW" LIST (dash-offset reveal + a JS-driven arrowhead
+     that rides the exact tip of the line as it grows)
+
+     NOTE: we intentionally do NOT use <marker-end> here. SVG markers
+     are painted at a path's fixed end-vertex regardless of stroke-
+     dasharray/dashoffset, so a marker-end arrowhead is fully visible
+     from the very first frame even while the line itself is still
+     hidden -- that's what caused arrowheads to float on screen
+     "ahead of" their line. Driving a small polygon by hand guarantees
+     the arrowhead only exists exactly where the visible line ends.
+     ============================================================ */
+        const NS = "http://www.w3.org/2000/svg";
+        function makeArrowHead(color, size) {
+          const poly = document.createElementNS(NS, "polygon");
+          const s = size || 8;
+          poly.setAttribute(
+            "points",
+            -2 * s + "," + -s * 0.72 + " 0,0 " + -2 * s + "," + s * 0.72,
+          );
+          poly.setAttribute("fill", color);
+          poly.style.opacity = 0;
+          svg.appendChild(poly);
+          return poly;
+        }
+
+        const drawArrows = [
+          { id: "p-teacherFeed1", win: P.feedDraw, color: "#2563EB" },
+          { id: "p-teacherFeed2", win: P.feedDraw, color: "#2563EB" },
+          { id: "p-studentFeed-g1", win: P.feedDraw, color: "#2563EB" },
+          { id: "p-studentFeed-g2", win: P.feedDraw, color: "#2563EB" },
+          {
+            id: "p-studentFeed-l1",
+            win: P.feedDraw,
+            color: "#F97316",
+            size: 6.5,
+          },
+          {
+            id: "p-studentFeed-l2",
+            win: P.feedDraw,
+            color: "#F97316",
+            size: 6.5,
+          },
+          {
+            id: "p-studentFeed-l3",
+            win: P.feedDraw,
+            color: "#F97316",
+            size: 6.5,
+          },
+          {
+            id: "p-studentFeed-l4",
+            win: P.feedDraw,
+            color: "#F97316",
+            size: 6.5,
+          },
+          { id: "p-tVitProj", win: P.vitProjArrow, color: "#7C3AED" },
+          { id: "p-sVitProj", win: P.vitProjArrow, color: "#059669" },
+          { id: "p-tProjEmb", win: P.projEmbArrow, color: "#7C3AED" },
+          { id: "p-sProjEmb", win: P.projEmbArrow, color: "#059669" },
+          { id: "p-tEmbDist", win: P.distArrow, color: "#0891B2" },
+          { id: "p-sEmbDist", win: P.distArrow, color: "#0891B2" },
+          { id: "p-tDistLoss", win: P.lossArrow, color: "#D97706" },
+          { id: "p-sDistLoss", win: P.lossArrow, color: "#D97706" },
+          { id: "p-ema", win: P.emaArrow, color: "#4C1D95", size: 9 },
+        ].map(function (a) {
+          const el = document.getElementById(a.id);
+          const len = el.getTotalLength();
+          el.style.strokeDasharray = len;
+          el.style.strokeDashoffset = len;
+          el.style.opacity = 1;
+          const head = makeArrowHead(a.color, a.size);
+          return { el: el, len: len, win: a.win, head: head };
+        });
+
+        function renderDrawArrows(t) {
+          drawArrows.forEach(function (a) {
+            const p = eprog(t, a.win);
+            a.el.style.strokeDashoffset = a.len * (1 - p);
+            if (p <= 0.004) {
+              a.head.style.opacity = 0;
+              return;
+            }
+            const dist = a.len * p;
+            const tip = a.el.getPointAtLength(dist);
+            const back = a.el.getPointAtLength(Math.max(0, dist - 4));
+            const angle =
+              (Math.atan2(tip.y - back.y, tip.x - back.x) * 180) / Math.PI;
+            a.head.setAttribute(
+              "transform",
+              "translate(" + tip.x + "," + tip.y + ") rotate(" + angle + ")",
+            );
+            a.head.style.opacity = 1;
+          });
+        }
+
+        /* backprop arrow: simple opacity fade (fixed dash pattern for a "gradient flow" look) */
+        const backpropPath = $("p-backprop");
+        function renderBackpropArrow(t) {
+          backpropPath.style.opacity = eprog(t, P.backpropArrow);
+        }
+
+        /* ============================================================
+     PARTICLES
+     ============================================================ */
+        function makeParticle(circleId, pathId, windows) {
+          const circle = document.getElementById(circleId);
+          const path = document.getElementById(pathId);
+          const len = path.getTotalLength();
+          return { circle: circle, path: path, len: len, windows: windows };
+        }
+
+        const particles = [
+          makeParticle("pt-teacherFeed1", "p-teacherFeed1", [
+            P.feedFlow,
+            P.rep2,
+          ]),
+          makeParticle("pt-teacherFeed2", "p-teacherFeed2", [
+            [P.feedFlow[0] + 0.2, P.feedFlow[1] + 0.2],
+            P.rep2,
+          ]),
+          makeParticle("pt-studentFeed-g1", "p-studentFeed-g1", [
+            [P.feedFlow[0] + 0.1, P.feedFlow[1] + 0.1],
+            P.rep2,
+          ]),
+          makeParticle("pt-studentFeed-g2", "p-studentFeed-g2", [
+            [P.feedFlow[0] + 0.3, P.feedFlow[1] + 0.3],
+            P.rep2,
+          ]),
+          makeParticle("pt-studentFeed-l1", "p-studentFeed-l1", [
+            [P.feedFlow[0] + 0.15, P.feedFlow[1] + 0.15],
+            P.rep2,
+          ]),
+          makeParticle("pt-studentFeed-l2", "p-studentFeed-l2", [
+            [P.feedFlow[0] + 0.25, P.feedFlow[1] + 0.25],
+            P.rep2,
+          ]),
+          makeParticle("pt-studentFeed-l3", "p-studentFeed-l3", [
+            [P.feedFlow[0] + 0.35, P.feedFlow[1] + 0.35],
+            P.rep2,
+          ]),
+          makeParticle("pt-studentFeed-l4", "p-studentFeed-l4", [
+            [P.feedFlow[0] + 0.45, P.feedFlow[1] + 0.45],
+            P.rep2,
+          ]),
+          makeParticle("pt-tDistLoss", "p-tDistLoss", [P.lossFlow, P.rep4]),
+          makeParticle("pt-sDistLoss", "p-sDistLoss", [
+            [P.lossFlow[0] + 0.15, P.lossFlow[1] + 0.15],
+            P.rep4,
+          ]),
+          makeParticle("pt-backprop", "p-backprop", [P.backpropFlow, P.rep5]),
+          makeParticle("pt-ema", "p-ema", [P.emaFlow, P.rep6]),
+        ];
+
+        function windowState(t, windows) {
+          for (let i = 0; i < windows.length; i++) {
+            const w = windows[i];
+            if (t >= w[0] && t <= w[1]) return prog(t, w);
+          }
+          return null;
+        }
+
+        function renderParticles(t) {
+          particles.forEach(function (pt) {
+            const st = windowState(t, pt.windows);
+            if (st === null) {
+              pt.circle.setAttribute("opacity", 0);
+              return;
+            }
+            const point = pt.path.getPointAtLength(st * pt.len);
+            pt.circle.setAttribute("cx", point.x);
+            pt.circle.setAttribute("cy", point.y);
+            const edge = Math.min(st / 0.12, (1 - st) / 0.12, 1);
+            pt.circle.setAttribute("opacity", clamp01(edge));
+          });
+        }
+
+        /* ============================================================
+     GLOWS
+     ============================================================ */
+        function applyGlow(el, intensity, color) {
+          if (intensity <= 0.01) {
+            el.style.boxShadow = "0 3px 10px rgba(17,24,39,0.06)";
+            return;
+          }
+          const blur = 14 + 26 * intensity;
+          const spread = 1 + 4 * intensity;
+          el.style.boxShadow =
+            "0 3px 10px rgba(17,24,39,0.06), 0 0 " +
+            blur +
+            "px " +
+            spread +
+            "px " +
+            color;
+        }
+
+        function renderGlows(t) {
+          const feedG = Math.max(bump(t, P.feedGlow), bump(t, P.rep2));
+
+          const embG = bump(t, [P.embIn[1] - 0.2, P.embIn[1] + 0.8]);
+          const embG2 = Math.max(embG, bump(t, P.rep3));
+          applyGlow(nodes.teacherEmb, embG2 * 0.8, "rgba(8,145,178,0.4)");
+          applyGlow(nodes.studentEmb, embG2 * 0.8, "rgba(8,145,178,0.4)");
+
+          const lossG = Math.max(bump(t, P.lossGlow), bump(t, P.rep4));
+          applyGlow(nodes.lossBox, lossG, "rgba(220,38,38,0.45)");
+
+          const studentG = Math.max(bump(t, P.studentGlow), bump(t, P.rep5));
+          applyGlow(
+            nodes.studentContainer,
+            Math.max(feedG * 0.7, studentG),
+            "rgba(5,150,105,0.4)",
+          );
+
+          const teacherG = Math.max(bump(t, P.teacherGlow), bump(t, P.rep6));
+          applyGlow(
+            nodes.teacherContainer,
+            Math.max(feedG * 0.7, teacherG),
+            "rgba(124,58,237,0.4)",
+          );
+        }
+
+        /* ============================================================
+     PILL LABELS
+     ============================================================ */
+        function renderPills(t) {
+          nodes.updateLabel.style.opacity = eprog(t, [
+            P.backpropArrow[0] + 0.5,
+            P.backpropArrow[0] + 1.6,
+          ]);
+          nodes.emaLabel.style.opacity = eprog(t, [
+            P.emaArrow[0] + 0.6,
+            P.emaArrow[0] + 2.0,
+          ]);
+
+          let nextOp = eprog(t, P.nextLabelIn);
+          const fadeOutWin = [P.finalHold[1] - 1.4, P.finalHold[1]];
+          if (t > fadeOutWin[0]) {
+            nextOp *= 1 - eprog(t, fadeOutWin);
+          }
+          nodes.nextLabel.style.opacity = nextOp;
+        }
+
+        /* ============================================================
+     ORIGINAL IMAGE
+     ============================================================ */
+        function renderOriginal(t) {
+          const p = eprog(t, P.imgIn);
+          nodes.originalImage.style.opacity = p;
+
+          const swap = eprog(t, P.imgSwap);
+          const swap2 = t > P.rep1[0] ? 1 : swap; // stays swapped through the repeat
+          nodes.iconA.style.opacity = 1 - swap2;
+          nodes.iconB.style.opacity = swap2;
+
+          const pulse = Math.max(bump(t, P.rep1), 0);
+          nodes.originalImage.style.transform =
+            "scale(" + (0.82 + 0.18 * p) * (1 + 0.05 * pulse) + ")";
+        }
+
+        /* view box pulse during quick repeat */
+        function renderRepeatPulses(t) {
+          const pulse = bump(t, P.rep1);
+          [
+            "global1",
+            "global2",
+            "local1",
+            "local2",
+            "local3",
+            "local4",
+          ].forEach(function (id) {
+            const el = nodes[id];
+            if (!el) return;
+            if (pulse > 0.01) {
+              el.style.transform = "scale(" + (1 + 0.07 * pulse) + ")";
+            } else if (t > P.l4[1]) {
+              el.style.transform = "scale(1)";
+            }
+          });
+        }
+
+        /* ============================================================
+     MASTER RENDER
+     ============================================================ */
+        function render(t) {
+          renderOriginal(t);
+          Object.keys(viewSpecs).forEach(function (k) {
+            renderViewBox(viewSpecs[k], t);
+          });
+          renderRepeatPulses(t);
+          renderSimpleLabels(t);
+          renderFadeNodes(t);
+          renderDrawArrows(t);
+          renderBackpropArrow(t);
+          renderParticles(t);
+          renderGlows(t);
+          renderPills(t);
+        }
+
+        /* ============================================================
+     PLAYBACK ENGINE
+     ============================================================ */
+        let t = 0;
+        let isPlaying = false;
+        let speed = 1;
+        let lastFrame = null;
+
+        const playBtn = $("playBtn");
+        const restartBtn = $("restartBtn");
+        const prevBtn = $("prevBtn");
+        const nextBtn = $("nextBtn");
+        const scrubber = $("scrubber");
+        const stepCounter = $("stepCounter");
+        const timeNow = $("timeNow");
+        const timeTotal = $("timeTotal");
+        const speedGroup = $("speedGroup");
+
+        scrubber.max = Math.round(TOTAL * 1000);
+
+        function fmt(sec) {
+          const m = Math.floor(sec / 60);
+          const s = Math.floor(sec % 60);
+          return m + ":" + (s < 10 ? "0" : "") + s;
+        }
+
+        function currentStepIndex() {
+          let idx = 0;
+          for (let i = 0; i < STEP_MARKERS.length; i++) {
+            if (t >= STEP_MARKERS[i] - 0.001) idx = i;
+          }
+          return idx;
+        }
+
+        function updateChrome() {
+          scrubber.value = Math.round(t * 1000);
+          const pct = (t / TOTAL) * 100;
+          scrubber.style.setProperty("--fill", pct + "%");
+          timeNow.textContent = fmt(t);
+          timeTotal.textContent = fmt(TOTAL);
+          stepCounter.textContent =
+            currentStepIndex() + 1 + " / " + STEP_MARKERS.length;
+          playBtn.textContent = isPlaying ? "⏸" : "▶";
+        }
+
+        function setTime(nt) {
+          t = Math.max(0, Math.min(TOTAL, nt));
+          render(t);
+          updateChrome();
+        }
+
+        function togglePlay(force) {
+          isPlaying = force !== undefined ? force : !isPlaying;
+          if (isPlaying && t >= TOTAL) {
+            t = 0;
+          }
+          lastFrame = null;
+          updateChrome();
+        }
+
+        function goStep(dir) {
+          const idx = currentStepIndex();
+          let target;
+          if (dir > 0) {
+            target = STEP_MARKERS[Math.min(STEP_MARKERS.length - 1, idx + 1)];
+            if (target <= t + 0.01 && idx + 1 < STEP_MARKERS.length) {
+              target = STEP_MARKERS[idx + 1];
+            }
+          } else {
+            target = STEP_MARKERS[Math.max(0, idx - 1)];
+            if (Math.abs(t - STEP_MARKERS[idx]) > 0.05) {
+              target = STEP_MARKERS[idx];
+            }
+          }
+          isPlaying = false;
+          setTime(target);
+        }
+
+        playBtn.addEventListener("click", function () {
+          togglePlay();
+        });
+        restartBtn.addEventListener("click", function () {
+          isPlaying = false;
+          setTime(0);
+        });
+        prevBtn.addEventListener("click", function () {
+          goStep(-1);
+        });
+        nextBtn.addEventListener("click", function () {
+          goStep(1);
+        });
+
+        scrubber.addEventListener("input", function () {
+          isPlaying = false;
+          setTime(parseFloat(scrubber.value) / 1000);
+        });
+
+        speedGroup.addEventListener("click", function (e) {
+          const btn = e.target.closest(".speed-btn");
+          if (!btn) return;
+          speed = parseFloat(btn.getAttribute("data-speed"));
+          Array.from(speedGroup.querySelectorAll(".speed-btn")).forEach(
+            function (b) {
+              b.classList.remove("active");
+            },
+          );
+          btn.classList.add("active");
+        });
+
+        window.addEventListener("keydown", function (e) {
+          if (e.code === "Space") {
+            e.preventDefault();
+            togglePlay();
+          } else if (e.code === "ArrowRight") {
+            e.preventDefault();
+            goStep(1);
+          } else if (e.code === "ArrowLeft") {
+            e.preventDefault();
+            goStep(-1);
+          }
+        });
+
+        function frame(now) {
+          if (lastFrame !== null && isPlaying) {
+            const dt = (now - lastFrame) / 1000;
+            t += dt * speed;
+            if (t >= TOTAL) {
+              t = TOTAL;
+              isPlaying = false;
+            }
+          }
+          lastFrame = now;
+          render(t);
+          updateChrome();
+          requestAnimationFrame(frame);
+        }
+        requestAnimationFrame(frame);
+
+        /* ============================================================
+     RESPONSIVE SCALING
+     ============================================================ */
+        function resize() {
+          const w = stageWrapper.clientWidth;
+          const scale = w / STAGE_W;
+          stage.style.transform = "scale(" + scale + ")";
+          stageWrapper.style.height = STAGE_H * scale + "px";
+        }
+        window.addEventListener("resize", resize);
+        resize();
+
+        render(0);
+        updateChrome();
+      })();
+    </script>
+  </body>
+</html>
