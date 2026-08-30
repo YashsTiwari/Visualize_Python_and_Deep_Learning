@@ -1,0 +1,1748 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Variables — Intuition Animation</title>
+
+    <!-- =========================================================
+       CSS BLOCK
+       Part 2 will be placed here.
+       ========================================================= -->
+    <style>
+      /* ============================================================
+   VARIABLES — INTUITION ANIMATION
+   PART 2 — CSS
+   White background + strong colorful visual language
+   ============================================================ */
+
+      :root {
+        --ink: #17213a;
+        --ink-2: #273b73;
+        --muted: #53627a;
+
+        --blue: #4263eb;
+        --blue-dark: #3156c9;
+        --blue-soft: #eef2ff;
+
+        --purple: #7c4dff;
+        --purple-soft: #f3eeff;
+
+        --teal: #00a896;
+        --teal-dark: #087d70;
+        --teal-soft: #e8fbf7;
+
+        --orange: #f59e0b;
+        --orange-dark: #b46a00;
+        --orange-soft: #fff5de;
+
+        --pink: #e84a8a;
+        --pink-soft: #fff0f6;
+
+        --green: #55a630;
+        --green-soft: #f0fbea;
+
+        --border: #c7d0e2;
+        --border-strong: #aeb9d0;
+      }
+
+      /* ============================================================
+   BASE
+   ============================================================ */
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+      }
+
+      body {
+        overflow: hidden;
+        background: #ffffff;
+        color: var(--ink);
+
+        font-family:
+          Inter,
+          ui-sans-serif,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+
+        -webkit-font-smoothing: antialiased;
+      }
+
+      button {
+        font: inherit;
+      }
+
+      #animation {
+        position: relative;
+
+        width: 100vw;
+        height: 100vh;
+
+        min-width: 900px;
+        min-height: 600px;
+
+        overflow: hidden;
+
+        background: #ffffff;
+      }
+
+      /* ============================================================
+   GLOBAL UI
+   ============================================================ */
+
+      .top-bar {
+        position: absolute;
+        z-index: 100;
+
+        top: 0;
+        left: 0;
+        right: 0;
+
+        height: 64px;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        padding: 0 34px;
+
+        pointer-events: none;
+      }
+
+      .lesson-label {
+        color: var(--muted);
+
+        font-size: 13px;
+        font-weight: 800;
+
+        letter-spacing: 0.12em;
+      }
+
+      .scene-indicator {
+        color: var(--muted);
+
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .stage {
+        position: absolute;
+        inset: 0;
+
+        overflow: hidden;
+      }
+
+      .scene {
+        position: absolute;
+        inset: 0;
+
+        overflow: hidden;
+
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+
+        transition:
+          opacity 380ms ease,
+          visibility 380ms ease;
+      }
+
+      .scene.active {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+      }
+
+      .scene-content {
+        position: relative;
+
+        width: 100%;
+        height: 100%;
+      }
+
+      /* ============================================================
+   NAVIGATION
+   ============================================================ */
+
+      .navigation {
+        position: absolute;
+        z-index: 200;
+
+        right: 34px;
+        bottom: 28px;
+      }
+
+      .main-next-button {
+        border: 0;
+        border-radius: 999px;
+
+        padding: 12px 23px;
+
+        background: var(--blue);
+        color: #ffffff;
+
+        font-size: 15px;
+        font-weight: 750;
+
+        cursor: pointer;
+
+        box-shadow: 0 8px 22px rgba(66, 99, 235, 0.24);
+
+        transition:
+          transform 160ms ease,
+          background 160ms ease,
+          box-shadow 160ms ease;
+      }
+
+      .main-next-button:hover {
+        transform: translateY(-2px);
+
+        background: var(--blue-dark);
+
+        box-shadow: 0 11px 28px rgba(66, 99, 235, 0.3);
+      }
+
+      .main-next-button:active {
+        transform: translateY(0);
+      }
+
+      .main-next-button:focus-visible {
+        outline: 3px solid rgba(66, 99, 235, 0.22);
+        outline-offset: 4px;
+      }
+
+      /* ============================================================
+   STUDENT SYSTEM
+   ============================================================ */
+
+      .students {
+        position: absolute;
+        inset: 0;
+      }
+
+      /*
+   IMPORTANT:
+   Students have fixed, deliberately separated positions.
+   None of the four bounding areas overlap.
+*/
+
+      .student {
+        position: absolute;
+
+        width: 150px;
+        height: 150px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        z-index: 2;
+
+        user-select: none;
+      }
+
+      .student-emoji {
+        position: relative;
+        z-index: 2;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        width: 116px;
+        height: 116px;
+
+        border-radius: 50%;
+
+        background: #ffffff;
+
+        font-size: 72px;
+        line-height: 1;
+
+        filter: drop-shadow(0 12px 17px rgba(33, 45, 70, 0.1));
+
+        transform-origin: center;
+      }
+
+      /* Subtle individual visual identities */
+
+      .student-1 .student-emoji {
+        background: var(--blue-soft);
+        box-shadow:
+          inset 0 0 0 3px #a8baff,
+          0 8px 25px rgba(66, 99, 235, 0.12);
+      }
+
+      .student-2 .student-emoji {
+        background: var(--pink-soft);
+        box-shadow:
+          inset 0 0 0 3px #ffb5d1,
+          0 8px 25px rgba(232, 74, 138, 0.11);
+      }
+
+      .student-3 .student-emoji {
+        background: var(--teal-soft);
+        box-shadow:
+          inset 0 0 0 3px #8dddd1,
+          0 8px 25px rgba(0, 168, 150, 0.11);
+      }
+
+      .student-4 .student-emoji {
+        background: var(--orange-soft);
+        box-shadow:
+          inset 0 0 0 3px #ffd48a,
+          0 8px 25px rgba(245, 158, 11, 0.12);
+      }
+
+      /* ============================================================
+   SCENE 1 — FOUR STUDENTS IN CENTER
+   ============================================================ */
+
+      .scene-1 .student-1 {
+        left: 27%;
+        top: 24%;
+      }
+
+      .scene-1 .student-2 {
+        left: 55%;
+        top: 24%;
+      }
+
+      .scene-1 .student-3 {
+        left: 27%;
+        top: 57%;
+      }
+
+      .scene-1 .student-4 {
+        left: 55%;
+        top: 57%;
+      }
+
+      /* Gentle idle motion, intentionally small enough
+   to preserve separation. */
+
+      .scene-1 .student-1 .student-emoji {
+        animation: studentFloat1 3.8s ease-in-out infinite;
+      }
+
+      .scene-1 .student-2 .student-emoji {
+        animation: studentFloat2 4.2s ease-in-out infinite;
+      }
+
+      .scene-1 .student-3 .student-emoji {
+        animation: studentFloat3 4s ease-in-out infinite;
+      }
+
+      .scene-1 .student-4 .student-emoji {
+        animation: studentFloat4 4.4s ease-in-out infinite;
+      }
+
+      @keyframes studentFloat1 {
+        0%,
+        100% {
+          transform: translateY(-4px);
+        }
+
+        50% {
+          transform: translateY(5px);
+        }
+      }
+
+      @keyframes studentFloat2 {
+        0%,
+        100% {
+          transform: translateY(4px);
+        }
+
+        50% {
+          transform: translateY(-5px);
+        }
+      }
+
+      @keyframes studentFloat3 {
+        0%,
+        100% {
+          transform: translateY(-3px);
+        }
+
+        50% {
+          transform: translateY(6px);
+        }
+      }
+
+      @keyframes studentFloat4 {
+        0%,
+        100% {
+          transform: translateY(5px);
+        }
+
+        50% {
+          transform: translateY(-4px);
+        }
+      }
+
+      /* ============================================================
+   SPEECH BUBBLE
+   ============================================================ */
+
+      .speech-bubble {
+        position: absolute;
+        z-index: 10;
+
+        left: 105px;
+        top: -17px;
+
+        width: max-content;
+        max-width: 220px;
+
+        padding: 13px 17px;
+
+        border: 2px solid var(--border);
+        border-radius: 14px;
+
+        background: #ffffff;
+
+        color: var(--ink);
+
+        font-size: 16px;
+        font-weight: 700;
+        line-height: 1.25;
+
+        box-shadow: 0 9px 24px rgba(33, 45, 70, 0.1);
+
+        opacity: 0;
+        transform: translateY(7px) scale(0.95);
+
+        pointer-events: none;
+      }
+
+      .speech-bubble::before {
+        content: "";
+
+        position: absolute;
+
+        left: -9px;
+        top: 27px;
+
+        width: 15px;
+        height: 15px;
+
+        background: #ffffff;
+
+        border-left: 2px solid var(--border);
+        border-bottom: 2px solid var(--border);
+
+        transform: rotate(45deg);
+      }
+
+      .speech-bubble span {
+        position: relative;
+        z-index: 2;
+      }
+
+      /* ============================================================
+   SCENE 2 — STUDENTS MOVE TO LEFT + AGE =
+   ============================================================ */
+
+      .scene2-students {
+        position: absolute;
+        left: 9%;
+        top: 15%;
+
+        width: 210px;
+        height: 70%;
+
+        display: block;
+      }
+
+      .scene-2 .student {
+        left: 0;
+
+        width: 150px;
+        height: 150px;
+      }
+
+      .scene-2 .student-1 {
+        top: 0;
+      }
+
+      .scene-2 .student-2 {
+        top: 24%;
+      }
+
+      .scene-2 .student-3 {
+        top: 48%;
+      }
+
+      .scene-2 .student-4 {
+        top: 72%;
+      }
+
+      /* Variable display */
+
+      .variable-display {
+        position: absolute;
+
+        left: 61%;
+        top: 50%;
+
+        display: flex;
+        align-items: baseline;
+        justify-content: center;
+
+        transform: translate(-50%, -50%);
+
+        white-space: nowrap;
+
+        opacity: 0;
+      }
+
+      .variable-name {
+        color: var(--blue);
+
+        font-size: clamp(55px, 6vw, 88px);
+        font-weight: 850;
+
+        letter-spacing: -0.055em;
+      }
+
+      .variable-equals {
+        margin: 0 16px;
+
+        color: #6c7890;
+
+        font-size: clamp(50px, 5vw, 76px);
+        font-weight: 500;
+      }
+
+      .variable-value {
+        min-width: 105px;
+
+        color: var(--purple);
+
+        font-size: clamp(55px, 6vw, 88px);
+        font-weight: 850;
+
+        letter-spacing: -0.055em;
+
+        text-align: left;
+      }
+
+      /* ============================================================
+   REFERENCE STUDENT SCENES
+   ============================================================ */
+
+      .student-reference {
+        position: absolute;
+
+        left: 23%;
+        top: 50%;
+
+        width: 180px;
+        height: 180px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        transform: translate(-50%, -50%);
+      }
+
+      .student-reference .student-emoji {
+        width: 140px;
+        height: 140px;
+
+        font-size: 88px;
+      }
+
+      .student-reference .speech-bubble {
+        left: 120px;
+        top: -5px;
+
+        font-size: 18px;
+      }
+
+      /* Variable scenes */
+
+      .scene-3 .variable-display,
+      .scene-4 .variable-display,
+      .scene-5 .variable-display,
+      .scene-6 .variable-display {
+        left: 67%;
+        top: 50%;
+      }
+
+      /* ============================================================
+   SCENE 7 — REFLECTION
+   ============================================================ */
+
+      .scene-7 .scene-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .reflection-question {
+        position: absolute;
+
+        top: 22%;
+        left: 50%;
+
+        transform: translateX(-50%);
+
+        color: var(--ink);
+
+        font-size: clamp(30px, 3.5vw, 48px);
+        font-weight: 750;
+
+        letter-spacing: -0.035em;
+
+        text-align: center;
+
+        opacity: 0;
+      }
+
+      .same-age-display {
+        position: absolute;
+
+        top: 41%;
+        left: 50%;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        min-width: 220px;
+        min-height: 95px;
+
+        padding: 15px 30px;
+
+        border: 3px solid #9eb5ff;
+        border-radius: 18px;
+
+        background: var(--blue-soft);
+
+        color: var(--blue);
+
+        font-size: clamp(40px, 4.4vw, 64px);
+        font-weight: 850;
+
+        letter-spacing: -0.045em;
+
+        transform: translate(-50%, -50%) scale(0.9);
+
+        box-shadow: 0 12px 30px rgba(66, 99, 235, 0.11);
+
+        opacity: 0;
+      }
+
+      .changed-question {
+        position: absolute;
+
+        top: 57%;
+        left: 50%;
+
+        transform: translateX(-50%);
+
+        color: var(--muted);
+
+        font-size: clamp(20px, 2vw, 28px);
+        font-weight: 650;
+
+        opacity: 0;
+      }
+
+      .changing-values {
+        position: absolute;
+
+        top: 68%;
+        left: 50%;
+
+        display: flex;
+        align-items: center;
+        gap: 18px;
+
+        transform: translateX(-50%);
+
+        opacity: 0;
+      }
+
+      .changing-values span {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        width: 68px;
+        height: 58px;
+
+        border-radius: 12px;
+
+        font-size: 22px;
+        font-weight: 800;
+
+        background: var(--orange-soft);
+        color: var(--orange-dark);
+
+        border: 2px solid #ffd48a;
+      }
+
+      /* ============================================================
+   SCENE 8 — VARIABLE DEFINITION
+   ============================================================ */
+
+      .scene-8 .definition-card {
+        position: absolute;
+
+        left: 50%;
+        top: 24%;
+
+        width: min(780px, 76vw);
+
+        text-align: center;
+
+        transform: translateX(-50%);
+
+        opacity: 0;
+      }
+
+      .scene-8 .definition-term {
+        margin-bottom: 18px;
+
+        color: var(--purple);
+
+        font-size: clamp(50px, 5.3vw, 74px);
+        font-weight: 850;
+
+        line-height: 1;
+
+        letter-spacing: -0.055em;
+      }
+
+      .scene-8 .definition-text {
+        max-width: 720px;
+
+        margin: 0 auto;
+
+        color: var(--muted);
+
+        font-size: clamp(20px, 1.9vw, 27px);
+        line-height: 1.5;
+        font-weight: 500;
+      }
+
+      .variable-example {
+        position: absolute;
+
+        left: 50%;
+        top: 56%;
+
+        display: flex;
+        align-items: baseline;
+        justify-content: center;
+
+        transform: translateX(-50%);
+
+        padding: 17px 28px;
+
+        border: 3px solid #b9b0ff;
+        border-radius: 17px;
+
+        background: var(--purple-soft);
+
+        box-shadow: 0 12px 30px rgba(124, 77, 255, 0.11);
+
+        opacity: 0;
+      }
+
+      .example-name {
+        color: var(--blue);
+
+        font-size: clamp(34px, 3.6vw, 52px);
+        font-weight: 850;
+      }
+
+      .example-equals {
+        margin: 0 13px;
+
+        color: #68748b;
+
+        font-size: clamp(31px, 3.2vw, 48px);
+      }
+
+      .example-value {
+        color: var(--purple);
+
+        font-size: clamp(34px, 3.6vw, 52px);
+        font-weight: 850;
+      }
+
+      .variable-change {
+        position: absolute;
+
+        left: 50%;
+        top: 73%;
+
+        display: flex;
+        align-items: center;
+        gap: 13px;
+
+        transform: translateX(-50%);
+
+        color: var(--muted);
+
+        font-size: clamp(18px, 1.8vw, 25px);
+        font-weight: 700;
+
+        opacity: 0;
+      }
+
+      .variable-change .old-value {
+        color: var(--orange-dark);
+      }
+
+      .variable-change .change-arrow {
+        color: #718099;
+
+        font-size: 25px;
+      }
+
+      .variable-change .new-value {
+        color: var(--purple);
+      }
+
+      /* ============================================================
+   GENERIC ANIMATION HELPERS
+   ============================================================ */
+
+      .reveal {
+        animation: revealUp 520ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      }
+
+      .pop {
+        animation: popIn 520ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      }
+
+      .reveal-soft {
+        animation: revealSoft 420ms ease forwards;
+      }
+
+      .value-change {
+        animation: valueChange 450ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      }
+
+      .student-enter {
+        animation: studentEnter 550ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      }
+
+      .student-move {
+        animation: studentMove 850ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      }
+
+      @keyframes revealUp {
+        from {
+          opacity: 0;
+          transform: translateY(18px);
+        }
+
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes revealSoft {
+        from {
+          opacity: 0;
+        }
+
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes popIn {
+        0% {
+          opacity: 0;
+          transform: scale(0.72);
+        }
+
+        65% {
+          opacity: 1;
+          transform: scale(1.045);
+        }
+
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      @keyframes valueChange {
+        0% {
+          opacity: 0;
+          transform: translateY(12px) scale(0.82);
+        }
+
+        65% {
+          opacity: 1;
+          transform: translateY(-2px) scale(1.04);
+        }
+
+        100% {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      @keyframes studentEnter {
+        from {
+          opacity: 0;
+          transform: scale(0.75);
+        }
+
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      @keyframes studentMove {
+        from {
+          opacity: 0;
+          transform: translateX(120px);
+        }
+
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      /* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+      @media (max-width: 1100px) {
+        #animation {
+          min-width: 760px;
+        }
+
+        .student {
+          width: 130px;
+          height: 130px;
+        }
+
+        .student-emoji {
+          width: 100px;
+          height: 100px;
+
+          font-size: 62px;
+        }
+
+        .scene2-students {
+          left: 6%;
+        }
+
+        .scene-2 .variable-display {
+          left: 64%;
+        }
+
+        .student-reference {
+          left: 20%;
+        }
+
+        .scene-3 .variable-display,
+        .scene-4 .variable-display,
+        .scene-5 .variable-display,
+        .scene-6 .variable-display {
+          left: 65%;
+        }
+      }
+
+      @media (max-height: 700px) {
+        .top-bar {
+          height: 52px;
+        }
+
+        .navigation {
+          bottom: 18px;
+        }
+
+        .scene-2 .student {
+          width: 120px;
+          height: 120px;
+        }
+
+        .scene-2 .student-2 {
+          top: 23%;
+        }
+
+        .scene-2 .student-3 {
+          top: 46%;
+        }
+
+        .scene-2 .student-4 {
+          top: 69%;
+        }
+      }
+
+      /* ============================================================
+   ACCESSIBILITY
+   ============================================================ */
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!--
+    =============================================================
+    VARIABLES — INTUITION ANIMATION
+
+    Story:
+      1. Four students appear in the center.
+      2. Students move to the left into a vertical line.
+      3. AGE = appears on the right.
+      4. Student 1 says "My age = 19" → AGE = 19
+      5. Student 2 says "My age = 28" → AGE = 28
+      6. Student 3 says "My age = 24" → AGE = 24
+      7. Student 4 says "My age = 21" → AGE = 21
+      8. Formal definition of VARIABLE appears.
+
+    Everything is click-controlled.
+    No automatic scene progression.
+    =============================================================
+  -->
+
+    <main id="animation">
+      <!-- =======================================================
+         GLOBAL UI
+         ======================================================= -->
+
+      <header id="topBar" class="top-bar">
+        <div class="lesson-label">VARIABLES</div>
+        <div id="sceneIndicator" class="scene-indicator">1 / 8</div>
+      </header>
+
+      <!-- =======================================================
+         MAIN STAGE
+         ======================================================= -->
+
+      <section id="stage" class="stage">
+        <!-- =====================================================
+           SCENE 1 — FOUR STUDENTS
+           ===================================================== -->
+        <section id="scene1" class="scene scene-1 active" data-scene="1">
+          <div class="scene-content">
+            <div id="students" class="students">
+              <div
+                id="student1"
+                class="student student-1"
+                data-age="19"
+                data-student="1"
+              >
+                <div class="student-emoji">👨‍🎓</div>
+                <div class="speech-bubble">
+                  <span>My age = 19</span>
+                </div>
+              </div>
+
+              <div
+                id="student2"
+                class="student student-2"
+                data-age="28"
+                data-student="2"
+              >
+                <div class="student-emoji">👩‍🎓</div>
+                <div class="speech-bubble">
+                  <span>My age = 28</span>
+                </div>
+              </div>
+
+              <div
+                id="student3"
+                class="student student-3"
+                data-age="24"
+                data-student="3"
+              >
+                <div class="student-emoji">👩‍🎓</div>
+                <div class="speech-bubble">
+                  <span>My age = 24</span>
+                </div>
+              </div>
+
+              <div
+                id="student4"
+                class="student student-4"
+                data-age="21"
+                data-student="4"
+              >
+                <div class="student-emoji">👨‍🎓</div>
+                <div class="speech-bubble">
+                  <span>My age = 21</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- =====================================================
+           SCENE 2 — STUDENTS MOVE LEFT + AGE =
+           ===================================================== -->
+        <section id="scene2" class="scene scene-2" data-scene="2">
+          <div class="scene-content">
+            <div id="scene2Students" class="students scene2-students">
+              <div class="student student-1" data-age="19">
+                <div class="student-emoji">👨‍🎓</div>
+                <div class="speech-bubble">
+                  <span>My age = 19</span>
+                </div>
+              </div>
+
+              <div class="student student-2" data-age="28">
+                <div class="student-emoji">👩‍🎓</div>
+                <div class="speech-bubble">
+                  <span>My age = 28</span>
+                </div>
+              </div>
+
+              <div class="student student-3" data-age="24">
+                <div class="student-emoji">👩‍🎓</div>
+                <div class="speech-bubble">
+                  <span>My age = 24</span>
+                </div>
+              </div>
+
+              <div class="student student-4" data-age="21">
+                <div class="student-emoji">👨‍🎓</div>
+                <div class="speech-bubble">
+                  <span>My age = 21</span>
+                </div>
+              </div>
+            </div>
+
+            <div id="variableDisplay" class="variable-display">
+              <span class="variable-name">AGE</span>
+              <span class="variable-equals">=</span>
+              <span id="variableValue" class="variable-value"></span>
+            </div>
+          </div>
+        </section>
+
+        <!-- =====================================================
+           SCENE 3 — FIRST STUDENT: AGE = 19
+           ===================================================== -->
+        <section id="scene3" class="scene scene-3" data-scene="3">
+          <div class="scene-content">
+            <div class="scene3-student student-reference">
+              <div class="student-emoji">👨‍🎓</div>
+
+              <div id="scene3Speech" class="speech-bubble">
+                <span>My age = 19</span>
+              </div>
+            </div>
+
+            <div id="scene3Variable" class="variable-display">
+              <span class="variable-name">AGE</span>
+              <span class="variable-equals">=</span>
+              <span class="variable-value">19</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- =====================================================
+           SCENE 4 — SECOND STUDENT: AGE = 28
+           ===================================================== -->
+        <section id="scene4" class="scene scene-4" data-scene="4">
+          <div class="scene-content">
+            <div class="student-reference student-2-reference">
+              <div class="student-emoji">👩‍🎓</div>
+
+              <div id="scene4Speech" class="speech-bubble">
+                <span>My age = 28</span>
+              </div>
+            </div>
+
+            <div id="scene4Variable" class="variable-display">
+              <span class="variable-name">AGE</span>
+              <span class="variable-equals">=</span>
+              <span class="variable-value">28</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- =====================================================
+           SCENE 5 — THIRD STUDENT: AGE = 24
+           ===================================================== -->
+        <section id="scene5" class="scene scene-5" data-scene="5">
+          <div class="scene-content">
+            <div class="student-reference student-3-reference">
+              <div class="student-emoji">👩‍🎓</div>
+
+              <div id="scene5Speech" class="speech-bubble">
+                <span>My age = 24</span>
+              </div>
+            </div>
+
+            <div id="scene5Variable" class="variable-display">
+              <span class="variable-name">AGE</span>
+              <span class="variable-equals">=</span>
+              <span class="variable-value">24</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- =====================================================
+           SCENE 6 — FOURTH STUDENT: AGE = 21
+           ===================================================== -->
+        <section id="scene6" class="scene scene-6" data-scene="6">
+          <div class="scene-content">
+            <div class="student-reference student-4-reference">
+              <div class="student-emoji">👨‍🎓</div>
+
+              <div id="scene6Speech" class="speech-bubble">
+                <span>My age = 21</span>
+              </div>
+            </div>
+
+            <div id="scene6Variable" class="variable-display">
+              <span class="variable-name">AGE</span>
+              <span class="variable-equals">=</span>
+              <span class="variable-value">21</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- =====================================================
+           SCENE 7 — WHAT STAYED THE SAME?
+           ===================================================== -->
+        <section id="scene7" class="scene scene-7" data-scene="7">
+          <div class="scene-content">
+            <div id="whatStayedSame" class="reflection-question">
+              What stayed the same?
+            </div>
+
+            <div id="sameAge" class="same-age-display">
+              <span>AGE</span>
+            </div>
+
+            <div id="whatChanged" class="changed-question">
+              What kept changing?
+            </div>
+
+            <div id="changingValues" class="changing-values">
+              <span>19</span>
+              <span>28</span>
+              <span>24</span>
+              <span>21</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- =====================================================
+           SCENE 8 — VARIABLE DEFINITION
+           ===================================================== -->
+        <section id="scene8" class="scene scene-8" data-scene="8">
+          <div class="scene-content">
+            <div id="variableDefinition" class="definition-card">
+              <div class="definition-term">VARIABLE</div>
+
+              <div class="definition-text">
+                A named storage location that holds a value.
+              </div>
+            </div>
+
+            <div id="variableExample" class="variable-example">
+              <span class="example-name">AGE</span>
+              <span class="example-equals">=</span>
+              <span class="example-value">21</span>
+            </div>
+
+            <div id="variableChange" class="variable-change">
+              <span>AGE</span>
+              <span>=</span>
+              <span class="old-value">19</span>
+              <span class="change-arrow">→</span>
+              <span class="new-value">21</span>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <!-- =======================================================
+         GLOBAL NAVIGATION
+         ======================================================= -->
+
+      <footer id="navigation" class="navigation">
+        <button
+          id="mainNext"
+          class="main-next-button"
+          type="button"
+          aria-label="Continue to next scene"
+        >
+          Continue
+        </button>
+      </footer>
+    </main>
+
+    <!-- =========================================================
+       JAVASCRIPT BLOCK
+       Part 3 will be placed here.
+       ========================================================= -->
+    <script>
+      /* ============================================================
+   VARIABLES — INTUITION ANIMATION
+   PART 3 — JAVASCRIPT
+
+   Completely click-driven:
+   Scene 1  → students appear
+   Scene 2  → students move left + AGE =
+   Scene 3  → 19
+   Scene 4  → 28
+   Scene 5  → 24
+   Scene 6  → 21
+   Scene 7  → reflection
+   Scene 8  → variable definition
+   ============================================================ */
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const TOTAL_SCENES = 8;
+
+        let currentScene = 1;
+        let isTransitioning = false;
+
+        const scenes = Array.from(document.querySelectorAll(".scene"));
+        const mainNext = document.getElementById("mainNext");
+        const sceneIndicator = document.getElementById("sceneIndicator");
+
+        /* ==========================================================
+     HELPERS
+     ========================================================== */
+
+        const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+        function updateIndicator() {
+          sceneIndicator.textContent = `${currentScene} / ${TOTAL_SCENES}`;
+        }
+
+        function activateScene(sceneNumber) {
+          scenes.forEach((scene) => {
+            const number = Number(scene.dataset.scene);
+
+            scene.classList.toggle("active", number === sceneNumber);
+          });
+
+          currentScene = sceneNumber;
+          updateIndicator();
+        }
+
+        function show(element) {
+          if (!element) return;
+
+          element.style.opacity = "1";
+          element.style.visibility = "visible";
+        }
+
+        function hide(element) {
+          if (!element) return;
+
+          element.style.opacity = "0";
+        }
+
+        function replayAnimation(element, animationClass) {
+          if (!element) return;
+
+          element.classList.remove(
+            "reveal",
+            "pop",
+            "reveal-soft",
+            "value-change",
+            "student-enter",
+            "student-move",
+          );
+
+          void element.offsetWidth;
+
+          element.classList.add(animationClass);
+        }
+
+        function clearAnimation(element) {
+          if (!element) return;
+
+          element.classList.remove(
+            "reveal",
+            "pop",
+            "reveal-soft",
+            "value-change",
+            "student-enter",
+            "student-move",
+          );
+        }
+
+        /* ==========================================================
+     SCENE 1
+     Four students start in the center.
+     ========================================================== */
+
+        async function enterScene1() {
+          const students = [
+            document.querySelector("#scene1 .student-1"),
+            document.querySelector("#scene1 .student-2"),
+            document.querySelector("#scene1 .student-3"),
+            document.querySelector("#scene1 .student-4"),
+          ];
+
+          students.forEach((student) => {
+            hide(student);
+            clearAnimation(student);
+          });
+
+          // Students appear one by one.
+          for (let i = 0; i < students.length; i++) {
+            replayAnimation(students[i], "student-enter");
+
+            await wait(180);
+          }
+
+          mainNext.textContent = "Continue";
+        }
+
+        /* ==========================================================
+     SCENE 2
+     Students move to left vertical column.
+     AGE = appears on right.
+     ========================================================== */
+
+        async function enterScene2() {
+          const students = Array.from(
+            document.querySelectorAll("#scene2 .student"),
+          );
+
+          const variableDisplay = document.getElementById("variableDisplay");
+
+          // Reset
+          hide(variableDisplay);
+          clearAnimation(variableDisplay);
+
+          students.forEach((student) => {
+            hide(student);
+            clearAnimation(student);
+          });
+
+          /*
+      Bring the students in sequentially.
+
+      CSS has already positioned them as a vertical column,
+      so the animation makes them feel as though they are
+      arriving from the center and settling into their places.
+    */
+          for (let i = 0; i < students.length; i++) {
+            replayAnimation(students[i], "student-move");
+
+            await wait(160);
+          }
+
+          await wait(250);
+
+          // Now reveal AGE =
+          show(variableDisplay);
+
+          variableDisplay.style.opacity = "0";
+
+          replayAnimation(variableDisplay, "pop");
+
+          mainNext.textContent = "Continue";
+        }
+
+        /* ==========================================================
+     SCENES 3–6
+     One student speaks.
+     Then only the VALUE changes.
+     AGE and "=" stay physically fixed.
+     ========================================================== */
+
+        const ageScenes = {
+          3: {
+            student: "#scene3 .student-reference",
+            speech: "#scene3Speech",
+            variable: "#scene3Variable",
+            age: "19",
+          },
+
+          4: {
+            student: "#scene4 .student-reference",
+            speech: "#scene4Speech",
+            variable: "#scene4Variable",
+            age: "28",
+          },
+
+          5: {
+            student: "#scene5 .student-reference",
+            speech: "#scene5Speech",
+            variable: "#scene5Variable",
+            age: "24",
+          },
+
+          6: {
+            student: "#scene6 .student-reference",
+            speech: "#scene6Speech",
+            variable: "#scene6Variable",
+            age: "21",
+          },
+        };
+
+        async function enterAgeScene(sceneNumber) {
+          const config = ageScenes[sceneNumber];
+
+          const student = document.querySelector(config.student);
+
+          const speech = document.querySelector(config.speech);
+
+          const variable = document.querySelector(config.variable);
+
+          const value = variable.querySelector(".variable-value");
+
+          // Reset
+          hide(student);
+          hide(speech);
+          hide(variable);
+
+          clearAnimation(student);
+          clearAnimation(speech);
+          clearAnimation(variable);
+
+          value.textContent = config.age;
+
+          // Student arrives first.
+          replayAnimation(student, "student-enter");
+
+          await wait(450);
+
+          // Student speaks.
+          replayAnimation(speech, "reveal");
+
+          await wait(450);
+
+          // AGE = VALUE appears.
+          replayAnimation(variable, "pop");
+
+          mainNext.textContent = sceneNumber === 6 ? "Continue" : "Next";
+        }
+
+        /* ==========================================================
+     SCENE 7
+     Reflection:
+       What stayed the same?
+       AGE
+       What kept changing?
+       19 28 24 21
+     ========================================================== */
+
+        async function enterScene7() {
+          const question = document.getElementById("whatStayedSame");
+
+          const sameAge = document.getElementById("sameAge");
+
+          const changed = document.getElementById("whatChanged");
+
+          const values = document.getElementById("changingValues");
+
+          [question, sameAge, changed, values].forEach((element) => {
+            hide(element);
+            clearAnimation(element);
+          });
+
+          // Question first.
+          replayAnimation(question, "reveal");
+
+          await wait(650);
+
+          // AGE appears.
+          replayAnimation(sameAge, "pop");
+
+          await wait(650);
+
+          // Second question.
+          replayAnimation(changed, "reveal");
+
+          await wait(500);
+
+          // Values appear one by one.
+          show(values);
+
+          const valueElements = Array.from(values.children);
+
+          valueElements.forEach((element) => {
+            element.style.opacity = "0";
+            element.style.transform = "translateY(12px) scale(0.9)";
+          });
+
+          valueElements.forEach((element, index) => {
+            setTimeout(() => {
+              element.style.transition =
+                "opacity 350ms ease, transform 450ms cubic-bezier(0.22,1,0.36,1)";
+
+              element.style.opacity = "1";
+              element.style.transform = "translateY(0) scale(1)";
+            }, index * 180);
+          });
+
+          mainNext.textContent = "Continue";
+        }
+
+        /* ==========================================================
+     SCENE 8
+     Formal definition.
+     ========================================================== */
+
+        async function enterScene8() {
+          const definition = document.getElementById("variableDefinition");
+
+          const example = document.getElementById("variableExample");
+
+          const change = document.getElementById("variableChange");
+
+          [definition, example, change].forEach((element) => {
+            hide(element);
+            clearAnimation(element);
+          });
+
+          // Definition.
+          replayAnimation(definition, "reveal");
+
+          await wait(650);
+
+          // Example.
+          replayAnimation(example, "pop");
+
+          await wait(600);
+
+          // Explicitly show that the value can change.
+          replayAnimation(change, "reveal");
+
+          mainNext.textContent = "Restart";
+        }
+
+        /* ==========================================================
+     SCENE TRANSITION
+     ========================================================== */
+
+        async function goToScene(sceneNumber) {
+          if (isTransitioning) return;
+
+          if (sceneNumber < 1 || sceneNumber > TOTAL_SCENES) {
+            return;
+          }
+
+          isTransitioning = true;
+
+          activateScene(sceneNumber);
+
+          switch (sceneNumber) {
+            case 1:
+              await enterScene1();
+              break;
+
+            case 2:
+              await enterScene2();
+              break;
+
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+              await enterAgeScene(sceneNumber);
+              break;
+
+            case 7:
+              await enterScene7();
+              break;
+
+            case 8:
+              await enterScene8();
+              break;
+          }
+
+          isTransitioning = false;
+        }
+
+        /* ==========================================================
+     MAIN BUTTON
+     ========================================================== */
+
+        mainNext.addEventListener("click", async () => {
+          if (isTransitioning) return;
+
+          // Restart after the final definition.
+          if (currentScene === TOTAL_SCENES) {
+            await goToScene(1);
+
+            return;
+          }
+
+          // Normal next scene.
+          await goToScene(currentScene + 1);
+        });
+
+        /* ==========================================================
+     KEYBOARD
+     ========================================================== */
+
+        document.addEventListener("keydown", (event) => {
+          if (
+            event.key === " " ||
+            event.key === "Enter" ||
+            event.key === "ArrowRight"
+          ) {
+            if (
+              document.activeElement &&
+              document.activeElement.tagName === "BUTTON"
+            ) {
+              return;
+            }
+
+            mainNext.click();
+          }
+
+          if (
+            event.key === "ArrowLeft" &&
+            currentScene > 1 &&
+            !isTransitioning
+          ) {
+            goToScene(currentScene - 1);
+          }
+        });
+
+        /* ==========================================================
+     INITIALIZE
+     ========================================================== */
+
+        scenes.forEach((scene) => {
+          scene.classList.remove("active");
+        });
+
+        activateScene(1);
+
+        enterScene1();
+      });
+    </script>
+  </body>
+</html>

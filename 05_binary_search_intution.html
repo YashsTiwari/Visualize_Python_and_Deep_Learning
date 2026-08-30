@@ -1,0 +1,3813 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Binary Search — Intuition</title>
+
+    <!-- =====================================================
+       CSS
+       ===================================================== -->
+
+    <style>
+      /* ============================================================
+   BINARY SEARCH — INTUITION ANIMATION
+   COMPLETE CSS
+   ============================================================ */
+
+      :root {
+        --ink: #17213a;
+        --muted: #53627a;
+
+        --blue: #4263eb;
+        --blue-dark: #3156c9;
+        --blue-soft: #eef2ff;
+
+        --purple: #7c4dff;
+        --purple-soft: #f3eeff;
+
+        --teal: #00a896;
+        --teal-soft: #e8fbf7;
+
+        --orange: #f59e0b;
+        --orange-soft: #fff5de;
+
+        --pink: #e84a8a;
+        --pink-soft: #fff0f6;
+
+        --green: #39a852;
+        --green-soft: #eaf8ed;
+
+        --red: #e5484d;
+        --red-soft: #fff0f0;
+
+        --border: #b9c4d8;
+      }
+
+      /* ============================================================
+   BASE
+   ============================================================ */
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        overflow: hidden;
+
+        background: #ffffff;
+        color: var(--ink);
+
+        font-family:
+          Inter,
+          ui-sans-serif,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+
+        -webkit-font-smoothing: antialiased;
+      }
+
+      button {
+        font-family: inherit;
+      }
+
+      /* ============================================================
+   MAIN APP
+   ============================================================ */
+
+      #animation {
+        position: relative;
+
+        width: 100vw;
+        height: 100vh;
+
+        min-width: 1000px;
+        min-height: 650px;
+
+        overflow: hidden;
+
+        background: #ffffff;
+      }
+
+      /* ============================================================
+   TOP BAR
+   ============================================================ */
+
+      .top-bar {
+        position: absolute;
+
+        z-index: 100;
+
+        top: 0;
+        left: 0;
+        right: 0;
+
+        height: 64px;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        padding: 0 38px;
+
+        pointer-events: none;
+      }
+
+      .lesson-label {
+        color: var(--muted);
+
+        font-size: 13px;
+        font-weight: 850;
+
+        letter-spacing: 0.13em;
+      }
+
+      .scene-indicator {
+        color: var(--muted);
+
+        font-size: 13px;
+        font-weight: 750;
+      }
+
+      /* ============================================================
+   STAGE
+   ============================================================ */
+
+      .stage {
+        position: absolute;
+
+        inset: 0;
+
+        overflow: hidden;
+      }
+
+      /* ============================================================
+   SCENES
+   ============================================================ */
+
+      .scene {
+        position: absolute;
+
+        inset: 0;
+
+        opacity: 0;
+        visibility: hidden;
+
+        pointer-events: none;
+
+        transition:
+          opacity 350ms ease,
+          visibility 350ms ease;
+      }
+
+      .scene.active {
+        opacity: 1;
+        visibility: visible;
+
+        pointer-events: auto;
+      }
+
+      .scene-content {
+        position: relative;
+
+        width: 100%;
+        height: 100%;
+      }
+
+      /* ============================================================
+   NAVIGATION
+   ============================================================ */
+
+      .navigation {
+        position: absolute;
+
+        z-index: 500;
+
+        right: 36px;
+        bottom: 29px;
+      }
+
+      .main-next-button {
+        border: none;
+
+        border-radius: 999px;
+
+        padding: 13px 28px;
+
+        background: var(--blue);
+
+        color: #ffffff;
+
+        font-size: 15px;
+        font-weight: 850;
+
+        cursor: pointer;
+
+        box-shadow: 0 9px 25px rgba(66, 99, 235, 0.25);
+
+        transition:
+          transform 160ms ease,
+          background 160ms ease,
+          box-shadow 160ms ease;
+      }
+
+      .main-next-button:hover {
+        background: var(--blue-dark);
+
+        transform: translateY(-2px);
+
+        box-shadow: 0 12px 30px rgba(66, 99, 235, 0.3);
+      }
+
+      .main-next-button:active {
+        transform: translateY(0);
+      }
+
+      /* ============================================================
+   ============================================================
+   SCENE 1
+   RANDOM ANSWER SHEETS
+   ============================================================
+   ============================================================ */
+
+      .answer-sheet {
+        position: absolute;
+
+        width: 145px;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        opacity: 0;
+
+        user-select: none;
+      }
+
+      .sheet-icon {
+        width: 72px;
+        height: 72px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 18px;
+
+        font-size: 48px;
+
+        box-shadow: 0 8px 22px rgba(33, 45, 70, 0.1);
+      }
+
+      .sheet-name {
+        margin-top: 7px;
+
+        color: var(--ink);
+
+        font-size: 15px;
+        font-weight: 850;
+      }
+
+      .sheet-roll {
+        margin-top: 3px;
+
+        color: var(--muted);
+
+        font-size: 12px;
+        font-weight: 700;
+
+        white-space: nowrap;
+      }
+
+      /* ============================================================
+   SCENE 1 — RANDOM POSITIONS
+   ============================================================ */
+
+      .sheet-1 {
+        left: 7%;
+        top: 13%;
+      }
+
+      .sheet-2 {
+        left: 27%;
+        top: 9%;
+      }
+
+      .sheet-3 {
+        left: 48%;
+        top: 14%;
+      }
+
+      .sheet-4 {
+        left: 72%;
+        top: 10%;
+      }
+
+      .sheet-5 {
+        left: 14%;
+        top: 39%;
+      }
+
+      .sheet-6 {
+        left: 37%;
+        top: 42%;
+      }
+
+      .sheet-7 {
+        left: 61%;
+        top: 37%;
+      }
+
+      .sheet-8 {
+        left: 82%;
+        top: 42%;
+      }
+
+      .sheet-9 {
+        left: 5%;
+        top: 69%;
+      }
+
+      .sheet-10 {
+        left: 25%;
+        top: 70%;
+      }
+
+      .sheet-11 {
+        left: 47%;
+        top: 68%;
+      }
+
+      .sheet-12 {
+        left: 68%;
+        top: 70%;
+      }
+
+      .sheet-13 {
+        left: 84%;
+        top: 70%;
+      }
+
+      .sheet-14 {
+        left: 17%;
+        top: 21%;
+      }
+
+      .sheet-15 {
+        left: 57%;
+        top: 22%;
+      }
+
+      .sheet-16 {
+        left: 76%;
+        top: 25%;
+      }
+
+      .sheet-17 {
+        left: 2%;
+        top: 45%;
+      }
+
+      .sheet-18 {
+        left: 44%;
+        top: 56%;
+      }
+
+      .sheet-19 {
+        left: 65%;
+        top: 56%;
+      }
+
+      .sheet-20 {
+        left: 87%;
+        top: 55%;
+      }
+
+      /* ============================================================
+   SCENE 1 — COLORS
+   ============================================================ */
+
+      .sheet-1 .sheet-icon,
+      .sheet-5 .sheet-icon,
+      .sheet-9 .sheet-icon,
+      .sheet-13 .sheet-icon {
+        background: var(--blue-soft);
+
+        box-shadow:
+          inset 0 0 0 2px #a8baff,
+          0 8px 22px rgba(66, 99, 235, 0.1);
+      }
+
+      .sheet-2 .sheet-icon,
+      .sheet-6 .sheet-icon,
+      .sheet-10 .sheet-icon,
+      .sheet-14 .sheet-icon,
+      .sheet-18 .sheet-icon {
+        background: var(--pink-soft);
+
+        box-shadow:
+          inset 0 0 0 2px #ffb5d1,
+          0 8px 22px rgba(232, 74, 138, 0.1);
+      }
+
+      .sheet-3 .sheet-icon,
+      .sheet-7 .sheet-icon,
+      .sheet-11 .sheet-icon,
+      .sheet-15 .sheet-icon,
+      .sheet-19 .sheet-icon {
+        background: var(--teal-soft);
+
+        box-shadow:
+          inset 0 0 0 2px #8dddd1,
+          0 8px 22px rgba(0, 168, 150, 0.1);
+      }
+
+      .sheet-4 .sheet-icon,
+      .sheet-8 .sheet-icon,
+      .sheet-12 .sheet-icon,
+      .sheet-16 .sheet-icon,
+      .sheet-17 .sheet-icon,
+      .sheet-20 .sheet-icon {
+        background: var(--orange-soft);
+
+        box-shadow:
+          inset 0 0 0 2px #ffd48a,
+          0 8px 22px rgba(245, 158, 11, 0.1);
+      }
+
+      /* ============================================================
+   ============================================================
+   SCENE 2
+   SORTED COLLECTION
+   ============================================================
+   ============================================================ */
+
+      .sorted-collection {
+        position: absolute;
+
+        left: 50%;
+        top: 49%;
+
+        width: min(930px, 88vw);
+
+        display: flex;
+        flex-direction: column;
+
+        gap: 22px;
+
+        transform: translate(-50%, -50%);
+      }
+
+      .sorted-row {
+        display: flex;
+
+        align-items: flex-start;
+        justify-content: center;
+
+        gap: 12px;
+      }
+
+      .sorted-sheet {
+        width: 112px;
+        height: 116px;
+
+        display: flex;
+        flex-direction: column;
+
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 16px;
+
+        background: #ffffff;
+
+        border: 2px solid #d5ddf0;
+
+        box-shadow: 0 7px 18px rgba(33, 45, 70, 0.07);
+
+        opacity: 0;
+      }
+
+      .small-sheet-icon {
+        font-size: 42px;
+
+        line-height: 1;
+      }
+
+      .sorted-roll {
+        margin-top: 7px;
+
+        color: var(--blue);
+
+        font-size: 17px;
+        font-weight: 900;
+      }
+
+      .sorted-sheet:nth-child(3n + 1) {
+        border-color: #b9c9ff;
+      }
+
+      .sorted-sheet:nth-child(3n + 2) {
+        border-color: #ffbbd4;
+      }
+
+      .sorted-sheet:nth-child(3n) {
+        border-color: #9bddd5;
+      }
+
+      /* ============================================================
+   ============================================================
+   SCENE 3
+   SEARCH PROBLEM
+   ============================================================
+   ============================================================ */
+
+      .mini-sorted-list {
+        position: absolute;
+
+        left: 50%;
+        top: 28%;
+
+        width: 900px;
+
+        transform: translate(-50%, -50%);
+
+        color: var(--muted);
+
+        font-size: 22px;
+        font-weight: 750;
+
+        line-height: 2.1;
+
+        text-align: center;
+
+        opacity: 0;
+      }
+
+      .search-target {
+        position: absolute;
+
+        left: 50%;
+        top: 61%;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        transform: translate(-50%, -50%) scale(0.85);
+
+        opacity: 0;
+      }
+
+      .target-small-label {
+        color: var(--muted);
+
+        font-size: 22px;
+        font-weight: 700;
+      }
+
+      .target-roll {
+        margin-top: 13px;
+
+        padding: 15px 30px;
+
+        border-radius: 18px;
+
+        background: var(--purple-soft);
+
+        border: 3px solid #bca8ff;
+
+        color: var(--purple);
+
+        font-size: 38px;
+        font-weight: 950;
+
+        box-shadow: 0 12px 30px rgba(124, 77, 255, 0.14);
+      }
+
+      .target-roll span {
+        font-size: 50px;
+      }
+
+      /* ============================================================
+   ============================================================
+   SCENE 4
+   INTERACTIVE BINARY SEARCH
+   ============================================================
+   ============================================================ */
+
+      /* ============================================================
+   TARGET BADGE
+   ============================================================ */
+
+      .target-badge {
+        position: absolute;
+
+        left: 50%;
+        top: 10%;
+
+        display: flex;
+        align-items: center;
+
+        gap: 14px;
+
+        padding: 10px 22px;
+
+        border-radius: 999px;
+
+        background: var(--purple-soft);
+
+        border: 2px solid #bca8ff;
+
+        transform: translate(-50%, -50%) scale(0.85);
+
+        opacity: 0;
+      }
+
+      .target-badge span {
+        color: var(--muted);
+
+        font-size: 13px;
+        font-weight: 850;
+
+        letter-spacing: 0.08em;
+      }
+
+      .target-badge strong {
+        color: var(--purple);
+
+        font-size: 27px;
+        font-weight: 950;
+      }
+
+      /* ============================================================
+   MAIN BINARY SEARCH AREA
+   ============================================================ */
+
+      .binary-search-area {
+        position: absolute;
+
+        left: 50%;
+        top: 46%;
+
+        width: 95vw;
+        max-width: 1500px;
+
+        transform: translate(-50%, -50%);
+      }
+
+      /*
+   IMPORTANT:
+
+   The 20 elements are treated as ONE sequence.
+
+   We allow the row to shrink visually when elements
+   are eliminated.
+*/
+
+      .binary-row {
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        gap: 6px;
+
+        width: 100%;
+
+        transition: gap 400ms ease;
+      }
+
+      /* ============================================================
+   INDIVIDUAL ANSWER SHEET
+   ============================================================ */
+
+      .binary-sheet {
+        position: relative;
+
+        flex: 1 1 0;
+
+        max-width: 72px;
+        min-width: 44px;
+
+        height: 104px;
+
+        display: flex;
+        flex-direction: column;
+
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 13px;
+
+        background: #ffffff;
+
+        border: 2px solid #b9c9ff;
+
+        box-shadow: 0 7px 17px rgba(33, 45, 70, 0.07);
+
+        transition:
+          opacity 450ms ease,
+          transform 450ms ease,
+          background 350ms ease,
+          border-color 350ms ease,
+          box-shadow 350ms ease,
+          filter 450ms ease,
+          flex 450ms ease;
+
+        z-index: 1;
+      }
+
+      .binary-icon {
+        font-size: 31px;
+
+        line-height: 1;
+      }
+
+      .binary-sheet strong {
+        margin-top: 7px;
+
+        color: var(--ink);
+
+        font-size: 14px;
+        font-weight: 900;
+      }
+
+      /* ============================================================
+   MIDDLE
+   ============================================================ */
+
+      .binary-sheet.middle {
+        background: var(--orange-soft);
+
+        border-color: var(--orange);
+
+        box-shadow:
+          0 0 0 4px rgba(245, 158, 11, 0.15),
+          0 12px 27px rgba(245, 158, 11, 0.2);
+
+        transform: translateY(-12px) scale(1.08);
+
+        z-index: 10;
+      }
+
+      /*
+   The MIDDLE label belongs ONLY to the selected card.
+*/
+
+      .binary-sheet.middle::before {
+        content: "MIDDLE";
+
+        position: absolute;
+
+        left: 50%;
+        top: -38px;
+
+        transform: translateX(-50%);
+
+        color: var(--orange);
+
+        font-size: 12px;
+        font-weight: 950;
+
+        letter-spacing: 0.09em;
+
+        white-space: nowrap;
+      }
+
+      /* ============================================================
+   CURRENT SEARCH RANGE
+   ============================================================ */
+
+      .binary-sheet.in-search {
+        background: var(--blue-soft);
+
+        border-color: #a8baff;
+      }
+
+      /* ============================================================
+   ELIMINATED ELEMENTS
+   ============================================================ */
+
+      .binary-sheet.eliminated {
+        opacity: 0.14;
+
+        filter: grayscale(0.9);
+
+        transform: scale(0.82);
+      }
+
+      /*
+   Red slash over eliminated answer sheets.
+*/
+
+      .binary-sheet.eliminated::after {
+        content: "";
+
+        position: absolute;
+
+        inset: 9px;
+
+        border-radius: 8px;
+
+        background: linear-gradient(
+          135deg,
+          transparent 46%,
+          rgba(229, 72, 77, 0.45) 47%,
+          rgba(229, 72, 77, 0.45) 53%,
+          transparent 54%
+        );
+
+        pointer-events: none;
+      }
+
+      /* ============================================================
+   FOUND
+   ============================================================ */
+
+      .binary-sheet.found {
+        background: var(--green-soft);
+
+        border-color: var(--green);
+
+        box-shadow:
+          0 0 0 5px rgba(57, 168, 82, 0.14),
+          0 14px 32px rgba(57, 168, 82, 0.2);
+
+        transform: translateY(-14px) scale(1.1);
+
+        z-index: 20;
+      }
+
+      .binary-sheet.found::before {
+        content: "FOUND";
+
+        position: absolute;
+
+        left: 50%;
+        top: -39px;
+
+        transform: translateX(-50%);
+
+        color: var(--green);
+
+        font-size: 12px;
+        font-weight: 950;
+
+        letter-spacing: 0.08em;
+      }
+
+      .binary-sheet.found strong {
+        color: var(--green);
+      }
+
+      /* ============================================================
+   COMPARISON
+   ============================================================ */
+
+      .comparison-box {
+        position: absolute;
+
+        left: 50%;
+        top: 69%;
+
+        display: flex;
+        align-items: center;
+
+        gap: 13px;
+
+        transform: translate(-50%, -50%) scale(0.85);
+
+        opacity: 0;
+      }
+
+      .comparison-target,
+      .comparison-value {
+        min-width: 86px;
+
+        padding: 9px 18px;
+
+        border-radius: 12px;
+
+        text-align: center;
+
+        font-size: 25px;
+        font-weight: 950;
+      }
+
+      .comparison-target {
+        background: var(--purple-soft);
+
+        border: 2px solid #bca8ff;
+
+        color: var(--purple);
+      }
+
+      .comparison-value {
+        background: var(--orange-soft);
+
+        border: 2px solid #ffd48a;
+
+        color: var(--orange);
+      }
+
+      .comparison-symbol {
+        color: var(--ink);
+
+        font-size: 34px;
+        font-weight: 950;
+      }
+
+      /* ============================================================
+   DIRECTION MESSAGE
+   ============================================================ */
+
+      .direction-message {
+        position: absolute;
+
+        left: 50%;
+        top: 80%;
+
+        max-width: 760px;
+
+        padding: 10px 25px;
+
+        border-radius: 999px;
+
+        background: var(--blue-soft);
+
+        border: 2px solid #a8baff;
+
+        color: var(--blue);
+
+        font-size: 21px;
+        font-weight: 850;
+
+        text-align: center;
+
+        transform: translate(-50%, -50%) scale(0.85);
+
+        opacity: 0;
+      }
+
+      /* ============================================================
+   SEARCH HERE LABEL
+   ============================================================ */
+
+      .remaining-label {
+        position: absolute;
+
+        color: var(--blue);
+
+        font-size: 12px;
+        font-weight: 950;
+
+        letter-spacing: 0.09em;
+
+        opacity: 0;
+
+        pointer-events: none;
+
+        transition:
+          left 450ms ease,
+          top 450ms ease;
+      }
+
+      /* ============================================================
+   ELIMINATED LABEL
+   ============================================================ */
+
+      .eliminated-label {
+        position: absolute;
+
+        color: var(--red);
+
+        font-size: 12px;
+        font-weight: 900;
+
+        letter-spacing: 0.07em;
+
+        opacity: 0;
+      }
+
+      /* ============================================================
+   ============================================================
+   SCENE 5
+   AUTOMATIC SEARCH
+   ============================================================
+   ============================================================ */
+
+      .auto-target-badge {
+        position: absolute;
+
+        left: 50%;
+        top: 12%;
+
+        display: flex;
+        align-items: center;
+
+        gap: 14px;
+
+        padding: 10px 22px;
+
+        border-radius: 999px;
+
+        background: var(--purple-soft);
+
+        border: 2px solid #bca8ff;
+
+        color: var(--muted);
+
+        font-size: 13px;
+        font-weight: 900;
+
+        letter-spacing: 0.08em;
+
+        transform: translate(-50%, -50%) scale(0.85);
+
+        opacity: 0;
+      }
+
+      .auto-target-badge strong {
+        color: var(--purple);
+
+        font-size: 27px;
+        font-weight: 950;
+
+        letter-spacing: 0;
+      }
+
+      /* ============================================================
+   AUTOMATIC LIST
+   ============================================================ */
+
+      .auto-binary-list {
+        position: absolute;
+
+        left: 50%;
+        top: 45%;
+
+        width: min(930px, 90vw);
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        gap: 7px;
+
+        transform: translate(-50%, -50%);
+      }
+
+      .auto-binary-item {
+        position: relative;
+
+        flex: 1 1 0;
+
+        max-width: 72px;
+
+        height: 90px;
+
+        display: flex;
+        flex-direction: column;
+
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 13px;
+
+        background: #ffffff;
+
+        border: 2px solid #b9c9ff;
+
+        box-shadow: 0 6px 15px rgba(33, 45, 70, 0.06);
+
+        transition:
+          opacity 350ms ease,
+          transform 350ms ease,
+          background 350ms ease,
+          border-color 350ms ease,
+          box-shadow 350ms ease;
+      }
+
+      .auto-binary-item span {
+        font-size: 29px;
+
+        line-height: 1;
+      }
+
+      .auto-binary-item strong {
+        margin-top: 5px;
+
+        color: var(--ink);
+
+        font-size: 13px;
+        font-weight: 900;
+      }
+
+      /* ============================================================
+   AUTO — CURRENT MIDDLE
+   ============================================================ */
+
+      .auto-binary-item.current {
+        background: var(--orange-soft);
+
+        border-color: var(--orange);
+
+        box-shadow:
+          0 0 0 4px rgba(245, 158, 11, 0.14),
+          0 10px 24px rgba(245, 158, 11, 0.18);
+
+        transform: translateY(-11px) scale(1.07);
+
+        z-index: 5;
+      }
+
+      .auto-binary-item.current::before {
+        content: "MIDDLE";
+
+        position: absolute;
+
+        left: 50%;
+        top: -32px;
+
+        transform: translateX(-50%);
+
+        color: var(--orange);
+
+        font-size: 10px;
+        font-weight: 950;
+
+        letter-spacing: 0.07em;
+      }
+
+      /* ============================================================
+   AUTO — ELIMINATED
+   ============================================================ */
+
+      .auto-binary-item.eliminated {
+        opacity: 0.14;
+
+        filter: grayscale(0.9);
+
+        transform: scale(0.88);
+      }
+
+      /* ============================================================
+   AUTO — FOUND
+   ============================================================ */
+
+      .auto-binary-item.found {
+        background: var(--green-soft);
+
+        border-color: var(--green);
+
+        box-shadow:
+          0 0 0 5px rgba(57, 168, 82, 0.14),
+          0 13px 29px rgba(57, 168, 82, 0.2);
+
+        transform: translateY(-13px) scale(1.1);
+
+        z-index: 10;
+      }
+
+      .auto-binary-item.found::before {
+        content: "FOUND";
+
+        position: absolute;
+
+        left: 50%;
+        top: -34px;
+
+        transform: translateX(-50%);
+
+        color: var(--green);
+
+        font-size: 10px;
+        font-weight: 950;
+
+        letter-spacing: 0.07em;
+      }
+
+      .auto-binary-item.found strong {
+        color: var(--green);
+      }
+
+      /* ============================================================
+   AUTO SEARCH STATUS
+   ============================================================ */
+
+      .auto-search-status {
+        position: absolute;
+
+        left: 50%;
+        top: 67%;
+
+        color: var(--muted);
+
+        font-size: 23px;
+        font-weight: 750;
+
+        text-align: center;
+
+        transform: translate(-50%, -50%) scale(0.9);
+
+        opacity: 0;
+      }
+
+      /* ============================================================
+   AUTO FOUND
+   ============================================================ */
+
+      .auto-found {
+        position: absolute;
+
+        left: 50%;
+        top: 79%;
+
+        color: var(--green);
+
+        font-size: clamp(42px, 5vw, 68px);
+
+        font-weight: 950;
+
+        letter-spacing: -0.05em;
+
+        transform: translate(-50%, -50%) scale(0.6);
+
+        opacity: 0;
+      }
+
+      /* ============================================================
+   ELIMINATION COUNT
+   ============================================================ */
+
+      .elimination-count {
+        position: absolute;
+
+        right: 55px;
+        top: 20%;
+
+        padding: 10px 15px;
+
+        border-radius: 12px;
+
+        background: var(--blue-soft);
+
+        border: 2px solid #a8baff;
+
+        color: var(--blue);
+
+        font-size: 15px;
+        font-weight: 850;
+
+        opacity: 0;
+      }
+
+      /* ============================================================
+   ============================================================
+   SCENE 6
+   BINARY SEARCH TITLE
+   ============================================================
+   ============================================================ */
+
+      .scene-6 .scene-content {
+        display: flex;
+
+        flex-direction: column;
+
+        align-items: center;
+        justify-content: center;
+      }
+
+      .binary-search-title {
+        color: var(--blue);
+
+        font-size: clamp(58px, 8vw, 110px);
+
+        font-weight: 950;
+
+        line-height: 1;
+
+        letter-spacing: -0.065em;
+
+        opacity: 0;
+
+        transform: translateY(20px) scale(0.82);
+      }
+
+      .binary-search-subtitle {
+        margin-top: 27px;
+
+        color: var(--ink);
+
+        font-size: clamp(23px, 2.5vw, 35px);
+
+        font-weight: 650;
+
+        text-align: center;
+
+        opacity: 0;
+
+        transform: translateY(15px);
+      }
+
+      /* ============================================================
+   BINARY VISUAL
+   ============================================================ */
+
+      .binary-visual {
+        display: flex;
+
+        align-items: center;
+
+        gap: 14px;
+
+        margin-top: 45px;
+
+        opacity: 0;
+      }
+
+      .binary-stage-number {
+        width: 62px;
+        height: 62px;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 50%;
+
+        background: var(--blue-soft);
+
+        border: 2px solid #a8baff;
+
+        color: var(--blue);
+
+        font-size: 20px;
+        font-weight: 950;
+      }
+
+      .binary-stage-arrow {
+        color: var(--muted);
+
+        font-size: 27px;
+        font-weight: 900;
+      }
+
+      .binary-stage-found {
+        padding: 13px 21px;
+
+        border-radius: 13px;
+
+        background: var(--green-soft);
+
+        border: 2px solid #9ed9aa;
+
+        color: var(--green);
+
+        font-size: 20px;
+        font-weight: 950;
+      }
+
+      /* ============================================================
+   ============================================================
+   SCENE 7
+   DEFINITION
+   ============================================================
+   ============================================================ */
+
+      .definition-title {
+        position: absolute;
+
+        left: 50%;
+        top: 12%;
+
+        color: var(--blue);
+
+        font-size: clamp(42px, 5vw, 66px);
+
+        font-weight: 900;
+
+        letter-spacing: -0.045em;
+
+        transform: translate(-50%, -50%) scale(0.85);
+
+        opacity: 0;
+      }
+
+      .definition-text {
+        position: absolute;
+
+        left: 50%;
+        top: 29%;
+
+        width: min(920px, 82vw);
+
+        color: var(--ink);
+
+        font-size: clamp(20px, 2vw, 28px);
+
+        font-weight: 550;
+
+        line-height: 1.5;
+
+        text-align: center;
+
+        transform: translate(-50%, -50%) translateY(15px);
+
+        opacity: 0;
+      }
+
+      /* ============================================================
+   SORTED WORD
+   ============================================================ */
+
+      .definition-word {
+        position: absolute;
+
+        left: 50%;
+        top: 49%;
+
+        display: flex;
+
+        flex-direction: column;
+
+        align-items: center;
+
+        transform: translate(-50%, -50%) scale(0.85);
+
+        opacity: 0;
+      }
+
+      .definition-word span {
+        color: var(--purple);
+
+        font-size: clamp(28px, 3vw, 42px);
+
+        font-weight: 950;
+
+        letter-spacing: 0.04em;
+      }
+
+      .definition-word small {
+        margin-top: 5px;
+
+        color: var(--muted);
+
+        font-size: 18px;
+
+        font-weight: 700;
+      }
+
+      /* ============================================================
+   DEFINITION FLOW
+   ============================================================ */
+
+      .definition-flow {
+        position: absolute;
+
+        left: 50%;
+        top: 70%;
+
+        display: flex;
+
+        align-items: center;
+
+        gap: 13px;
+
+        transform: translate(-50%, -50%);
+
+        opacity: 0;
+      }
+
+      .flow-box {
+        padding: 12px 17px;
+
+        border-radius: 11px;
+
+        background: var(--blue-soft);
+
+        border: 2px solid #a8baff;
+
+        color: var(--blue);
+
+        font-size: 15px;
+        font-weight: 850;
+
+        white-space: nowrap;
+      }
+
+      .flow-arrow {
+        color: var(--muted);
+
+        font-size: 25px;
+
+        font-weight: 850;
+      }
+
+      .split-box {
+        display: flex;
+
+        flex-direction: column;
+
+        gap: 5px;
+
+        background: var(--orange-soft);
+
+        border-color: #ffd48a;
+
+        color: var(--orange);
+      }
+
+      /* ============================================================
+   FINAL TAKEAWAY
+   ============================================================ */
+
+      .definition-takeaway {
+        position: absolute;
+
+        left: 50%;
+        top: 87%;
+
+        width: 850px;
+
+        color: var(--green);
+
+        font-size: clamp(19px, 2vw, 26px);
+
+        font-weight: 800;
+
+        line-height: 1.35;
+
+        text-align: center;
+
+        transform: translate(-50%, -50%) translateY(12px);
+
+        opacity: 0;
+      }
+
+      /* ============================================================
+   ============================================================
+   GENERIC ANIMATION CLASSES
+   ============================================================
+   ============================================================ */
+
+      .pop {
+        animation: popIn 500ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      }
+
+      .reveal {
+        animation: revealUp 500ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      }
+
+      .number-pop {
+        animation: numberPop 450ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      }
+
+      .found-pop {
+        animation: foundPop 650ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      }
+
+      /* ============================================================
+   KEYFRAMES
+   ============================================================ */
+
+      @keyframes popIn {
+        0% {
+          opacity: 0;
+
+          transform: scale(0.65);
+        }
+
+        65% {
+          opacity: 1;
+
+          transform: scale(1.06);
+        }
+
+        100% {
+          opacity: 1;
+
+          transform: scale(1);
+        }
+      }
+
+      @keyframes revealUp {
+        from {
+          opacity: 0;
+
+          transform: translateY(18px);
+        }
+
+        to {
+          opacity: 1;
+
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes numberPop {
+        0% {
+          opacity: 0;
+
+          transform: scale(0.4);
+        }
+
+        65% {
+          opacity: 1;
+
+          transform: scale(1.12);
+        }
+
+        100% {
+          opacity: 1;
+
+          transform: scale(1);
+        }
+      }
+
+      @keyframes foundPop {
+        0% {
+          opacity: 0;
+
+          transform: translate(-50%, -50%) scale(0.55);
+        }
+
+        60% {
+          opacity: 1;
+
+          transform: translate(-50%, -50%) scale(1.12);
+        }
+
+        100% {
+          opacity: 1;
+
+          transform: translate(-50%, -50%) scale(1);
+        }
+      }
+
+      /* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+      @media (max-width: 1250px) {
+        #animation {
+          min-width: 900px;
+        }
+
+        .binary-search-area {
+          width: 94vw;
+        }
+
+        .binary-sheet {
+          max-width: 64px;
+          height: 94px;
+        }
+
+        .binary-icon {
+          font-size: 27px;
+        }
+
+        .binary-sheet strong {
+          font-size: 13px;
+        }
+
+        .binary-row {
+          gap: 4px;
+        }
+
+        .auto-binary-list {
+          width: 870px;
+        }
+      }
+
+      /* ============================================================
+   SHORT SCREEN
+   ============================================================ */
+
+      @media (max-height: 720px) {
+        .top-bar {
+          height: 52px;
+        }
+
+        .navigation {
+          bottom: 17px;
+        }
+
+        .target-badge {
+          top: 9%;
+        }
+
+        .binary-search-area {
+          top: 45%;
+        }
+
+        .binary-sheet {
+          height: 84px;
+        }
+
+        .binary-icon {
+          font-size: 25px;
+        }
+
+        .binary-sheet strong {
+          font-size: 12px;
+        }
+
+        .comparison-box {
+          top: 68%;
+        }
+
+        .direction-message {
+          top: 79%;
+        }
+
+        .auto-binary-list {
+          top: 44%;
+        }
+
+        .auto-search-status {
+          top: 65%;
+        }
+
+        .auto-found {
+          top: 77%;
+        }
+
+        .definition-text {
+          top: 27%;
+        }
+
+        .definition-flow {
+          top: 68%;
+        }
+
+        .definition-takeaway {
+          top: 86%;
+        }
+      }
+
+      /* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+
+          animation-iteration-count: 1 !important;
+
+          transition-duration: 0.01ms !important;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <main id="animation">
+      <!-- =====================================================
+         TOP BAR
+         ===================================================== -->
+
+      <header class="top-bar">
+        <div class="lesson-label">BINARY SEARCH</div>
+
+        <div id="sceneIndicator" class="scene-indicator">1 / 7</div>
+      </header>
+
+      <!-- =====================================================
+         STAGE
+         ===================================================== -->
+
+      <section class="stage">
+        <!-- ===================================================
+           SCENE 1
+           
+           RANDOM ANSWER SHEETS
+           =================================================== -->
+
+        <section id="scene1" class="scene scene-1 active" data-scene="1">
+          <div class="scene-content">
+            <!-- 101 -->
+
+            <div class="answer-sheet scattered-sheet sheet-1" data-roll="101">
+              <div class="sheet-icon">📄</div>
+
+              <div class="sheet-name">Aarav</div>
+
+              <div class="sheet-roll">Roll No. 101</div>
+            </div>
+
+            <!-- 102 -->
+
+            <div class="answer-sheet scattered-sheet sheet-2" data-roll="102">
+              <div class="sheet-icon">📄</div>
+
+              <div class="sheet-name">Riya</div>
+
+              <div class="sheet-roll">Roll No. 102</div>
+            </div>
+
+            <!-- 103 -->
+
+            <div class="answer-sheet scattered-sheet sheet-3" data-roll="103">
+              <div class="sheet-icon">📄</div>
+
+              <div class="sheet-name">Kabir</div>
+
+              <div class="sheet-roll">Roll No. 103</div>
+            </div>
+
+            <!-- 104 -->
+
+            <div class="answer-sheet scattered-sheet sheet-4" data-roll="104">
+              <div class="sheet-icon">📄</div>
+
+              <div class="sheet-name">Meera</div>
+
+              <div class="sheet-roll">Roll No. 104</div>
+            </div>
+
+            <!-- 105 -->
+
+            <div class="answer-sheet scattered-sheet sheet-5" data-roll="105">
+              <div class="sheet-icon">📄</div>
+
+              <div class="sheet-name">Arjun</div>
+
+              <div class="sheet-roll">Roll No. 105</div>
+            </div>
+
+            <!-- 106 -->
+
+            <div class="answer-sheet scattered-sheet sheet-6" data-roll="106">
+              <div class="sheet-icon">📄</div>
+
+              <div class="sheet-name">Anaya</div>
+
+              <div class="sheet-roll">Roll No. 106</div>
+            </div>
+
+            <!-- 107 -->
+
+            <div class="answer-sheet scattered-sheet sheet-7" data-roll="107">
+              <div class="sheet-icon">📄</div>
+
+              <div class="sheet-name">Rahul</div>
+
+              <div class="sheet-roll">Roll No. 107</div>
+            </div>
+
+            <!-- 108 -->
+
+            <div class="answer-sheet scattered-sheet sheet-8" data-roll="108">
+              <div class="sheet-icon">📄</div>
+
+              <div class="sheet-name">Sneha</div>
+
+              <div class="sheet-roll">Roll No. 108</div>
+            </div>
+
+            <!-- 109 -->
+
+            <div class="answer-sheet scattered-sheet sheet-9" data-roll="109">
+              <div class="sheet-icon">📄</div>
+
+              <div class="sheet-name">Vivaan</div>
+
+              <div class="sheet-roll">Roll No. 109</div>
+            </div>
+
+            <!-- 110 -->
+
+            <div class="answer-sheet scattered-sheet sheet-10" data-roll="110">
+              <div class="sheet-icon">📄</div>
+
+              <div class="sheet-name">Isha</div>
+
+              <div class="sheet-roll">Roll No. 110</div>
+            </div>
+
+            <!-- 111 -->
+
+            <div class="answer-sheet scattered-sheet sheet-11" data-roll="111">
+              <div class="sheet-icon">📄</div>
+
+              <div class="sheet-name">Dev</div>
+
+              <div class="sheet-roll">Roll No. 111</div>
+            </div>
+
+            <!-- 112 -->
+
+            <div class="answer-sheet scattered-sheet sheet-12" data-roll="112">
+              <div class="sheet-icon">📄</div>
+
+              <div class="sheet-name">Nisha</div>
+
+              <div class="sheet-roll">Roll No. 112</div>
+            </div>
+
+            <!-- 113 -->
+
+            <div class="answer-sheet scattered-sheet sheet-13" data-roll="113">
+              <div class="sheet-icon">📄</div>
+
+              <div class="sheet-name">Karan</div>
+
+              <div class="sheet-roll">Roll No. 113</div>
+            </div>
+
+            <!-- 114 -->
+
+            <div class="answer-sheet scattered-sheet sheet-14" data-roll="114">
+              <div class="sheet-icon">📄</div>
+
+              <div class="sheet-name">Pooja</div>
+
+              <div class="sheet-roll">Roll No. 114</div>
+            </div>
+
+            <!-- 115 -->
+
+            <div class="answer-sheet scattered-sheet sheet-15" data-roll="115">
+              <div class="sheet-icon">📄</div>
+
+              <div class="sheet-name">Aditya</div>
+
+              <div class="sheet-roll">Roll No. 115</div>
+            </div>
+
+            <!-- 116 -->
+
+            <div class="answer-sheet scattered-sheet sheet-16" data-roll="116">
+              <div class="sheet-icon">📄</div>
+
+              <div class="sheet-name">Simran</div>
+
+              <div class="sheet-roll">Roll No. 116</div>
+            </div>
+
+            <!-- 117 -->
+
+            <div class="answer-sheet scattered-sheet sheet-17" data-roll="117">
+              <div class="sheet-icon">📄</div>
+
+              <div class="sheet-name">Rohan</div>
+
+              <div class="sheet-roll">Roll No. 117</div>
+            </div>
+
+            <!-- 118 -->
+
+            <div class="answer-sheet scattered-sheet sheet-18" data-roll="118">
+              <div class="sheet-icon">📄</div>
+
+              <div class="sheet-name">Tanya</div>
+
+              <div class="sheet-roll">Roll No. 118</div>
+            </div>
+
+            <!-- 119 -->
+
+            <div class="answer-sheet scattered-sheet sheet-19" data-roll="119">
+              <div class="sheet-icon">📄</div>
+
+              <div class="sheet-name">Yash</div>
+
+              <div class="sheet-roll">Roll No. 119</div>
+            </div>
+
+            <!-- 120 -->
+
+            <div class="answer-sheet scattered-sheet sheet-20" data-roll="120">
+              <div class="sheet-icon">📄</div>
+
+              <div class="sheet-name">Ishita</div>
+
+              <div class="sheet-roll">Roll No. 120</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================
+           SCENE 2
+           
+           ARRANGED BY ROLL NUMBER
+           
+           This can remain in 3 rows because this scene is
+           simply introducing ORDER.
+           =================================================== -->
+
+        <section id="scene2" class="scene scene-2" data-scene="2">
+          <div class="scene-content">
+            <div id="sortedCollection" class="sorted-collection">
+              <div class="sorted-row">
+                <div class="sorted-sheet" data-roll="101">
+                  <div class="small-sheet-icon">📄</div>
+                  <div class="sorted-roll">101</div>
+                </div>
+
+                <div class="sorted-sheet" data-roll="102">
+                  <div class="small-sheet-icon">📄</div>
+                  <div class="sorted-roll">102</div>
+                </div>
+
+                <div class="sorted-sheet" data-roll="103">
+                  <div class="small-sheet-icon">📄</div>
+                  <div class="sorted-roll">103</div>
+                </div>
+
+                <div class="sorted-sheet" data-roll="104">
+                  <div class="small-sheet-icon">📄</div>
+                  <div class="sorted-roll">104</div>
+                </div>
+
+                <div class="sorted-sheet" data-roll="105">
+                  <div class="small-sheet-icon">📄</div>
+                  <div class="sorted-roll">105</div>
+                </div>
+
+                <div class="sorted-sheet" data-roll="106">
+                  <div class="small-sheet-icon">📄</div>
+                  <div class="sorted-roll">106</div>
+                </div>
+
+                <div class="sorted-sheet" data-roll="107">
+                  <div class="small-sheet-icon">📄</div>
+                  <div class="sorted-roll">107</div>
+                </div>
+              </div>
+
+              <div class="sorted-row">
+                <div class="sorted-sheet" data-roll="108">
+                  <div class="small-sheet-icon">📄</div>
+                  <div class="sorted-roll">108</div>
+                </div>
+
+                <div class="sorted-sheet" data-roll="109">
+                  <div class="small-sheet-icon">📄</div>
+                  <div class="sorted-roll">109</div>
+                </div>
+
+                <div class="sorted-sheet" data-roll="110">
+                  <div class="small-sheet-icon">📄</div>
+                  <div class="sorted-roll">110</div>
+                </div>
+
+                <div class="sorted-sheet" data-roll="111">
+                  <div class="small-sheet-icon">📄</div>
+                  <div class="sorted-roll">111</div>
+                </div>
+
+                <div class="sorted-sheet" data-roll="112">
+                  <div class="small-sheet-icon">📄</div>
+                  <div class="sorted-roll">112</div>
+                </div>
+
+                <div class="sorted-sheet" data-roll="113">
+                  <div class="small-sheet-icon">📄</div>
+                  <div class="sorted-roll">113</div>
+                </div>
+
+                <div class="sorted-sheet" data-roll="114">
+                  <div class="small-sheet-icon">📄</div>
+                  <div class="sorted-roll">114</div>
+                </div>
+              </div>
+
+              <div class="sorted-row">
+                <div class="sorted-sheet" data-roll="115">
+                  <div class="small-sheet-icon">📄</div>
+                  <div class="sorted-roll">115</div>
+                </div>
+
+                <div class="sorted-sheet" data-roll="116">
+                  <div class="small-sheet-icon">📄</div>
+                  <div class="sorted-roll">116</div>
+                </div>
+
+                <div class="sorted-sheet" data-roll="117">
+                  <div class="small-sheet-icon">📄</div>
+                  <div class="sorted-roll">117</div>
+                </div>
+
+                <div class="sorted-sheet" data-roll="118">
+                  <div class="small-sheet-icon">📄</div>
+                  <div class="sorted-roll">118</div>
+                </div>
+
+                <div class="sorted-sheet" data-roll="119">
+                  <div class="small-sheet-icon">📄</div>
+                  <div class="sorted-roll">119</div>
+                </div>
+
+                <div class="sorted-sheet" data-roll="120">
+                  <div class="small-sheet-icon">📄</div>
+                  <div class="sorted-roll">120</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================
+           SCENE 3
+           
+           THE SEARCH PROBLEM
+           =================================================== -->
+
+        <section id="scene3" class="scene scene-3" data-scene="3">
+          <div class="scene-content">
+            <div id="scene3List" class="mini-sorted-list">
+              101 · 102 · 103 · 104 · 105 · 106 · 107 · 108 · 109 · 110
+
+              <br />
+
+              111 · 112 · 113 · 114 · 115 · 116 · 117 · 118 · 119 · 120
+            </div>
+
+            <div id="searchTarget" class="search-target">
+              <div class="target-small-label">
+                I need to see my answer sheet
+              </div>
+
+              <div class="target-roll">ROLL NO. <span>118</span></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================
+           SCENE 4
+           
+           INTERACTIVE BINARY SEARCH
+           
+           IMPORTANT:
+           
+           THIS IS NOW ONE CONTINUOUS SEQUENCE.
+           
+           101 → 102 → 103 → ... → 120
+           
+           There are NO separate rows.
+           =================================================== -->
+
+        <section id="scene4" class="scene scene-4" data-scene="4">
+          <div class="scene-content">
+            <!-- =========================
+               TARGET
+               ========================= -->
+
+            <div id="targetBadge" class="target-badge">
+              <span> MY ROLL NO. </span>
+
+              <strong> 118 </strong>
+            </div>
+
+            <!-- =========================
+               MAIN SEARCH SEQUENCE
+               
+               ONE SINGLE LINE
+               ========================= -->
+
+            <div id="binarySearchArea" class="binary-search-area">
+              <div class="binary-row">
+                <div class="binary-sheet" data-index="0" data-roll="101">
+                  <span class="binary-icon"> 📄 </span>
+
+                  <strong>101</strong>
+                </div>
+
+                <div class="binary-sheet" data-index="1" data-roll="102">
+                  <span class="binary-icon"> 📄 </span>
+
+                  <strong>102</strong>
+                </div>
+
+                <div class="binary-sheet" data-index="2" data-roll="103">
+                  <span class="binary-icon"> 📄 </span>
+
+                  <strong>103</strong>
+                </div>
+
+                <div class="binary-sheet" data-index="3" data-roll="104">
+                  <span class="binary-icon"> 📄 </span>
+
+                  <strong>104</strong>
+                </div>
+
+                <div class="binary-sheet" data-index="4" data-roll="105">
+                  <span class="binary-icon"> 📄 </span>
+
+                  <strong>105</strong>
+                </div>
+
+                <div class="binary-sheet" data-index="5" data-roll="106">
+                  <span class="binary-icon"> 📄 </span>
+
+                  <strong>106</strong>
+                </div>
+
+                <div class="binary-sheet" data-index="6" data-roll="107">
+                  <span class="binary-icon"> 📄 </span>
+
+                  <strong>107</strong>
+                </div>
+
+                <div class="binary-sheet" data-index="7" data-roll="108">
+                  <span class="binary-icon"> 📄 </span>
+
+                  <strong>108</strong>
+                </div>
+
+                <div class="binary-sheet" data-index="8" data-roll="109">
+                  <span class="binary-icon"> 📄 </span>
+
+                  <strong>109</strong>
+                </div>
+
+                <div class="binary-sheet" data-index="9" data-roll="110">
+                  <span class="binary-icon"> 📄 </span>
+
+                  <strong>110</strong>
+                </div>
+
+                <div class="binary-sheet" data-index="10" data-roll="111">
+                  <span class="binary-icon"> 📄 </span>
+
+                  <strong>111</strong>
+                </div>
+
+                <div class="binary-sheet" data-index="11" data-roll="112">
+                  <span class="binary-icon"> 📄 </span>
+
+                  <strong>112</strong>
+                </div>
+
+                <div class="binary-sheet" data-index="12" data-roll="113">
+                  <span class="binary-icon"> 📄 </span>
+
+                  <strong>113</strong>
+                </div>
+
+                <div class="binary-sheet" data-index="13" data-roll="114">
+                  <span class="binary-icon"> 📄 </span>
+
+                  <strong>114</strong>
+                </div>
+
+                <div class="binary-sheet" data-index="14" data-roll="115">
+                  <span class="binary-icon"> 📄 </span>
+
+                  <strong>115</strong>
+                </div>
+
+                <div class="binary-sheet" data-index="15" data-roll="116">
+                  <span class="binary-icon"> 📄 </span>
+
+                  <strong>116</strong>
+                </div>
+
+                <div class="binary-sheet" data-index="16" data-roll="117">
+                  <span class="binary-icon"> 📄 </span>
+
+                  <strong>117</strong>
+                </div>
+
+                <div class="binary-sheet" data-index="17" data-roll="118">
+                  <span class="binary-icon"> 📄 </span>
+
+                  <strong>118</strong>
+                </div>
+
+                <div class="binary-sheet" data-index="18" data-roll="119">
+                  <span class="binary-icon"> 📄 </span>
+
+                  <strong>119</strong>
+                </div>
+
+                <div class="binary-sheet" data-index="19" data-roll="120">
+                  <span class="binary-icon"> 📄 </span>
+
+                  <strong>120</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- =================================================
+               COMPARISON
+               
+               118 ? 110
+               ================================================= -->
+
+            <div id="comparisonBox" class="comparison-box">
+              <div class="comparison-target">118</div>
+
+              <div class="comparison-symbol">?</div>
+
+              <div id="comparisonValue" class="comparison-value">110</div>
+            </div>
+
+            <!-- =================================================
+               DIRECTION MESSAGE
+               ================================================= -->
+
+            <div id="directionMessage" class="direction-message"></div>
+
+            <!-- =================================================
+               SEARCH RANGE LABEL
+               ================================================= -->
+
+            <div id="remainingLabel" class="remaining-label">SEARCH HERE</div>
+
+            <!-- =================================================
+               ELIMINATED LABEL
+               ================================================= -->
+
+            <div id="eliminatedLabel" class="eliminated-label">
+              WE DON'T NEED THIS
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================
+           SCENE 5
+           
+           FULL AUTOMATIC DEMONSTRATION
+           
+           101 → 112
+           
+           TARGET = 109
+           =================================================== -->
+
+        <section id="scene5" class="scene scene-5" data-scene="5">
+          <div class="scene-content">
+            <div id="autoTargetBadge" class="auto-target-badge">
+              TARGET
+
+              <strong> 109 </strong>
+            </div>
+
+            <div id="autoBinaryList" class="auto-binary-list">
+              <div class="auto-binary-item" data-roll="101">
+                <span>📄</span>
+                <strong>101</strong>
+              </div>
+
+              <div class="auto-binary-item" data-roll="102">
+                <span>📄</span>
+                <strong>102</strong>
+              </div>
+
+              <div class="auto-binary-item" data-roll="103">
+                <span>📄</span>
+                <strong>103</strong>
+              </div>
+
+              <div class="auto-binary-item" data-roll="104">
+                <span>📄</span>
+                <strong>104</strong>
+              </div>
+
+              <div class="auto-binary-item" data-roll="105">
+                <span>📄</span>
+                <strong>105</strong>
+              </div>
+
+              <div class="auto-binary-item" data-roll="106">
+                <span>📄</span>
+                <strong>106</strong>
+              </div>
+
+              <div class="auto-binary-item" data-roll="107">
+                <span>📄</span>
+                <strong>107</strong>
+              </div>
+
+              <div class="auto-binary-item" data-roll="108">
+                <span>📄</span>
+                <strong>108</strong>
+              </div>
+
+              <div class="auto-binary-item" data-roll="109">
+                <span>📄</span>
+                <strong>109</strong>
+              </div>
+
+              <div class="auto-binary-item" data-roll="110">
+                <span>📄</span>
+                <strong>110</strong>
+              </div>
+
+              <div class="auto-binary-item" data-roll="111">
+                <span>📄</span>
+                <strong>111</strong>
+              </div>
+
+              <div class="auto-binary-item" data-roll="112">
+                <span>📄</span>
+                <strong>112</strong>
+              </div>
+            </div>
+
+            <div id="autoSearchStatus" class="auto-search-status">
+              Searching...
+            </div>
+
+            <div id="autoFound" class="auto-found">FOUND!</div>
+
+            <div id="eliminationCount" class="elimination-count"></div>
+          </div>
+        </section>
+
+        <!-- ===================================================
+           SCENE 6
+           
+           NAME THE ALGORITHM
+           =================================================== -->
+
+        <section id="scene6" class="scene scene-6" data-scene="6">
+          <div class="scene-content">
+            <div id="binarySearchTitle" class="binary-search-title">
+              BINARY SEARCH
+            </div>
+
+            <div id="binarySearchSubtitle" class="binary-search-subtitle">
+              Repeatedly divide the search space in half.
+            </div>
+
+            <div id="binaryVisual" class="binary-visual">
+              <div class="binary-stage-number">20</div>
+
+              <div class="binary-stage-arrow">→</div>
+
+              <div class="binary-stage-number">10</div>
+
+              <div class="binary-stage-arrow">→</div>
+
+              <div class="binary-stage-number">5</div>
+
+              <div class="binary-stage-arrow">→</div>
+
+              <div class="binary-stage-number">2–3</div>
+
+              <div class="binary-stage-arrow">→</div>
+
+              <div class="binary-stage-found">FOUND</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================
+           SCENE 7
+           
+           FORMAL DEFINITION
+           =================================================== -->
+
+        <section id="scene7" class="scene scene-7" data-scene="7">
+          <div class="scene-content">
+            <div id="definitionTitle" class="definition-title">
+              Binary Search
+            </div>
+
+            <div id="definitionText" class="definition-text">
+              Binary Search is a searching technique that repeatedly divides a
+              sorted collection into two halves and eliminates the half that
+              cannot contain the target.
+            </div>
+
+            <div id="definitionWord" class="definition-word">
+              <span> SORTED </span>
+
+              <small> The collection must be ordered. </small>
+            </div>
+
+            <div id="definitionFlow" class="definition-flow">
+              <div class="flow-box">SORTED</div>
+
+              <div class="flow-arrow">→</div>
+
+              <div class="flow-box">FIND MIDDLE</div>
+
+              <div class="flow-arrow">→</div>
+
+              <div class="flow-box">COMPARE</div>
+
+              <div class="flow-arrow">→</div>
+
+              <div class="flow-box split-box">
+                <span> Target &lt; Middle </span>
+
+                <span> Target &gt; Middle </span>
+              </div>
+            </div>
+
+            <div id="definitionTakeaway" class="definition-takeaway">
+              Every comparison lets us throw away roughly half of the remaining
+              possibilities.
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <!-- =====================================================
+         NAVIGATION
+         ===================================================== -->
+
+      <footer class="navigation">
+        <button id="mainNext" class="main-next-button" type="button">
+          Continue
+        </button>
+      </footer>
+    </main>
+
+    <!-- =====================================================
+       JAVASCRIPT
+       ===================================================== -->
+
+    <script>
+      /* ============================================================
+   BINARY SEARCH — INTUITION ANIMATION
+   COMPLETE JAVASCRIPT
+   ============================================================ */
+
+      /* ============================================================
+   GLOBAL STATE
+   ============================================================ */
+
+      let currentScene = 1;
+
+      const totalScenes = 7;
+
+      const targetRoll = 118;
+
+      /* ============================================================
+   DOM REFERENCES
+   ============================================================ */
+
+      const sceneIndicator = document.getElementById("sceneIndicator");
+
+      const mainNext = document.getElementById("mainNext");
+
+      /* ============================================================
+   SCENE 4 — BINARY SEARCH STATE
+   ============================================================ */
+
+      let binaryLeft = 0;
+
+      let binaryRight = 19;
+
+      let binaryMiddle = null;
+
+      let binaryStep = 0;
+
+      let binaryPhase = "idle";
+
+      let binaryInitialized = false;
+
+      /*
+   The actual ordered data.
+
+   IMPORTANT:
+   This is what the algorithm operates on.
+*/
+
+      const binaryData = Array.from({ length: 20 }, (_, i) => 101 + i);
+
+      /* ============================================================
+   SCENE 5 — AUTOMATIC SEARCH STATE
+   ============================================================ */
+
+      let autoSearchRunning = false;
+
+      let autoSearchTimer = null;
+
+      /* ============================================================
+   INITIALIZATION
+   ============================================================ */
+
+      document.addEventListener("DOMContentLoaded", () => {
+        showScene(1);
+      });
+
+      /* ============================================================
+   MAIN BUTTON
+   ============================================================ */
+
+      mainNext.addEventListener("click", () => {
+        handleSceneClick();
+      });
+
+      /* ============================================================
+   SCENE CLICK HANDLER
+   ============================================================ */
+
+      function handleSceneClick() {
+        switch (currentScene) {
+          /* ================================================
+       SCENE 1
+       RANDOM STUDENTS
+       ================================================ */
+
+          case 1:
+            goToScene(2);
+
+            break;
+
+          /* ================================================
+       SCENE 2
+       ARRANGED COLLECTION
+       ================================================ */
+
+          case 2:
+            goToScene(3);
+
+            break;
+
+          /* ================================================
+       SCENE 3
+       SEARCH TARGET
+       ================================================ */
+
+          case 3:
+            goToScene(4);
+
+            break;
+
+          /* ================================================
+       SCENE 4
+       INTERACTIVE BINARY SEARCH
+       ================================================ */
+
+          case 4:
+            handleBinarySearchClick();
+
+            break;
+
+          /* ================================================
+       SCENE 5
+       AUTOMATIC DEMONSTRATION
+       ================================================ */
+
+          case 5:
+            goToScene(6);
+
+            break;
+
+          /* ================================================
+       SCENE 6
+       NAME
+       ================================================ */
+
+          case 6:
+            goToScene(7);
+
+            break;
+
+          /* ================================================
+       SCENE 7
+       DEFINITION
+       ================================================ */
+
+          case 7:
+            restartAnimation();
+
+            break;
+        }
+      }
+
+      /* ============================================================
+   GO TO SCENE
+   ============================================================ */
+
+      function goToScene(sceneNumber) {
+        currentScene = sceneNumber;
+
+        showScene(sceneNumber);
+      }
+
+      /* ============================================================
+   SHOW SCENE
+   ============================================================ */
+
+      function showScene(sceneNumber) {
+        document.querySelectorAll(".scene").forEach((scene) => {
+          scene.classList.remove("active");
+        });
+
+        const scene = document.getElementById(`scene${sceneNumber}`);
+
+        if (scene) {
+          scene.classList.add("active");
+        }
+
+        sceneIndicator.textContent = `${sceneNumber} / ${totalScenes}`;
+
+        /*
+     Reset button text.
+  */
+
+        if (sceneNumber === 7) {
+          mainNext.textContent = "Restart";
+        } else {
+          mainNext.textContent = "Continue";
+        }
+
+        /*
+     Run scene-specific setup.
+  */
+
+        switch (sceneNumber) {
+          case 1:
+            animateScene1();
+
+            break;
+
+          case 2:
+            animateScene2();
+
+            break;
+
+          case 3:
+            animateScene3();
+
+            break;
+
+          case 4:
+            setupScene4();
+
+            break;
+
+          case 5:
+            setupScene5();
+
+            break;
+
+          case 6:
+            animateScene6();
+
+            break;
+
+          case 7:
+            animateScene7();
+
+            break;
+        }
+      }
+
+      /* ============================================================
+   ============================================================
+   SCENE 1
+   RANDOM ANSWER SHEETS
+   ============================================================
+   ============================================================ */
+
+      function animateScene1() {
+        const sheets = document.querySelectorAll("#scene1 .answer-sheet");
+
+        sheets.forEach((sheet, index) => {
+          sheet.style.opacity = "0";
+
+          sheet.style.transform = "scale(0.65)";
+
+          setTimeout(() => {
+            sheet.style.transition =
+              "opacity 450ms ease, transform 450ms cubic-bezier(.22,1,.36,1)";
+
+            sheet.style.opacity = "1";
+
+            sheet.style.transform = "scale(1)";
+          }, index * 45);
+        });
+      }
+
+      /* ============================================================
+   ============================================================
+   SCENE 2
+   ARRANGE BY ROLL NUMBER
+   ============================================================
+   ============================================================ */
+
+      function animateScene2() {
+        const sheets = document.querySelectorAll("#scene2 .sorted-sheet");
+
+        sheets.forEach((sheet) => {
+          sheet.style.opacity = "0";
+
+          sheet.style.transform = "translateY(20px) scale(0.9)";
+        });
+
+        sheets.forEach((sheet, index) => {
+          setTimeout(
+            () => {
+              sheet.style.transition =
+                "opacity 450ms ease, transform 450ms cubic-bezier(.22,1,.36,1)";
+
+              sheet.style.opacity = "1";
+
+              sheet.style.transform = "translateY(0) scale(1)";
+            },
+            70 + index * 55,
+          );
+        });
+      }
+
+      /* ============================================================
+   ============================================================
+   SCENE 3
+   FINDING THE TARGET
+   ============================================================
+   ============================================================ */
+
+      function animateScene3() {
+        const list = document.getElementById("scene3List");
+
+        const target = document.getElementById("searchTarget");
+
+        list.style.opacity = "0";
+
+        target.style.opacity = "0";
+
+        list.style.transform = "translate(-50%, -50%) translateY(-15px)";
+
+        target.style.transform = "translate(-50%, -50%) scale(0.8)";
+
+        /*
+     First show the ordered list.
+  */
+
+        setTimeout(() => {
+          list.style.transition = "opacity 500ms ease, transform 500ms ease";
+
+          list.style.opacity = "1";
+
+          list.style.transform = "translate(-50%, -50%)";
+        }, 250);
+
+        /*
+     Then show what we want to find.
+  */
+
+        setTimeout(() => {
+          target.style.transition =
+            "opacity 550ms ease, transform 550ms cubic-bezier(.22,1,.36,1)";
+
+          target.style.opacity = "1";
+
+          target.style.transform = "translate(-50%, -50%) scale(1)";
+        }, 850);
+      }
+
+      /* ============================================================
+   ============================================================
+   SCENE 4
+   INTERACTIVE BINARY SEARCH
+   ============================================================
+   ============================================================ */
+
+      /*
+   Reset the entire binary-search state.
+*/
+
+      function setupScene4() {
+        binaryLeft = 0;
+
+        binaryRight = binaryData.length - 1;
+
+        binaryMiddle = null;
+
+        binaryStep = 0;
+
+        binaryPhase = "idle";
+
+        binaryInitialized = false;
+
+        const targetBadge = document.getElementById("targetBadge");
+
+        const comparison = document.getElementById("comparisonBox");
+
+        const direction = document.getElementById("directionMessage");
+
+        const remaining = document.getElementById("remainingLabel");
+
+        const eliminated = document.getElementById("eliminatedLabel");
+
+        targetBadge.style.opacity = "0";
+
+        comparison.style.opacity = "0";
+
+        direction.style.opacity = "0";
+
+        remaining.style.opacity = "0";
+
+        eliminated.style.opacity = "0";
+
+        /*
+     Reset all cards.
+  */
+
+        const cards = document.querySelectorAll("#scene4 .binary-sheet");
+
+        cards.forEach((card) => {
+          card.classList.remove("middle", "in-search", "eliminated", "found");
+
+          card.style.opacity = "1";
+
+          card.style.transform = "";
+        });
+
+        /*
+     Show target badge.
+  */
+
+        setTimeout(() => {
+          targetBadge.style.transition =
+            "opacity 450ms ease, transform 450ms cubic-bezier(.22,1,.36,1)";
+
+          targetBadge.style.opacity = "1";
+
+          targetBadge.style.transform = "translate(-50%, -50%) scale(1)";
+        }, 250);
+
+        /*
+     Mark the whole sequence as searchable.
+
+     We do NOT choose the middle yet.
+
+     This gives the teacher the opportunity to explain:
+
+     "I have 20 ordered answer sheets.
+      Where should I start?"
+  */
+
+        setTimeout(() => {
+          cards.forEach((card) => {
+            card.classList.add("in-search");
+          });
+
+          binaryInitialized = true;
+        }, 700);
+      }
+
+      /* ============================================================
+   SCENE 4 — CLICK HANDLER
+   ============================================================ */
+
+      function handleBinarySearchClick() {
+        if (!binaryInitialized) {
+          return;
+        }
+
+        /*
+     PHASE 1
+     
+     Pick the middle.
+  */
+
+        if (binaryPhase === "idle") {
+          chooseBinaryMiddle();
+
+          return;
+        }
+
+        /*
+     PHASE 2
+     
+     Compare target with middle.
+  */
+
+        if (binaryPhase === "middle-selected") {
+          compareBinaryMiddle();
+
+          return;
+        }
+
+        /*
+     PHASE 3
+     
+     Move to the correct half.
+  */
+
+        if (binaryPhase === "compared") {
+          eliminateWrongHalf();
+
+          return;
+        }
+
+        /*
+     PHASE 4
+     
+     Find next middle.
+  */
+
+        if (binaryPhase === "half-eliminated") {
+          chooseNextMiddle();
+
+          return;
+        }
+
+        /*
+     Found.
+  */
+
+        if (binaryPhase === "found") {
+          goToScene(5);
+        }
+      }
+
+      /* ============================================================
+   CHOOSE FIRST MIDDLE
+   ============================================================ */
+
+      function chooseBinaryMiddle() {
+        /*
+     Actual binary-search formula.
+  */
+
+        binaryMiddle = Math.floor((binaryLeft + binaryRight) / 2);
+
+        binaryPhase = "middle-selected";
+
+        binaryStep++;
+
+        clearBinaryVisuals();
+
+        const card = getBinaryCard(binaryMiddle);
+
+        if (!card) {
+          return;
+        }
+
+        card.classList.add("middle");
+
+        /*
+     Update comparison display.
+  */
+
+        updateComparison(targetRoll, binaryData[binaryMiddle]);
+
+        /*
+     Move button stays "Continue".
+  */
+
+        mainNext.textContent = "Compare";
+      }
+
+      /* ============================================================
+   COMPARE TARGET WITH MIDDLE
+   ============================================================ */
+
+      function compareBinaryMiddle() {
+        const middleValue = binaryData[binaryMiddle];
+
+        const direction = document.getElementById("directionMessage");
+
+        const comparison = document.getElementById("comparisonBox");
+
+        /*
+     Make comparison visible.
+  */
+
+        comparison.style.transition =
+          "opacity 400ms ease, transform 400ms ease";
+
+        comparison.style.opacity = "1";
+
+        comparison.style.transform = "translate(-50%, -50%) scale(1)";
+
+        /*
+     Target found immediately.
+  */
+
+        if (targetRoll === middleValue) {
+          direction.textContent = "118 = 118  →  We found it!";
+
+          direction.style.background = "var(--green-soft)";
+
+          direction.style.borderColor = "var(--green)";
+
+          direction.style.color = "var(--green)";
+
+          direction.style.transition =
+            "opacity 450ms ease, transform 450ms ease";
+
+          direction.style.opacity = "1";
+
+          direction.style.transform = "translate(-50%, -50%) scale(1)";
+
+          const card = getBinaryCard(binaryMiddle);
+
+          card.classList.remove("middle");
+
+          card.classList.add("found");
+
+          binaryPhase = "found";
+
+          mainNext.textContent = "Continue";
+
+          return;
+        }
+
+        /*
+     Target is greater than middle.
+  */
+
+        if (targetRoll > middleValue) {
+          direction.textContent = `${targetRoll} > ${middleValue}  →  Look to the RIGHT`;
+        } else {
+
+        /*
+     Target is smaller than middle.
+  */
+          direction.textContent = `${targetRoll} < ${middleValue}  →  Look to the LEFT`;
+        }
+
+        direction.style.background = "var(--blue-soft)";
+
+        direction.style.borderColor = "#A8BAFF";
+
+        direction.style.color = "var(--blue)";
+
+        direction.style.transition = "opacity 450ms ease, transform 450ms ease";
+
+        direction.style.opacity = "1";
+
+        direction.style.transform = "translate(-50%, -50%) scale(1)";
+
+        binaryPhase = "compared";
+
+        mainNext.textContent = "Remove the other half";
+      }
+
+      /* ============================================================
+   ELIMINATE WRONG HALF
+   ============================================================ */
+
+      function eliminateWrongHalf() {
+        const middleValue = binaryData[binaryMiddle];
+
+        /*
+     Target is on the RIGHT.
+  */
+
+        if (targetRoll > middleValue) {
+          /*
+       Everything from LEFT through MIDDLE
+       can be discarded.
+    */
+
+          for (let i = binaryLeft; i <= binaryMiddle; i++) {
+            eliminateBinaryCard(i);
+          }
+
+          binaryLeft = binaryMiddle + 1;
+        } else {
+
+        /*
+     Target is on the LEFT.
+  */
+          /*
+       Everything from MIDDLE through RIGHT
+       can be discarded.
+    */
+
+          for (let i = binaryMiddle; i <= binaryRight; i++) {
+            eliminateBinaryCard(i);
+          }
+
+          binaryRight = binaryMiddle - 1;
+        }
+
+        /*
+     The old middle should no longer be marked
+     as middle because it has been eliminated.
+  */
+
+        binaryPhase = "half-eliminated";
+
+        mainNext.textContent = "Find the new middle";
+
+        /*
+     Show the remaining range.
+  */
+
+        updateRemainingLabel();
+      }
+
+      /* ============================================================
+   CHOOSE NEXT MIDDLE
+   ============================================================ */
+
+      function chooseNextMiddle() {
+        /*
+     Safety check.
+  */
+
+        if (binaryLeft > binaryRight) {
+          return;
+        }
+
+        binaryMiddle = Math.floor((binaryLeft + binaryRight) / 2);
+
+        binaryStep++;
+
+        /*
+     Clear previous middle.
+  */
+
+        document
+          .querySelectorAll("#scene4 .binary-sheet.middle")
+          .forEach((card) => {
+            card.classList.remove("middle");
+          });
+
+        const card = getBinaryCard(binaryMiddle);
+
+        if (!card) {
+          return;
+        }
+
+        card.classList.add("middle");
+
+        /*
+     Update comparison.
+  */
+
+        updateComparison(targetRoll, binaryData[binaryMiddle]);
+
+        /*
+     Hide previous direction message
+     while we inspect the new middle.
+  */
+
+        const direction = document.getElementById("directionMessage");
+
+        direction.style.opacity = "0";
+
+        /*
+     Reset comparison slightly.
+
+     It will become visible on the next click.
+  */
+
+        const comparison = document.getElementById("comparisonBox");
+
+        comparison.style.opacity = "0";
+
+        comparison.style.transform = "translate(-50%, -50%) scale(0.85)";
+
+        binaryPhase = "middle-selected";
+
+        mainNext.textContent = "Compare";
+      }
+
+      /* ============================================================
+   ELIMINATE ONE CARD
+   ============================================================ */
+
+      function eliminateBinaryCard(index) {
+        const card = getBinaryCard(index);
+
+        if (!card) {
+          return;
+        }
+
+        card.classList.remove("middle", "in-search");
+
+        card.classList.add("eliminated");
+      }
+
+      /* ============================================================
+   GET CARD
+   ============================================================ */
+
+      function getBinaryCard(index) {
+        return document.querySelector(
+          `#scene4 .binary-sheet[data-index="${index}"]`,
+        );
+      }
+
+      /* ============================================================
+   UPDATE COMPARISON
+   ============================================================ */
+
+      function updateComparison(target, middle) {
+        const targetElement = document.querySelector(".comparison-target");
+
+        const valueElement = document.getElementById("comparisonValue");
+
+        targetElement.textContent = target;
+
+        valueElement.textContent = middle;
+      }
+
+      /* ============================================================
+   CLEAR BINARY VISUALS
+   ============================================================ */
+
+      function clearBinaryVisuals() {
+        const cards = document.querySelectorAll("#scene4 .binary-sheet");
+
+        cards.forEach((card) => {
+          card.classList.remove("middle", "found");
+        });
+
+        const direction = document.getElementById("directionMessage");
+
+        direction.style.opacity = "0";
+
+        const comparison = document.getElementById("comparisonBox");
+
+        comparison.style.opacity = "0";
+
+        comparison.style.transform = "translate(-50%, -50%) scale(0.85)";
+
+        const remaining = document.getElementById("remainingLabel");
+
+        remaining.style.opacity = "0";
+      }
+
+      /* ============================================================
+   UPDATE REMAINING SEARCH LABEL
+   ============================================================ */
+
+      function updateRemainingLabel() {
+        const label = document.getElementById("remainingLabel");
+
+        if (binaryLeft > binaryRight) {
+          label.style.opacity = "0";
+
+          return;
+        }
+
+        const leftValue = binaryData[binaryLeft];
+
+        const rightValue = binaryData[binaryRight];
+
+        label.textContent = `SEARCH ONLY: ${leftValue} → ${rightValue}`;
+
+        label.style.left = "50%";
+
+        label.style.top = "59%";
+
+        label.style.transform = "translate(-50%, -50%)";
+
+        label.style.transition = "opacity 400ms ease";
+
+        label.style.opacity = "1";
+      }
+
+      /* ============================================================
+   ============================================================
+   SCENE 5
+   AUTOMATIC BINARY SEARCH
+   ============================================================
+   ============================================================ */
+
+      function setupScene5() {
+        stopAutoSearch();
+
+        const target = document.getElementById("autoTargetBadge");
+
+        const status = document.getElementById("autoSearchStatus");
+
+        const found = document.getElementById("autoFound");
+
+        const count = document.getElementById("eliminationCount");
+
+        /*
+     Reset UI.
+  */
+
+        target.style.opacity = "0";
+
+        status.style.opacity = "0";
+
+        found.style.opacity = "0";
+
+        count.style.opacity = "0";
+
+        const cards = document.querySelectorAll("#scene5 .auto-binary-item");
+
+        cards.forEach((card) => {
+          card.classList.remove("current", "eliminated", "found");
+
+          card.style.opacity = "1";
+        });
+
+        /*
+     Show target first.
+  */
+
+        setTimeout(() => {
+          target.style.transition = "opacity 450ms ease, transform 450ms ease";
+
+          target.style.opacity = "1";
+
+          target.style.transform = "translate(-50%, -50%) scale(1)";
+        }, 300);
+
+        /*
+     Start automatic demonstration
+     after target appears.
+  */
+
+        setTimeout(() => {
+          runAutomaticBinarySearch();
+        }, 1000);
+      }
+
+      /* ============================================================
+   AUTOMATIC SEARCH
+   ============================================================ */
+
+      function runAutomaticBinarySearch() {
+        if (autoSearchRunning) {
+          return;
+        }
+
+        autoSearchRunning = true;
+
+        const data = Array.from(
+          document.querySelectorAll("#scene5 .auto-binary-item"),
+        ).map((card) => Number(card.dataset.roll));
+
+        const target = 109;
+
+        let left = 0;
+
+        let right = data.length - 1;
+
+        let step = 0;
+
+        /*
+     First reset everything.
+  */
+
+        const cards = document.querySelectorAll("#scene5 .auto-binary-item");
+
+        cards.forEach((card) => {
+          card.classList.remove("current", "eliminated", "found");
+
+          card.style.opacity = "1";
+        });
+
+        /*
+     Recursive/iterative animation.
+  */
+
+        function nextStep() {
+          /*
+       Search complete.
+    */
+
+          if (left > right) {
+            autoSearchRunning = false;
+
+            return;
+          }
+
+          /*
+       Calculate actual middle.
+    */
+
+          const middle = Math.floor((left + right) / 2);
+
+          step++;
+
+          /*
+       Remove previous current marker.
+    */
+
+          cards.forEach((card) => {
+            card.classList.remove("current");
+          });
+
+          /*
+       Highlight middle.
+    */
+
+          cards[middle].classList.add("current");
+
+          /*
+       Update status.
+    */
+
+          const status = document.getElementById("autoSearchStatus");
+
+          status.textContent = `Checking ${data[middle]}...`;
+
+          status.style.transition = "opacity 300ms ease";
+
+          status.style.opacity = "1";
+
+          /*
+       Show step count.
+    */
+
+          const count = document.getElementById("eliminationCount");
+
+          count.textContent = `Step ${step}`;
+
+          count.style.opacity = "1";
+
+          /*
+       Wait before comparing.
+    */
+
+          autoSearchTimer = setTimeout(() => {
+            /*
+           FOUND
+        */
+
+            if (data[middle] === target) {
+              cards[middle].classList.remove("current");
+
+              cards[middle].classList.add("found");
+
+              status.textContent = `${target} = ${data[middle]}  →  Found!`;
+
+              status.style.color = "var(--green)";
+
+              const found = document.getElementById("autoFound");
+
+              found.style.transition =
+                "opacity 500ms ease, transform 500ms cubic-bezier(.22,1,.36,1)";
+
+              found.style.opacity = "1";
+
+              found.style.transform = "translate(-50%, -50%) scale(1)";
+
+              autoSearchRunning = false;
+
+              return;
+            }
+
+            /*
+           TARGET IS TO THE RIGHT
+        */
+
+            if (target > data[middle]) {
+              status.textContent = `${target} > ${data[middle]}  →  Ignore the LEFT half`;
+
+              /*
+             Eliminate left half,
+             including middle.
+          */
+
+              for (let i = left; i <= middle; i++) {
+                cards[i].classList.add("eliminated");
+              }
+
+              left = middle + 1;
+            } else {
+
+            /*
+           TARGET IS TO THE LEFT
+        */
+              status.textContent = `${target} < ${data[middle]}  →  Ignore the RIGHT half`;
+
+              /*
+             Eliminate right half,
+             including middle.
+          */
+
+              for (let i = middle; i <= right; i++) {
+                cards[i].classList.add("eliminated");
+              }
+
+              right = middle - 1;
+            }
+
+            /*
+           Give the students time to see
+           what was eliminated.
+        */
+
+            autoSearchTimer = setTimeout(nextStep, 1100);
+          }, 1000);
+        }
+
+        nextStep();
+      }
+
+      /* ============================================================
+   STOP AUTOMATIC SEARCH
+   ============================================================ */
+
+      function stopAutoSearch() {
+        autoSearchRunning = false;
+
+        if (autoSearchTimer) {
+          clearTimeout(autoSearchTimer);
+
+          autoSearchTimer = null;
+        }
+      }
+
+      /* ============================================================
+   ============================================================
+   SCENE 6
+   NAME THE ALGORITHM
+   ============================================================
+   ============================================================ */
+
+      function animateScene6() {
+        const title = document.getElementById("binarySearchTitle");
+
+        const subtitle = document.getElementById("binarySearchSubtitle");
+
+        const visual = document.getElementById("binaryVisual");
+
+        /*
+     Reset.
+  */
+
+        title.style.opacity = "0";
+
+        subtitle.style.opacity = "0";
+
+        visual.style.opacity = "0";
+
+        title.style.transform = "translateY(20px) scale(0.82)";
+
+        subtitle.style.transform = "translateY(15px)";
+
+        /*
+     Title.
+  */
+
+        setTimeout(() => {
+          title.style.transition =
+            "opacity 600ms ease, transform 600ms cubic-bezier(.22,1,.36,1)";
+
+          title.style.opacity = "1";
+
+          title.style.transform = "translateY(0) scale(1)";
+        }, 250);
+
+        /*
+     Subtitle.
+  */
+
+        setTimeout(() => {
+          subtitle.style.transition =
+            "opacity 500ms ease, transform 500ms ease";
+
+          subtitle.style.opacity = "1";
+
+          subtitle.style.transform = "translateY(0)";
+        }, 800);
+
+        /*
+     Visual reduction.
+  */
+
+        setTimeout(() => {
+          visual.style.transition = "opacity 600ms ease";
+
+          visual.style.opacity = "1";
+        }, 1250);
+      }
+
+      /* ============================================================
+   ============================================================
+   SCENE 7
+   FORMAL DEFINITION
+   ============================================================
+   ============================================================ */
+
+      function animateScene7() {
+        const title = document.getElementById("definitionTitle");
+
+        const text = document.getElementById("definitionText");
+
+        const word = document.getElementById("definitionWord");
+
+        const flow = document.getElementById("definitionFlow");
+
+        const takeaway = document.getElementById("definitionTakeaway");
+
+        /*
+     Reset.
+  */
+
+        [title, text, word, flow, takeaway].forEach((element) => {
+          element.style.opacity = "0";
+        });
+
+        /*
+     Title.
+  */
+
+        setTimeout(() => {
+          title.style.transition =
+            "opacity 500ms ease, transform 500ms cubic-bezier(.22,1,.36,1)";
+
+          title.style.opacity = "1";
+
+          title.style.transform = "translate(-50%, -50%) scale(1)";
+        }, 250);
+
+        /*
+     Definition.
+  */
+
+        setTimeout(() => {
+          text.style.transition = "opacity 600ms ease, transform 600ms ease";
+
+          text.style.opacity = "1";
+
+          text.style.transform = "translate(-50%, -50%) translateY(0)";
+        }, 750);
+
+        /*
+     SORTED.
+  */
+
+        setTimeout(() => {
+          word.style.transition =
+            "opacity 550ms ease, transform 550ms cubic-bezier(.22,1,.36,1)";
+
+          word.style.opacity = "1";
+
+          word.style.transform = "translate(-50%, -50%) scale(1)";
+        }, 1350);
+
+        /*
+     Flow.
+  */
+
+        setTimeout(() => {
+          flow.style.transition = "opacity 600ms ease";
+
+          flow.style.opacity = "1";
+        }, 1950);
+
+        /*
+     Final takeaway.
+  */
+
+        setTimeout(() => {
+          takeaway.style.transition =
+            "opacity 600ms ease, transform 600ms ease";
+
+          takeaway.style.opacity = "1";
+
+          takeaway.style.transform = "translate(-50%, -50%) translateY(0)";
+        }, 2550);
+      }
+
+      /* ============================================================
+   RESTART
+   ============================================================ */
+
+      function restartAnimation() {
+        stopAutoSearch();
+
+        currentScene = 1;
+
+        showScene(1);
+      }
+
+      /* ============================================================
+   KEYBOARD SUPPORT
+   ============================================================ */
+
+      document.addEventListener("keydown", (event) => {
+        /*
+       Space / ArrowRight = Continue
+    */
+
+        if (event.code === "Space" || event.code === "ArrowRight") {
+          event.preventDefault();
+
+          handleSceneClick();
+        }
+
+        /*
+       R = Restart
+    */
+
+        if (event.key.toLowerCase() === "r") {
+          restartAnimation();
+        }
+      });
+    </script>
+  </body>
+</html>

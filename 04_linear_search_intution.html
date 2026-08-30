@@ -1,0 +1,3318 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Linear Search — Intuition</title>
+
+    <!-- =====================================================
+       CSS
+       Part 2 will be pasted inside this block.
+       ===================================================== -->
+
+    <style>
+      /* ============================================================
+   LINEAR SEARCH — INTUITION ANIMATION
+   CSS
+   ============================================================ */
+
+      :root {
+        --ink: #17213a;
+        --muted: #53627a;
+
+        --blue: #4263eb;
+        --blue-dark: #3156c9;
+        --blue-soft: #eef2ff;
+
+        --purple: #7c4dff;
+        --purple-soft: #f3eeff;
+
+        --teal: #00a896;
+        --teal-soft: #e8fbf7;
+
+        --orange: #f59e0b;
+        --orange-soft: #fff5de;
+
+        --pink: #e84a8a;
+        --pink-soft: #fff0f6;
+
+        --green: #39a852;
+        --green-soft: #eaf8ed;
+
+        --red: #e5484d;
+        --red-soft: #fff0f0;
+
+        --border: #b9c4d8;
+      }
+
+      /* ============================================================
+   BASE
+   ============================================================ */
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+      }
+
+      body {
+        overflow: hidden;
+
+        background: #ffffff;
+        color: var(--ink);
+
+        font-family:
+          Inter,
+          ui-sans-serif,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+
+        -webkit-font-smoothing: antialiased;
+      }
+
+      button {
+        font: inherit;
+      }
+
+      /* ============================================================
+   MAIN ANIMATION
+   ============================================================ */
+
+      #animation {
+        position: relative;
+
+        width: 100vw;
+        height: 100vh;
+
+        min-width: 1000px;
+        min-height: 620px;
+
+        overflow: hidden;
+
+        background: #ffffff;
+      }
+
+      /* ============================================================
+   TOP BAR
+   ============================================================ */
+
+      .top-bar {
+        position: absolute;
+        z-index: 100;
+
+        top: 0;
+        left: 0;
+        right: 0;
+
+        height: 64px;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        padding: 0 34px;
+
+        pointer-events: none;
+      }
+
+      .lesson-label {
+        color: var(--muted);
+
+        font-size: 13px;
+        font-weight: 800;
+
+        letter-spacing: 0.12em;
+      }
+
+      .scene-indicator {
+        color: var(--muted);
+
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      /* ============================================================
+   STAGE
+   ============================================================ */
+
+      .stage {
+        position: absolute;
+        inset: 0;
+
+        overflow: hidden;
+      }
+
+      .scene {
+        position: absolute;
+        inset: 0;
+
+        overflow: hidden;
+
+        opacity: 0;
+        visibility: hidden;
+
+        pointer-events: none;
+
+        transition:
+          opacity 350ms ease,
+          visibility 350ms ease;
+      }
+
+      .scene.active {
+        opacity: 1;
+        visibility: visible;
+
+        pointer-events: auto;
+      }
+
+      .scene-content {
+        position: relative;
+
+        width: 100%;
+        height: 100%;
+      }
+
+      /* ============================================================
+   NAVIGATION
+   ============================================================ */
+
+      .navigation {
+        position: absolute;
+        z-index: 300;
+
+        right: 34px;
+        bottom: 28px;
+      }
+
+      .main-next-button {
+        border: none;
+        border-radius: 999px;
+
+        padding: 12px 25px;
+
+        background: var(--blue);
+        color: #ffffff;
+
+        font-size: 15px;
+        font-weight: 750;
+
+        cursor: pointer;
+
+        box-shadow: 0 8px 22px rgba(66, 99, 235, 0.24);
+
+        transition:
+          transform 160ms ease,
+          background 160ms ease,
+          box-shadow 160ms ease;
+      }
+
+      .main-next-button:hover {
+        transform: translateY(-2px);
+
+        background: var(--blue-dark);
+
+        box-shadow: 0 11px 28px rgba(66, 99, 235, 0.3);
+      }
+
+      .main-next-button:active {
+        transform: translateY(0);
+      }
+
+      /* ============================================================
+   COMMON STUDENT STYLING
+   ============================================================ */
+
+      .student {
+        position: absolute;
+
+        width: 130px;
+        height: 150px;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        opacity: 0;
+
+        user-select: none;
+      }
+
+      .student-emoji {
+        width: 100px;
+        height: 100px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 50%;
+
+        background: #ffffff;
+
+        font-size: 64px;
+        line-height: 1;
+
+        box-shadow: 0 9px 25px rgba(33, 45, 70, 0.1);
+      }
+
+      .student-name {
+        margin-top: 8px;
+
+        color: var(--ink);
+
+        font-size: 17px;
+        font-weight: 800;
+
+        white-space: nowrap;
+      }
+
+      /* ============================================================
+   SCENE 1
+   SCATTERED STUDENTS
+   ============================================================ */
+
+      .scene-1 .student {
+        opacity: 0;
+      }
+
+      /* Carefully separated positions */
+
+      .scene-1 .student-1 {
+        left: 8%;
+        top: 16%;
+      }
+
+      .scene-1 .student-2 {
+        left: 30%;
+        top: 11%;
+      }
+
+      .scene-1 .student-3 {
+        left: 52%;
+        top: 18%;
+      }
+
+      .scene-1 .student-4 {
+        left: 76%;
+        top: 14%;
+      }
+
+      .scene-1 .student-5 {
+        left: 18%;
+        top: 48%;
+      }
+
+      .scene-1 .student-6 {
+        left: 42%;
+        top: 43%;
+      }
+
+      .scene-1 .student-7 {
+        left: 66%;
+        top: 49%;
+      }
+
+      .scene-1 .student-8 {
+        left: 82%;
+        top: 58%;
+      }
+
+      .scene-1 .student-9 {
+        left: 7%;
+        top: 69%;
+      }
+
+      .scene-1 .student-10 {
+        left: 50%;
+        top: 70%;
+      }
+
+      /* Different colored circles */
+
+      .scene-1 .student-1 .student-emoji,
+      .scene-1 .student-5 .student-emoji {
+        background: var(--blue-soft);
+        box-shadow:
+          inset 0 0 0 3px #a8baff,
+          0 9px 25px rgba(66, 99, 235, 0.12);
+      }
+
+      .scene-1 .student-2 .student-emoji,
+      .scene-1 .student-8 .student-emoji {
+        background: var(--pink-soft);
+        box-shadow:
+          inset 0 0 0 3px #ffb5d1,
+          0 9px 25px rgba(232, 74, 138, 0.11);
+      }
+
+      .scene-1 .student-3 .student-emoji,
+      .scene-1 .student-6 .student-emoji {
+        background: var(--teal-soft);
+        box-shadow:
+          inset 0 0 0 3px #8dddd1,
+          0 9px 25px rgba(0, 168, 150, 0.11);
+      }
+
+      .scene-1 .student-4 .student-emoji,
+      .scene-1 .student-7 .student-emoji,
+      .scene-1 .student-9 .student-emoji,
+      .scene-1 .student-10 .student-emoji {
+        background: var(--orange-soft);
+        box-shadow:
+          inset 0 0 0 3px #ffd48a,
+          0 9px 25px rgba(245, 158, 11, 0.12);
+      }
+
+      /* ============================================================
+   SCENE 2
+   ORGANIZED SEQUENCE
+   ============================================================ */
+
+      .sequence {
+        position: absolute;
+
+        left: 50%;
+        top: 48%;
+
+        width: 94%;
+
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+
+        gap: 10px;
+
+        transform: translate(-50%, -50%);
+      }
+
+      .sequence-student {
+        position: relative;
+
+        width: 92px;
+        min-width: 92px;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        opacity: 0;
+      }
+
+      .sequence-emoji {
+        width: 76px;
+        height: 76px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 50%;
+
+        background: var(--blue-soft);
+
+        font-size: 48px;
+
+        box-shadow: 0 7px 18px rgba(33, 45, 70, 0.09);
+      }
+
+      .sequence-student:nth-child(2n) .sequence-emoji {
+        background: var(--pink-soft);
+      }
+
+      .sequence-student:nth-child(3n) .sequence-emoji {
+        background: var(--teal-soft);
+      }
+
+      .sequence-student:nth-child(4n) .sequence-emoji {
+        background: var(--orange-soft);
+      }
+
+      .sequence-name {
+        margin-top: 9px;
+
+        color: var(--ink);
+
+        font-size: 15px;
+        font-weight: 800;
+
+        white-space: nowrap;
+      }
+
+      .sequence-number-placeholder {
+        height: 30px;
+      }
+
+      /* ============================================================
+   SCENE 3
+   NUMBERED SEQUENCE
+   ============================================================ */
+
+      .numbered-sequence {
+        position: absolute;
+
+        left: 50%;
+        top: 47%;
+
+        width: 94%;
+
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+
+        gap: 10px;
+
+        transform: translate(-50%, -50%);
+      }
+
+      .numbered-student {
+        width: 92px;
+        min-width: 92px;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        opacity: 1;
+      }
+
+      .position-number {
+        width: 40px;
+        height: 40px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        margin-bottom: 10px;
+
+        border-radius: 50%;
+
+        background: var(--blue-soft);
+        color: var(--blue);
+
+        border: 2px solid #a8baff;
+
+        font-size: 18px;
+        font-weight: 900;
+
+        opacity: 0;
+
+        transform: scale(0.5);
+      }
+
+      .numbered-emoji {
+        width: 76px;
+        height: 76px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 50%;
+
+        background: var(--teal-soft);
+
+        font-size: 48px;
+
+        box-shadow: 0 7px 18px rgba(33, 45, 70, 0.09);
+      }
+
+      .numbered-student:nth-child(2n) .numbered-emoji {
+        background: var(--pink-soft);
+      }
+
+      .numbered-student:nth-child(3n) .numbered-emoji {
+        background: var(--teal-soft);
+      }
+
+      .numbered-student:nth-child(4n) .numbered-emoji {
+        background: var(--orange-soft);
+      }
+
+      .numbered-name {
+        margin-top: 9px;
+
+        color: var(--ink);
+
+        font-size: 15px;
+        font-weight: 800;
+
+        white-space: nowrap;
+      }
+
+      /* ============================================================
+   SCENE 4
+   SEARCH QUESTION
+   ============================================================ */
+
+      .search-sequence {
+        position: absolute;
+
+        left: 50%;
+        top: 39%;
+
+        width: 94%;
+
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+
+        gap: 10px;
+
+        transform: translate(-50%, -50%);
+      }
+
+      .search-student {
+        position: relative;
+
+        width: 92px;
+        min-width: 92px;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        border-radius: 16px;
+
+        padding: 8px 3px 10px;
+
+        transition:
+          transform 300ms ease,
+          background 300ms ease,
+          box-shadow 300ms ease;
+      }
+
+      .search-position {
+        width: 34px;
+        height: 34px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        margin-bottom: 8px;
+
+        color: var(--muted);
+
+        font-size: 15px;
+        font-weight: 850;
+      }
+
+      .search-emoji {
+        width: 72px;
+        height: 72px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 50%;
+
+        background: var(--blue-soft);
+
+        font-size: 46px;
+
+        box-shadow: 0 6px 17px rgba(33, 45, 70, 0.08);
+
+        transition:
+          transform 250ms ease,
+          box-shadow 250ms ease;
+      }
+
+      .search-student:nth-child(2n) .search-emoji {
+        background: var(--pink-soft);
+      }
+
+      .search-student:nth-child(3n) .search-emoji {
+        background: var(--teal-soft);
+      }
+
+      .search-student:nth-child(4n) .search-emoji {
+        background: var(--orange-soft);
+      }
+
+      .search-name {
+        margin-top: 8px;
+
+        color: var(--ink);
+
+        font-size: 15px;
+        font-weight: 800;
+
+        white-space: nowrap;
+      }
+
+      .target-student .search-name {
+        font-weight: 900;
+      }
+
+      /* ---------- Search question ---------- */
+
+      .search-question {
+        position: absolute;
+
+        left: 50%;
+        top: 68%;
+
+        transform: translate(-50%, -50%) scale(0.85);
+
+        color: var(--ink);
+
+        font-size: clamp(34px, 4vw, 56px);
+        font-weight: 750;
+
+        letter-spacing: -0.04em;
+
+        opacity: 0;
+
+        white-space: nowrap;
+      }
+
+      .search-question span {
+        color: var(--purple);
+
+        font-weight: 900;
+      }
+
+      /* ============================================================
+   SCENE 5
+   MANUAL COMPARISONS
+   ============================================================ */
+
+      .scene-5 .search-sequence {
+        top: 37%;
+      }
+
+      .scene-5 .search-student {
+        opacity: 1;
+      }
+
+      /* ---------- Comparison highlight ---------- */
+
+      .search-student.checking {
+        background: var(--blue-soft);
+
+        box-shadow:
+          0 0 0 3px var(--blue),
+          0 12px 30px rgba(66, 99, 235, 0.18);
+
+        transform: translateY(-13px);
+      }
+
+      .search-student.checking .search-emoji {
+        transform: scale(1.08);
+
+        box-shadow: 0 8px 24px rgba(66, 99, 235, 0.2);
+      }
+
+      /* ---------- Failed comparison ---------- */
+
+      .search-student.failed {
+        background: var(--red-soft);
+
+        box-shadow: 0 0 0 2px #ffb4b4;
+      }
+
+      .search-student.failed .search-position {
+        color: var(--red);
+      }
+
+      .search-student.failed .search-name {
+        color: var(--red);
+      }
+
+      /* ---------- Comparison result ---------- */
+
+      .comparison-result {
+        position: absolute;
+
+        left: 50%;
+        bottom: -53px;
+
+        width: 42px;
+        height: 42px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        transform: translateX(-50%) scale(0.4);
+
+        border-radius: 50%;
+
+        background: var(--red-soft);
+        color: var(--red);
+
+        border: 2px solid #ffb4b4;
+
+        font-size: 25px;
+        font-weight: 900;
+
+        opacity: 0;
+
+        z-index: 10;
+      }
+
+      .target-student .comparison-result {
+        background: var(--green-soft);
+        color: var(--green);
+
+        border-color: #9ed9aa;
+      }
+
+      /* ---------- Checking message ---------- */
+
+      .checking-message {
+        position: absolute;
+
+        left: 50%;
+        top: 69%;
+
+        transform: translate(-50%, -50%) scale(0.9);
+
+        color: var(--muted);
+
+        font-size: 23px;
+        font-weight: 750;
+
+        opacity: 0;
+      }
+
+      .manual-result {
+        position: absolute;
+
+        left: 50%;
+        top: 77%;
+
+        transform: translate(-50%, -50%);
+
+        color: var(--red);
+
+        font-size: 22px;
+        font-weight: 850;
+
+        opacity: 0;
+
+        white-space: nowrap;
+      }
+
+      /* ============================================================
+   SCENE 6
+   AUTOMATIC SEARCH
+   ============================================================ */
+
+      .scene-6 .search-sequence {
+        top: 40%;
+      }
+
+      .auto-search-student {
+        position: relative;
+
+        width: 92px;
+        min-width: 92px;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        padding: 8px 3px 10px;
+
+        border-radius: 16px;
+
+        opacity: 0;
+
+        transition:
+          transform 300ms ease,
+          background 300ms ease,
+          box-shadow 300ms ease;
+      }
+
+      .auto-search-student .search-position {
+        width: 34px;
+        height: 34px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        margin-bottom: 8px;
+
+        color: var(--muted);
+
+        font-size: 15px;
+        font-weight: 850;
+      }
+
+      .auto-search-student .search-emoji {
+        width: 72px;
+        height: 72px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 50%;
+
+        background: var(--blue-soft);
+
+        font-size: 46px;
+
+        box-shadow: 0 6px 17px rgba(33, 45, 70, 0.08);
+      }
+
+      .auto-search-student:nth-child(2n) .search-emoji {
+        background: var(--pink-soft);
+      }
+
+      .auto-search-student:nth-child(3n) .search-emoji {
+        background: var(--teal-soft);
+      }
+
+      .auto-search-student:nth-child(4n) .search-emoji {
+        background: var(--orange-soft);
+      }
+
+      .auto-search-student .search-name {
+        margin-top: 8px;
+
+        color: var(--ink);
+
+        font-size: 15px;
+        font-weight: 800;
+
+        white-space: nowrap;
+      }
+
+      .auto-search-student.checking {
+        background: var(--blue-soft);
+
+        box-shadow:
+          0 0 0 3px var(--blue),
+          0 12px 30px rgba(66, 99, 235, 0.18);
+
+        transform: translateY(-13px);
+      }
+
+      .auto-search-student.checking .search-emoji {
+        transform: scale(1.08);
+      }
+
+      .auto-search-student.searched {
+        opacity: 0.48;
+      }
+
+      .auto-search-student.failed {
+        background: var(--red-soft);
+      }
+
+      .auto-search-student.found {
+        background: var(--green-soft);
+
+        box-shadow:
+          0 0 0 4px var(--green),
+          0 15px 35px rgba(57, 168, 82, 0.2);
+
+        transform: translateY(-15px) scale(1.04);
+      }
+
+      .auto-search-student.found .search-name {
+        color: var(--green);
+
+        font-weight: 900;
+      }
+
+      .auto-search-student .comparison-result {
+        bottom: -50px;
+      }
+
+      /* ---------- Automatic status ---------- */
+
+      .auto-search-status {
+        position: absolute;
+
+        left: 50%;
+        top: 69%;
+
+        transform: translate(-50%, -50%);
+
+        color: var(--muted);
+
+        font-size: 23px;
+        font-weight: 750;
+
+        opacity: 0;
+      }
+
+      .found-message {
+        position: absolute;
+
+        left: 50%;
+        top: 78%;
+
+        transform: translate(-50%, -50%) scale(0.65);
+
+        color: var(--green);
+
+        font-size: clamp(36px, 4vw, 58px);
+        font-weight: 950;
+
+        letter-spacing: -0.04em;
+
+        opacity: 0;
+      }
+
+      /* ============================================================
+   SCENE 7
+   FULL REPLAY
+   ============================================================ */
+
+      .replay-question {
+        position: absolute;
+
+        left: 50%;
+        top: 19%;
+
+        transform: translate(-50%, -50%) scale(0.9);
+
+        color: var(--ink);
+
+        font-size: clamp(32px, 3.5vw, 50px);
+        font-weight: 750;
+
+        opacity: 0;
+
+        white-space: nowrap;
+      }
+
+      .replay-question span {
+        color: var(--purple);
+
+        font-weight: 900;
+      }
+
+      /* ---------- Search path ---------- */
+
+      .search-path {
+        position: absolute;
+
+        left: 50%;
+        top: 44%;
+
+        transform: translate(-50%, -50%);
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        gap: 12px;
+
+        opacity: 0;
+      }
+
+      .path-step {
+        width: 56px;
+        height: 56px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 50%;
+
+        background: var(--blue-soft);
+        color: var(--blue);
+
+        border: 2px solid #a8baff;
+
+        font-size: 20px;
+        font-weight: 900;
+
+        opacity: 0.3;
+
+        transform: scale(0.85);
+
+        transition:
+          opacity 250ms ease,
+          transform 250ms ease,
+          background 250ms ease,
+          color 250ms ease;
+      }
+
+      .path-arrow {
+        color: var(--border-strong);
+
+        font-size: 25px;
+        font-weight: 800;
+
+        opacity: 0.25;
+      }
+
+      .path-step.active {
+        opacity: 1;
+
+        transform: scale(1.12);
+
+        background: var(--blue);
+        color: #ffffff;
+
+        border-color: var(--blue);
+
+        box-shadow: 0 9px 22px rgba(66, 99, 235, 0.22);
+      }
+
+      .path-step.completed {
+        opacity: 0.65;
+
+        transform: scale(1);
+
+        background: var(--blue-soft);
+      }
+
+      .path-step.found-step.active {
+        background: var(--green);
+
+        border-color: var(--green);
+
+        box-shadow: 0 10px 25px rgba(57, 168, 82, 0.25);
+      }
+
+      /* ---------- Replay statement ---------- */
+
+      .replay-statement {
+        position: absolute;
+
+        left: 50%;
+        top: 62%;
+
+        width: 760px;
+
+        transform: translate(-50%, -50%) translateY(15px);
+
+        color: var(--ink);
+
+        font-size: clamp(24px, 2.5vw, 34px);
+        font-weight: 700;
+
+        line-height: 1.35;
+
+        text-align: center;
+
+        opacity: 0;
+      }
+
+      .replay-found {
+        position: absolute;
+
+        left: 50%;
+        top: 78%;
+
+        transform: translate(-50%, -50%) scale(0.7);
+
+        color: var(--green);
+
+        font-size: 46px;
+        font-weight: 950;
+
+        opacity: 0;
+      }
+
+      /* ============================================================
+   SCENE 8
+   NAME IT — LINEAR SEARCH
+   ============================================================ */
+
+      .scene-8 .scene-content {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+      }
+
+      .linear-search-title {
+        color: var(--blue);
+
+        font-size: clamp(58px, 8vw, 110px);
+
+        font-weight: 950;
+
+        letter-spacing: -0.065em;
+
+        line-height: 1;
+
+        opacity: 0;
+
+        transform: translateY(20px) scale(0.82);
+      }
+
+      .linear-search-subtitle {
+        margin-top: 28px;
+
+        color: var(--ink);
+
+        font-size: clamp(23px, 2.5vw, 34px);
+
+        font-weight: 650;
+
+        opacity: 0;
+
+        transform: translateY(15px);
+      }
+
+      .linear-search-trail {
+        margin-top: 42px;
+
+        color: var(--purple);
+
+        font-size: clamp(24px, 3vw, 38px);
+
+        font-weight: 850;
+
+        letter-spacing: 0.02em;
+
+        opacity: 0;
+      }
+
+      /* ============================================================
+   SCENE 9
+   FORMAL DEFINITION
+   ============================================================ */
+
+      .definition-title {
+        position: absolute;
+
+        left: 50%;
+        top: 13%;
+
+        transform: translate(-50%, -50%) scale(0.85);
+
+        color: var(--blue);
+
+        font-size: clamp(42px, 5vw, 66px);
+
+        font-weight: 900;
+
+        letter-spacing: -0.045em;
+
+        opacity: 0;
+      }
+
+      .definition-text {
+        position: absolute;
+
+        left: 50%;
+        top: 32%;
+
+        width: min(900px, 80vw);
+
+        transform: translate(-50%, -50%) translateY(15px);
+
+        color: var(--ink);
+
+        font-size: clamp(20px, 2vw, 28px);
+
+        font-weight: 550;
+
+        line-height: 1.5;
+
+        text-align: center;
+
+        opacity: 0;
+      }
+
+      .definition-word {
+        position: absolute;
+
+        left: 50%;
+        top: 51%;
+
+        transform: translate(-50%, -50%) scale(0.85);
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        opacity: 0;
+      }
+
+      .definition-word span {
+        color: var(--purple);
+
+        font-size: clamp(28px, 3vw, 42px);
+
+        font-weight: 950;
+
+        letter-spacing: 0.03em;
+      }
+
+      .definition-word small {
+        margin-top: 5px;
+
+        color: var(--muted);
+
+        font-size: 18px;
+
+        font-weight: 700;
+      }
+
+      /* ---------- Definition flow ---------- */
+
+      .definition-flow {
+        position: absolute;
+
+        left: 50%;
+        top: 76%;
+
+        transform: translate(-50%, -50%);
+
+        display: flex;
+        align-items: center;
+
+        gap: 14px;
+
+        opacity: 0;
+      }
+
+      .flow-box {
+        padding: 12px 18px;
+
+        border-radius: 11px;
+
+        background: var(--blue-soft);
+
+        border: 2px solid #a8baff;
+
+        color: var(--blue);
+
+        font-size: 16px;
+        font-weight: 850;
+
+        white-space: nowrap;
+      }
+
+      .flow-arrow {
+        color: var(--muted);
+
+        font-size: 25px;
+
+        font-weight: 800;
+      }
+
+      .flow-question {
+        padding: 13px 19px;
+
+        border-radius: 11px;
+
+        background: var(--orange-soft);
+
+        border: 2px solid #ffd48a;
+
+        color: var(--orange);
+
+        font-size: 16px;
+        font-weight: 850;
+
+        white-space: nowrap;
+      }
+
+      .flow-branches {
+        display: flex;
+        flex-direction: column;
+
+        gap: 8px;
+      }
+
+      .branch {
+        display: flex;
+        align-items: center;
+
+        gap: 10px;
+
+        padding: 8px 14px;
+
+        border-radius: 9px;
+
+        font-size: 14px;
+        font-weight: 800;
+
+        white-space: nowrap;
+      }
+
+      .yes-branch {
+        background: var(--green-soft);
+
+        color: var(--green);
+
+        border: 2px solid #9ed9aa;
+      }
+
+      .no-branch {
+        background: var(--red-soft);
+
+        color: var(--red);
+
+        border: 2px solid #ffb4b4;
+      }
+
+      /* ============================================================
+   GENERIC ANIMATION CLASSES
+   ============================================================ */
+
+      .pop {
+        animation: popIn 500ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      }
+
+      .reveal {
+        animation: revealUp 500ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      }
+
+      .number-pop {
+        animation: numberPop 450ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      }
+
+      .highlight {
+        animation: highlightPulse 700ms cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      .found-pop {
+        animation: foundPop 650ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      }
+
+      /* ============================================================
+   KEYFRAMES
+   ============================================================ */
+
+      @keyframes popIn {
+        0% {
+          opacity: 0;
+
+          transform: scale(0.65);
+        }
+
+        65% {
+          opacity: 1;
+
+          transform: scale(1.06);
+        }
+
+        100% {
+          opacity: 1;
+
+          transform: scale(1);
+        }
+      }
+
+      @keyframes revealUp {
+        from {
+          opacity: 0;
+
+          transform: translateY(18px);
+        }
+
+        to {
+          opacity: 1;
+
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes numberPop {
+        0% {
+          opacity: 0;
+
+          transform: scale(0.4);
+        }
+
+        65% {
+          opacity: 1;
+
+          transform: scale(1.12);
+        }
+
+        100% {
+          opacity: 1;
+
+          transform: scale(1);
+        }
+      }
+
+      @keyframes highlightPulse {
+        0% {
+          box-shadow: 0 0 0 0 rgba(66, 99, 235, 0);
+        }
+
+        50% {
+          box-shadow: 0 0 0 8px rgba(66, 99, 235, 0.15);
+        }
+
+        100% {
+          box-shadow: 0 0 0 3px var(--blue);
+        }
+      }
+
+      @keyframes foundPop {
+        0% {
+          opacity: 0;
+
+          transform: translate(-50%, -50%) scale(0.55);
+        }
+
+        60% {
+          opacity: 1;
+
+          transform: translate(-50%, -50%) scale(1.12);
+        }
+
+        100% {
+          opacity: 1;
+
+          transform: translate(-50%, -50%) scale(1);
+        }
+      }
+
+      /* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+      @media (max-width: 1100px) {
+        #animation {
+          min-width: 850px;
+        }
+
+        .sequence,
+        .numbered-sequence,
+        .search-sequence {
+          gap: 5px;
+        }
+
+        .sequence-student,
+        .numbered-student,
+        .search-student,
+        .auto-search-student {
+          width: 82px;
+          min-width: 82px;
+        }
+
+        .sequence-emoji,
+        .numbered-emoji,
+        .search-emoji,
+        .auto-search-student .search-emoji {
+          width: 64px;
+          height: 64px;
+
+          font-size: 40px;
+        }
+
+        .sequence-name,
+        .numbered-name,
+        .search-name,
+        .auto-search-student .search-name {
+          font-size: 13px;
+        }
+
+        .search-path {
+          gap: 7px;
+        }
+
+        .path-step {
+          width: 48px;
+          height: 48px;
+        }
+
+        .path-arrow {
+          font-size: 19px;
+        }
+
+        .replay-statement {
+          width: 680px;
+        }
+      }
+
+      /* ============================================================
+   SHORT SCREENS
+   ============================================================ */
+
+      @media (max-height: 700px) {
+        .top-bar {
+          height: 54px;
+        }
+
+        .navigation {
+          bottom: 18px;
+        }
+
+        .scene-1 .student-1,
+        .scene-1 .student-2,
+        .scene-1 .student-3,
+        .scene-1 .student-4 {
+          top: 9%;
+        }
+
+        .scene-1 .student-5,
+        .scene-1 .student-6,
+        .scene-1 .student-7,
+        .scene-1 .student-8 {
+          top: 42%;
+        }
+
+        .scene-1 .student-9,
+        .scene-1 .student-10 {
+          top: 68%;
+        }
+
+        .search-question {
+          top: 72%;
+        }
+
+        .checking-message {
+          top: 72%;
+        }
+
+        .found-message {
+          top: 82%;
+        }
+      }
+
+      /* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <main id="animation">
+      <!-- =====================================================
+         TOP BAR
+         ===================================================== -->
+
+      <header class="top-bar">
+        <div class="lesson-label">LINEAR SEARCH</div>
+
+        <div id="sceneIndicator" class="scene-indicator">1 / 9</div>
+      </header>
+
+      <!-- =====================================================
+         MAIN STAGE
+         ===================================================== -->
+
+      <section class="stage">
+        <!-- ===================================================
+           SCENE 1
+           10 students scattered around
+           =================================================== -->
+
+        <section id="scene1" class="scene scene-1 active" data-scene="1">
+          <div class="scene-content">
+            <div class="student student-1" data-name="Aarav">
+              <div class="student-emoji">👨‍🎓</div>
+
+              <div class="student-name">Aarav</div>
+            </div>
+
+            <div class="student student-2" data-name="Riya">
+              <div class="student-emoji">👩‍🎓</div>
+
+              <div class="student-name">Riya</div>
+            </div>
+
+            <div class="student student-3" data-name="Kabir">
+              <div class="student-emoji">👨‍🎓</div>
+
+              <div class="student-name">Kabir</div>
+            </div>
+
+            <div class="student student-4" data-name="Meera">
+              <div class="student-emoji">👩‍🎓</div>
+
+              <div class="student-name">Meera</div>
+            </div>
+
+            <div class="student student-5" data-name="Arjun">
+              <div class="student-emoji">👨‍🎓</div>
+
+              <div class="student-name">Arjun</div>
+            </div>
+
+            <div class="student student-6" data-name="Anaya">
+              <div class="student-emoji">👩‍🎓</div>
+
+              <div class="student-name">Anaya</div>
+            </div>
+
+            <div class="student student-7" data-name="Rahul">
+              <div class="student-emoji">👨‍🎓</div>
+
+              <div class="student-name">Rahul</div>
+            </div>
+
+            <div class="student student-8" data-name="Sneha">
+              <div class="student-emoji">👩‍🎓</div>
+
+              <div class="student-name">Sneha</div>
+            </div>
+
+            <div class="student student-9" data-name="Vivaan">
+              <div class="student-emoji">👨‍🎓</div>
+
+              <div class="student-name">Vivaan</div>
+            </div>
+
+            <div class="student student-10" data-name="Isha">
+              <div class="student-emoji">👩‍🎓</div>
+
+              <div class="student-name">Isha</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================
+           SCENE 2
+           Arrange students into a sequence
+           =================================================== -->
+
+        <section id="scene2" class="scene scene-2" data-scene="2">
+          <div class="scene-content">
+            <div class="sequence">
+              <div class="sequence-student" data-index="1" data-name="Aarav">
+                <div class="sequence-number-placeholder"></div>
+
+                <div class="sequence-emoji">👨‍🎓</div>
+
+                <div class="sequence-name">Aarav</div>
+              </div>
+
+              <div class="sequence-student" data-index="2" data-name="Riya">
+                <div class="sequence-number-placeholder"></div>
+
+                <div class="sequence-emoji">👩‍🎓</div>
+
+                <div class="sequence-name">Riya</div>
+              </div>
+
+              <div class="sequence-student" data-index="3" data-name="Kabir">
+                <div class="sequence-number-placeholder"></div>
+
+                <div class="sequence-emoji">👨‍🎓</div>
+
+                <div class="sequence-name">Kabir</div>
+              </div>
+
+              <div class="sequence-student" data-index="4" data-name="Meera">
+                <div class="sequence-number-placeholder"></div>
+
+                <div class="sequence-emoji">👩‍🎓</div>
+
+                <div class="sequence-name">Meera</div>
+              </div>
+
+              <div class="sequence-student" data-index="5" data-name="Arjun">
+                <div class="sequence-number-placeholder"></div>
+
+                <div class="sequence-emoji">👨‍🎓</div>
+
+                <div class="sequence-name">Arjun</div>
+              </div>
+
+              <div class="sequence-student" data-index="6" data-name="Anaya">
+                <div class="sequence-number-placeholder"></div>
+
+                <div class="sequence-emoji">👩‍🎓</div>
+
+                <div class="sequence-name">Anaya</div>
+              </div>
+
+              <div class="sequence-student" data-index="7" data-name="Rahul">
+                <div class="sequence-number-placeholder"></div>
+
+                <div class="sequence-emoji">👨‍🎓</div>
+
+                <div class="sequence-name">Rahul</div>
+              </div>
+
+              <div class="sequence-student" data-index="8" data-name="Sneha">
+                <div class="sequence-number-placeholder"></div>
+
+                <div class="sequence-emoji">👩‍🎓</div>
+
+                <div class="sequence-name">Sneha</div>
+              </div>
+
+              <div class="sequence-student" data-index="9" data-name="Vivaan">
+                <div class="sequence-number-placeholder"></div>
+
+                <div class="sequence-emoji">👨‍🎓</div>
+
+                <div class="sequence-name">Vivaan</div>
+              </div>
+
+              <div class="sequence-student" data-index="10" data-name="Isha">
+                <div class="sequence-number-placeholder"></div>
+
+                <div class="sequence-emoji">👩‍🎓</div>
+
+                <div class="sequence-name">Isha</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================
+           SCENE 3
+           Give every student a position number
+           =================================================== -->
+
+        <section id="scene3" class="scene scene-3" data-scene="3">
+          <div class="scene-content">
+            <div class="numbered-sequence">
+              <div class="numbered-student" data-index="1">
+                <div class="position-number">1</div>
+
+                <div class="numbered-emoji">👨‍🎓</div>
+
+                <div class="numbered-name">Aarav</div>
+              </div>
+
+              <div class="numbered-student" data-index="2">
+                <div class="position-number">2</div>
+
+                <div class="numbered-emoji">👩‍🎓</div>
+
+                <div class="numbered-name">Riya</div>
+              </div>
+
+              <div class="numbered-student" data-index="3">
+                <div class="position-number">3</div>
+
+                <div class="numbered-emoji">👨‍🎓</div>
+
+                <div class="numbered-name">Kabir</div>
+              </div>
+
+              <div class="numbered-student" data-index="4">
+                <div class="position-number">4</div>
+
+                <div class="numbered-emoji">👩‍🎓</div>
+
+                <div class="numbered-name">Meera</div>
+              </div>
+
+              <div class="numbered-student" data-index="5">
+                <div class="position-number">5</div>
+
+                <div class="numbered-emoji">👨‍🎓</div>
+
+                <div class="numbered-name">Arjun</div>
+              </div>
+
+              <div class="numbered-student" data-index="6">
+                <div class="position-number">6</div>
+
+                <div class="numbered-emoji">👩‍🎓</div>
+
+                <div class="numbered-name">Anaya</div>
+              </div>
+
+              <div class="numbered-student" data-index="7">
+                <div class="position-number">7</div>
+
+                <div class="numbered-emoji">👨‍🎓</div>
+
+                <div class="numbered-name">Rahul</div>
+              </div>
+
+              <div class="numbered-student" data-index="8">
+                <div class="position-number">8</div>
+
+                <div class="numbered-emoji">👩‍🎓</div>
+
+                <div class="numbered-name">Sneha</div>
+              </div>
+
+              <div class="numbered-student" data-index="9">
+                <div class="position-number">9</div>
+
+                <div class="numbered-emoji">👨‍🎓</div>
+
+                <div class="numbered-name">Vivaan</div>
+              </div>
+
+              <div class="numbered-student" data-index="10">
+                <div class="position-number">10</div>
+
+                <div class="numbered-emoji">👩‍🎓</div>
+
+                <div class="numbered-name">Isha</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================
+           SCENE 4
+           Ask the search question
+           =================================================== -->
+
+        <section id="scene4" class="scene scene-4" data-scene="4">
+          <div class="scene-content">
+            <div class="search-sequence">
+              <div class="search-student">
+                <div class="search-position">1</div>
+                <div class="search-emoji">👨‍🎓</div>
+                <div class="search-name">Aarav</div>
+              </div>
+
+              <div class="search-student">
+                <div class="search-position">2</div>
+                <div class="search-emoji">👩‍🎓</div>
+                <div class="search-name">Riya</div>
+              </div>
+
+              <div class="search-student">
+                <div class="search-position">3</div>
+                <div class="search-emoji">👨‍🎓</div>
+                <div class="search-name">Kabir</div>
+              </div>
+
+              <div class="search-student">
+                <div class="search-position">4</div>
+                <div class="search-emoji">👩‍🎓</div>
+                <div class="search-name">Meera</div>
+              </div>
+
+              <div class="search-student">
+                <div class="search-position">5</div>
+                <div class="search-emoji">👨‍🎓</div>
+                <div class="search-name">Arjun</div>
+              </div>
+
+              <div class="search-student">
+                <div class="search-position">6</div>
+                <div class="search-emoji">👩‍🎓</div>
+                <div class="search-name">Anaya</div>
+              </div>
+
+              <div class="search-student">
+                <div class="search-position">7</div>
+                <div class="search-emoji">👨‍🎓</div>
+                <div class="search-name">Rahul</div>
+              </div>
+
+              <div class="search-student target-student">
+                <div class="search-position">8</div>
+                <div class="search-emoji">👩‍🎓</div>
+                <div class="search-name">Sneha</div>
+              </div>
+
+              <div class="search-student">
+                <div class="search-position">9</div>
+                <div class="search-emoji">👨‍🎓</div>
+                <div class="search-name">Vivaan</div>
+              </div>
+
+              <div class="search-student">
+                <div class="search-position">10</div>
+                <div class="search-emoji">👩‍🎓</div>
+                <div class="search-name">Isha</div>
+              </div>
+            </div>
+
+            <div id="searchQuestion" class="search-question">
+              Where is
+              <span>"Sneha"</span>?
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================
+           SCENE 5
+           First 3 comparisons are manual
+           =================================================== -->
+
+        <section id="scene5" class="scene scene-5" data-scene="5">
+          <div class="scene-content">
+            <div class="search-sequence">
+              <div class="search-student" data-index="1" data-name="Aarav">
+                <div class="search-position">1</div>
+
+                <div class="search-emoji">👨‍🎓</div>
+
+                <div class="search-name">Aarav</div>
+
+                <div class="comparison-result">✕</div>
+              </div>
+
+              <div class="search-student" data-index="2" data-name="Riya">
+                <div class="search-position">2</div>
+
+                <div class="search-emoji">👩‍🎓</div>
+
+                <div class="search-name">Riya</div>
+
+                <div class="comparison-result">✕</div>
+              </div>
+
+              <div class="search-student" data-index="3" data-name="Kabir">
+                <div class="search-position">3</div>
+
+                <div class="search-emoji">👨‍🎓</div>
+
+                <div class="search-name">Kabir</div>
+
+                <div class="comparison-result">✕</div>
+              </div>
+
+              <div class="search-student" data-index="4" data-name="Meera">
+                <div class="search-position">4</div>
+
+                <div class="search-emoji">👩‍🎓</div>
+
+                <div class="search-name">Meera</div>
+
+                <div class="comparison-result">✕</div>
+              </div>
+
+              <div class="search-student" data-index="5" data-name="Arjun">
+                <div class="search-position">5</div>
+
+                <div class="search-emoji">👨‍🎓</div>
+
+                <div class="search-name">Arjun</div>
+
+                <div class="comparison-result">✕</div>
+              </div>
+
+              <div class="search-student" data-index="6" data-name="Anaya">
+                <div class="search-position">6</div>
+
+                <div class="search-emoji">👩‍🎓</div>
+
+                <div class="search-name">Anaya</div>
+
+                <div class="comparison-result">✕</div>
+              </div>
+
+              <div class="search-student" data-index="7" data-name="Rahul">
+                <div class="search-position">7</div>
+
+                <div class="search-emoji">👨‍🎓</div>
+
+                <div class="search-name">Rahul</div>
+
+                <div class="comparison-result">✕</div>
+              </div>
+
+              <div
+                class="search-student target-student"
+                data-index="8"
+                data-name="Sneha"
+              >
+                <div class="search-position">8</div>
+
+                <div class="search-emoji">👩‍🎓</div>
+
+                <div class="search-name">Sneha</div>
+
+                <div class="comparison-result">✓</div>
+              </div>
+
+              <div class="search-student" data-index="9" data-name="Vivaan">
+                <div class="search-position">9</div>
+
+                <div class="search-emoji">👨‍🎓</div>
+
+                <div class="search-name">Vivaan</div>
+
+                <div class="comparison-result">✕</div>
+              </div>
+
+              <div class="search-student" data-index="10" data-name="Isha">
+                <div class="search-position">10</div>
+
+                <div class="search-emoji">👩‍🎓</div>
+
+                <div class="search-name">Isha</div>
+
+                <div class="comparison-result">✕</div>
+              </div>
+            </div>
+
+            <div id="checkingMessage" class="checking-message">
+              Check each one...
+            </div>
+
+            <div id="manualResult" class="manual-result"></div>
+          </div>
+        </section>
+
+        <!-- ===================================================
+           SCENE 6
+           Automatic continuation from 4 → 8
+           =================================================== -->
+
+        <section id="scene6" class="scene scene-6" data-scene="6">
+          <div class="scene-content">
+            <div class="search-sequence">
+              <div class="auto-search-student" data-index="1" data-name="Aarav">
+                <div class="search-position">1</div>
+                <div class="search-emoji">👨‍🎓</div>
+                <div class="search-name">Aarav</div>
+                <div class="comparison-result">✕</div>
+              </div>
+
+              <div class="auto-search-student" data-index="2" data-name="Riya">
+                <div class="search-position">2</div>
+                <div class="search-emoji">👩‍🎓</div>
+                <div class="search-name">Riya</div>
+                <div class="comparison-result">✕</div>
+              </div>
+
+              <div class="auto-search-student" data-index="3" data-name="Kabir">
+                <div class="search-position">3</div>
+                <div class="search-emoji">👨‍🎓</div>
+                <div class="search-name">Kabir</div>
+                <div class="comparison-result">✕</div>
+              </div>
+
+              <div class="auto-search-student" data-index="4" data-name="Meera">
+                <div class="search-position">4</div>
+                <div class="search-emoji">👩‍🎓</div>
+                <div class="search-name">Meera</div>
+                <div class="comparison-result">✕</div>
+              </div>
+
+              <div class="auto-search-student" data-index="5" data-name="Arjun">
+                <div class="search-position">5</div>
+                <div class="search-emoji">👨‍🎓</div>
+                <div class="search-name">Arjun</div>
+                <div class="comparison-result">✕</div>
+              </div>
+
+              <div class="auto-search-student" data-index="6" data-name="Anaya">
+                <div class="search-position">6</div>
+                <div class="search-emoji">👩‍🎓</div>
+                <div class="search-name">Anaya</div>
+                <div class="comparison-result">✕</div>
+              </div>
+
+              <div class="auto-search-student" data-index="7" data-name="Rahul">
+                <div class="search-position">7</div>
+                <div class="search-emoji">👨‍🎓</div>
+                <div class="search-name">Rahul</div>
+                <div class="comparison-result">✕</div>
+              </div>
+
+              <div
+                class="auto-search-student target-student"
+                data-index="8"
+                data-name="Sneha"
+              >
+                <div class="search-position">8</div>
+                <div class="search-emoji">👩‍🎓</div>
+                <div class="search-name">Sneha</div>
+                <div class="comparison-result">✓</div>
+              </div>
+
+              <div
+                class="auto-search-student"
+                data-index="9"
+                data-name="Vivaan"
+              >
+                <div class="search-position">9</div>
+                <div class="search-emoji">👨‍🎓</div>
+                <div class="search-name">Vivaan</div>
+                <div class="comparison-result">✕</div>
+              </div>
+
+              <div class="auto-search-student" data-index="10" data-name="Isha">
+                <div class="search-position">10</div>
+                <div class="search-emoji">👩‍🎓</div>
+                <div class="search-name">Isha</div>
+                <div class="comparison-result">✕</div>
+              </div>
+            </div>
+
+            <div id="autoSearchStatus" class="auto-search-status">
+              Searching...
+            </div>
+
+            <div id="foundMessage" class="found-message">FOUND!</div>
+          </div>
+        </section>
+
+        <!-- ===================================================
+           SCENE 7
+           Full replay of the search
+           =================================================== -->
+
+        <section id="scene7" class="scene scene-7" data-scene="7">
+          <div class="scene-content">
+            <div id="replayQuestion" class="replay-question">
+              Where is <span>"Sneha"</span>?
+            </div>
+
+            <div id="searchPath" class="search-path">
+              <div class="path-step">1</div>
+              <div class="path-arrow">→</div>
+
+              <div class="path-step">2</div>
+              <div class="path-arrow">→</div>
+
+              <div class="path-step">3</div>
+              <div class="path-arrow">→</div>
+
+              <div class="path-step">4</div>
+              <div class="path-arrow">→</div>
+
+              <div class="path-step">5</div>
+              <div class="path-arrow">→</div>
+
+              <div class="path-step">6</div>
+              <div class="path-arrow">→</div>
+
+              <div class="path-step">7</div>
+              <div class="path-arrow">→</div>
+
+              <div class="path-step found-step">8 ✓</div>
+            </div>
+
+            <div id="replayStatement" class="replay-statement">
+              We checked each person, one after another, until we found Sneha.
+            </div>
+
+            <div id="replayFound" class="replay-found">FOUND!</div>
+          </div>
+        </section>
+
+        <!-- ===================================================
+           SCENE 8
+           Name the idea: LINEAR SEARCH
+           =================================================== -->
+
+        <section id="scene8" class="scene scene-8" data-scene="8">
+          <div class="scene-content">
+            <div id="linearSearchTitle" class="linear-search-title">
+              LINEAR SEARCH
+            </div>
+
+            <div id="linearSearchSubtitle" class="linear-search-subtitle">
+              Search one item at a time, from the beginning.
+            </div>
+
+            <div id="linearSearchTrail" class="linear-search-trail">
+              1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================
+           SCENE 9
+           Formal definition
+           =================================================== -->
+
+        <section id="scene9" class="scene scene-9" data-scene="9">
+          <div class="scene-content">
+            <div id="definitionTitle" class="definition-title">
+              Linear Search
+            </div>
+
+            <div id="definitionText" class="definition-text">
+              Linear Search is a searching technique in which we check each
+              element sequentially, starting from the beginning, until the
+              target element is found or the entire collection has been checked.
+            </div>
+
+            <div id="definitionWord" class="definition-word">
+              <span>SEQUENTIALLY</span>
+
+              <small> one after another </small>
+            </div>
+
+            <div id="definitionFlow" class="definition-flow">
+              <div class="flow-box">START</div>
+
+              <div class="flow-arrow">↓</div>
+
+              <div class="flow-box">Check element</div>
+
+              <div class="flow-arrow">↓</div>
+
+              <div class="flow-question">Is it the target?</div>
+
+              <div class="flow-branches">
+                <div class="branch yes-branch">
+                  <strong>YES</strong>
+                  <span>FOUND ✓</span>
+                </div>
+
+                <div class="branch no-branch">
+                  <strong>NO</strong>
+                  <span>Check next →</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <!-- =====================================================
+         NAVIGATION
+         ===================================================== -->
+
+      <footer class="navigation">
+        <button id="mainNext" class="main-next-button" type="button">
+          Continue
+        </button>
+      </footer>
+    </main>
+
+    <!-- =====================================================
+       JAVASCRIPT
+       Part 3 will be pasted inside this block.
+       ===================================================== -->
+
+    <script>
+      /* ============================================================
+   LINEAR SEARCH — INTUITION ANIMATION
+   JAVASCRIPT
+   ============================================================ */
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const TOTAL_SCENES = 9;
+
+        let currentScene = 1;
+        let isBusy = false;
+
+        const scenes = [...document.querySelectorAll(".scene")];
+
+        const nextButton = document.getElementById("mainNext");
+
+        const sceneIndicator = document.getElementById("sceneIndicator");
+
+        /* ==========================================================
+     BASIC HELPERS
+     ========================================================== */
+
+        const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+        function updateIndicator() {
+          sceneIndicator.textContent = `${currentScene} / ${TOTAL_SCENES}`;
+        }
+
+        function activateScene(sceneNumber) {
+          scenes.forEach((scene) => {
+            const number = Number(scene.dataset.scene);
+
+            scene.classList.toggle("active", number === sceneNumber);
+          });
+
+          currentScene = sceneNumber;
+
+          updateIndicator();
+        }
+
+        function resetElement(element) {
+          if (!element) return;
+
+          element.classList.remove(
+            "pop",
+            "reveal",
+            "number-pop",
+            "highlight",
+            "found-pop",
+          );
+
+          element.style.animation = "";
+          element.style.transition = "";
+          element.style.opacity = "0";
+          element.style.transform = "";
+        }
+
+        function resetElements(elements) {
+          elements.forEach(resetElement);
+        }
+
+        function animateIn(element, animation = "pop") {
+          if (!element) return;
+
+          element.classList.remove(
+            "pop",
+            "reveal",
+            "number-pop",
+            "highlight",
+            "found-pop",
+          );
+
+          void element.offsetWidth;
+
+          element.classList.add(animation);
+        }
+
+        function showInstant(element) {
+          if (!element) return;
+
+          element.style.opacity = "1";
+        }
+
+        /* ==========================================================
+     SCENE 1
+     
+     10 students are scattered around the screen.
+
+     No ordering.
+     No numbers.
+     No search terminology.
+
+     Just:
+     
+          "Here are 10 students."
+     ========================================================== */
+
+        async function enterScene1() {
+          const students = [...document.querySelectorAll("#scene1 .student")];
+
+          resetElements(students);
+
+          /*
+      Students appear one after another.
+      This makes the scattered scene feel alive
+      without causing them to collide.
+    */
+
+          for (const student of students) {
+            animateIn(student, "pop");
+
+            await wait(100);
+          }
+
+          nextButton.textContent = "Arrange them";
+        }
+
+        /* ==========================================================
+     SCENE 2
+     
+     The scattered students now appear as an organized
+     sequence.
+
+     Important:
+     We do NOT call it a Python list here.
+     
+     We are only establishing:
+     
+          "Let's put them in a sequence."
+     ========================================================== */
+
+        async function enterScene2() {
+          const students = [
+            ...document.querySelectorAll("#scene2 .sequence-student"),
+          ];
+
+          resetElements(students);
+
+          /*
+      Students enter from left to right.
+    */
+
+          for (const student of students) {
+            animateIn(student, "pop");
+
+            await wait(100);
+          }
+
+          nextButton.textContent = "Give them positions";
+        }
+
+        /* ==========================================================
+     SCENE 3
+     
+     Numbers 1 → 10 appear ABOVE the students.
+
+     This is intentionally sequential.
+     
+     The students are already present.
+     Only their positions are revealed.
+     ========================================================== */
+
+        async function enterScene3() {
+          const students = [
+            ...document.querySelectorAll("#scene3 .numbered-student"),
+          ];
+
+          const numbers = [
+            ...document.querySelectorAll("#scene3 .position-number"),
+          ];
+
+          /*
+      Keep students visible.
+    */
+
+          students.forEach((student) => {
+            student.style.opacity = "1";
+          });
+
+          /*
+      Numbers begin hidden.
+    */
+
+          numbers.forEach((number) => {
+            number.classList.remove("number-pop");
+
+            number.style.opacity = "0";
+          });
+
+          /*
+      Pop numbers one by one:
+      
+      1
+      2
+      3
+      ...
+      10
+    */
+
+          for (const number of numbers) {
+            number.classList.remove("number-pop");
+
+            void number.offsetWidth;
+
+            number.classList.add("number-pop");
+
+            await wait(120);
+          }
+
+          nextButton.textContent = "Find someone";
+        }
+
+        /* ==========================================================
+     SCENE 4
+     
+     The problem appears:
+     
+              Where is "Sneha"?
+     
+     The students and their positions remain visible.
+     ========================================================== */
+
+        async function enterScene4() {
+          const students = [
+            ...document.querySelectorAll("#scene4 .search-student"),
+          ];
+
+          const question = document.getElementById("searchQuestion");
+
+          /*
+      Students appear first.
+    */
+
+          students.forEach((student) => {
+            student.style.opacity = "0";
+          });
+
+          for (const student of students) {
+            animateIn(student, "pop");
+
+            await wait(80);
+          }
+
+          await wait(350);
+
+          /*
+      Then the question appears.
+    */
+
+          question.classList.remove("reveal");
+
+          void question.offsetWidth;
+
+          question.classList.add("reveal");
+
+          nextButton.textContent = "Start searching";
+        }
+
+        /* ==========================================================
+     SCENE 5
+     
+     MANUAL SEARCH
+     
+     Click 1:
+       Aarav → NO
+     
+     Click 2:
+       Riya → NO
+     
+     Click 3:
+       Kabir → NO
+     
+     Then STOP.
+     
+     The teacher can ask:
+     
+       "What should we do now?"
+     
+     The next click moves to Scene 6.
+     ========================================================== */
+
+        let manualStep = 0;
+
+        async function enterScene5() {
+          manualStep = 0;
+
+          const students = [
+            ...document.querySelectorAll("#scene5 .search-student"),
+          ];
+
+          const checkingMessage = document.getElementById("checkingMessage");
+
+          const manualResult = document.getElementById("manualResult");
+
+          /*
+      Reset all students.
+    */
+
+          students.forEach((student) => {
+            student.classList.remove("checking", "failed");
+
+            student.style.opacity = "1";
+
+            const result = student.querySelector(".comparison-result");
+
+            if (result) {
+              result.style.opacity = "0";
+            }
+          });
+
+          checkingMessage.style.opacity = "0";
+
+          manualResult.style.opacity = "0";
+
+          /*
+      We don't automatically check anything here.
+
+      The first three comparisons are controlled
+      by the teacher's clicks.
+    */
+
+          nextButton.textContent = "Check first";
+        }
+
+        /* ==========================================================
+     MANUAL SEARCH — ONE COMPARISON
+     
+     This function performs exactly ONE check.
+     ========================================================== */
+
+        async function performManualCheck() {
+          const students = [
+            ...document.querySelectorAll("#scene5 .search-student"),
+          ];
+
+          const checkingMessage = document.getElementById("checkingMessage");
+
+          const manualResult = document.getElementById("manualResult");
+
+          /*
+      Index:
+      
+      manualStep = 0 → Aarav
+      manualStep = 1 → Riya
+      manualStep = 2 → Kabir
+    */
+
+          const student = students[manualStep];
+
+          if (!student) return;
+
+          /*
+      Remove previous active highlight.
+    */
+
+          students.forEach((item) => {
+            item.classList.remove("checking");
+          });
+
+          /*
+      Highlight the current student.
+    */
+
+          student.classList.add("checking");
+
+          checkingMessage.textContent = `Checking ${student.dataset.name}...`;
+
+          checkingMessage.style.opacity = "1";
+
+          await wait(550);
+
+          /*
+      This student is NOT Sneha.
+    */
+
+          student.classList.remove("checking");
+
+          student.classList.add("failed");
+
+          const result = student.querySelector(".comparison-result");
+
+          if (result) {
+            result.style.opacity = "1";
+
+            result.style.transform = "translateX(-50%) scale(1)";
+
+            result.style.transition =
+              "opacity 250ms ease, transform 250ms ease";
+          }
+
+          manualResult.textContent = `${student.dataset.name} is not Sneha.`;
+
+          manualResult.style.opacity = "1";
+
+          await wait(300);
+
+          manualStep++;
+
+          /*
+      After Aarav and Riya:
+      
+        "Check next"
+      
+      After Kabir:
+      
+        "What should we do now?"
+      
+      We intentionally STOP here.
+    */
+
+          if (manualStep < 3) {
+            nextButton.textContent = "Check next";
+          } else {
+            checkingMessage.textContent = "What should we do now?";
+
+            manualResult.textContent = "We still haven't found Sneha.";
+
+            nextButton.textContent = "Continue";
+          }
+        }
+
+        /* ==========================================================
+     SCENE 6
+     
+     Automatic continuation.
+     
+     The search starts from position 4:
+     
+       Meera
+       Arjun
+       Anaya
+       Rahul
+       Sneha ✓
+     
+     It automatically stops when Sneha is found.
+     ========================================================== */
+
+        async function enterScene6() {
+          const students = [
+            ...document.querySelectorAll("#scene6 .auto-search-student"),
+          ];
+
+          const status = document.getElementById("autoSearchStatus");
+
+          const foundMessage = document.getElementById("foundMessage");
+
+          /*
+      Reset.
+    */
+
+          students.forEach((student) => {
+            student.classList.remove("checking", "searched", "failed", "found");
+
+            student.style.opacity = "0";
+
+            const result = student.querySelector(".comparison-result");
+
+            if (result) {
+              result.style.opacity = "0";
+            }
+          });
+
+          foundMessage.style.opacity = "0";
+
+          /*
+      Show all students.
+    */
+
+          for (const student of students) {
+            animateIn(student, "pop");
+
+            await wait(55);
+          }
+
+          await wait(300);
+
+          status.textContent = "Continuing the search...";
+
+          status.style.opacity = "1";
+
+          /*
+      Start at index 3 = position 4.
+    */
+
+          for (let i = 3; i < students.length; i++) {
+            const student = students[i];
+
+            /*
+        Highlight current student.
+      */
+
+            student.classList.add("checking");
+
+            await wait(500);
+
+            /*
+        Is this Sneha?
+      */
+
+            if (student.dataset.name === "Sneha") {
+              /*
+          FOUND
+        */
+
+              student.classList.remove("checking");
+
+              student.classList.add("found");
+
+              const result = student.querySelector(".comparison-result");
+
+              if (result) {
+                result.textContent = "✓";
+
+                result.style.opacity = "1";
+
+                result.style.transform = "translateX(-50%) scale(1)";
+
+                result.style.transition =
+                  "opacity 250ms ease, transform 250ms ease";
+              }
+
+              status.style.opacity = "0";
+
+              await wait(250);
+
+              foundMessage.style.opacity = "1";
+
+              foundMessage.style.transform = "translate(-50%, -50%) scale(1)";
+
+              foundMessage.classList.remove("found-pop");
+
+              void foundMessage.offsetWidth;
+
+              foundMessage.classList.add("found-pop");
+
+              /*
+          IMPORTANT:
+          Stop the loop immediately.
+        */
+
+              break;
+            }
+
+            /*
+        Not found.
+      */
+
+            student.classList.remove("checking");
+
+            student.classList.add("searched", "failed");
+
+            const result = student.querySelector(".comparison-result");
+
+            if (result) {
+              result.textContent = "✕";
+
+              result.style.opacity = "1";
+
+              result.style.transform = "translateX(-50%) scale(1)";
+
+              result.style.transition =
+                "opacity 250ms ease, transform 250ms ease";
+            }
+
+            await wait(180);
+          }
+
+          nextButton.textContent = "See the whole search";
+        }
+
+        /* ==========================================================
+     SCENE 7
+     
+     FULL REPLAY
+     
+     This is the consolidation scene.
+
+     We show:
+     
+       1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 ✓
+     
+     The entire behavior is now seen as ONE process.
+     ========================================================== */
+
+        async function enterScene7() {
+          const question = document.getElementById("replayQuestion");
+
+          const path = document.getElementById("searchPath");
+
+          const steps = [
+            ...document.querySelectorAll("#searchPath .path-step"),
+          ];
+
+          const statement = document.getElementById("replayStatement");
+
+          const found = document.getElementById("replayFound");
+
+          /*
+      Reset.
+    */
+
+          question.style.opacity = "0";
+
+          question.classList.remove("reveal");
+
+          path.style.opacity = "0";
+
+          steps.forEach((step) => {
+            step.classList.remove("active", "completed");
+          });
+
+          statement.style.opacity = "0";
+
+          found.style.opacity = "0";
+
+          /*
+      Question appears.
+    */
+
+          question.classList.remove("reveal");
+
+          void question.offsetWidth;
+
+          question.classList.add("reveal");
+
+          await wait(600);
+
+          /*
+      Search path appears.
+    */
+
+          path.style.opacity = "1";
+
+          /*
+      Move through:
+      
+      1 → 2 → 3 → ... → 8
+    */
+
+          for (let i = 0; i < steps.length; i++) {
+            const step = steps[i];
+
+            /*
+        Current position.
+      */
+
+            step.classList.add("active");
+
+            await wait(430);
+
+            /*
+        If this is NOT the final position,
+        mark it completed and continue.
+      */
+
+            if (i < steps.length - 1) {
+              step.classList.remove("active");
+
+              step.classList.add("completed");
+            }
+          }
+
+          await wait(400);
+
+          /*
+      The explanation appears only AFTER
+      the complete search has been seen.
+    */
+
+          statement.classList.remove("reveal");
+
+          void statement.offsetWidth;
+
+          statement.classList.add("reveal");
+
+          await wait(600);
+
+          /*
+      FOUND
+    */
+
+          found.classList.remove("found-pop");
+
+          void found.offsetWidth;
+
+          found.classList.add("found-pop");
+
+          nextButton.textContent = "What do we call this?";
+        }
+
+        /* ==========================================================
+     SCENE 8
+     
+     NOW we finally give the behavior a name:
+     
+                     LINEAR SEARCH
+     
+     The name comes AFTER the intuition.
+     ========================================================== */
+
+        async function enterScene8() {
+          const title = document.getElementById("linearSearchTitle");
+
+          const subtitle = document.getElementById("linearSearchSubtitle");
+
+          const trail = document.getElementById("linearSearchTrail");
+
+          /*
+      Reset.
+    */
+
+          title.style.opacity = "0";
+
+          subtitle.style.opacity = "0";
+
+          trail.style.opacity = "0";
+
+          /*
+      Big title.
+    */
+
+          title.classList.remove("pop");
+
+          void title.offsetWidth;
+
+          title.classList.add("pop");
+
+          await wait(650);
+
+          /*
+      Explain in one sentence.
+    */
+
+          subtitle.classList.remove("reveal");
+
+          void subtitle.offsetWidth;
+
+          subtitle.classList.add("reveal");
+
+          await wait(500);
+
+          /*
+      Show the mental path.
+    */
+
+          trail.classList.remove("reveal");
+
+          void trail.offsetWidth;
+
+          trail.classList.add("reveal");
+
+          nextButton.textContent = "Definition";
+        }
+
+        /* ==========================================================
+     SCENE 9
+     
+     Formal definition comes LAST.
+     ========================================================== */
+
+        async function enterScene9() {
+          const title = document.getElementById("definitionTitle");
+
+          const text = document.getElementById("definitionText");
+
+          const word = document.getElementById("definitionWord");
+
+          const flow = document.getElementById("definitionFlow");
+
+          /*
+      Reset.
+    */
+
+          title.style.opacity = "0";
+
+          text.style.opacity = "0";
+
+          word.style.opacity = "0";
+
+          flow.style.opacity = "0";
+
+          /*
+      Definition title.
+    */
+
+          title.classList.remove("pop");
+
+          void title.offsetWidth;
+
+          title.classList.add("pop");
+
+          await wait(550);
+
+          /*
+      Formal definition.
+    */
+
+          text.classList.remove("reveal");
+
+          void text.offsetWidth;
+
+          text.classList.add("reveal");
+
+          await wait(650);
+
+          /*
+      Highlight the word:
+      
+            SEQUENTIALLY
+    */
+
+          word.classList.remove("pop");
+
+          void word.offsetWidth;
+
+          word.classList.add("pop");
+
+          await wait(600);
+
+          /*
+      Final process diagram.
+    */
+
+          flow.classList.remove("reveal");
+
+          void flow.offsetWidth;
+
+          flow.classList.add("reveal");
+
+          nextButton.textContent = "Restart";
+        }
+
+        /* ==========================================================
+     SCENE TRANSITION
+     ========================================================== */
+
+        async function goToScene(sceneNumber) {
+          if (isBusy) return;
+
+          if (sceneNumber < 1 || sceneNumber > TOTAL_SCENES) {
+            return;
+          }
+
+          isBusy = true;
+
+          activateScene(sceneNumber);
+
+          switch (sceneNumber) {
+            case 1:
+              await enterScene1();
+
+              break;
+
+            case 2:
+              await enterScene2();
+
+              break;
+
+            case 3:
+              await enterScene3();
+
+              break;
+
+            case 4:
+              await enterScene4();
+
+              break;
+
+            case 5:
+              await enterScene5();
+
+              break;
+
+            case 6:
+              await enterScene6();
+
+              break;
+
+            case 7:
+              await enterScene7();
+
+              break;
+
+            case 8:
+              await enterScene8();
+
+              break;
+
+            case 9:
+              await enterScene9();
+
+              break;
+          }
+
+          isBusy = false;
+        }
+
+        /* ==========================================================
+     NEXT BUTTON
+     
+     IMPORTANT:
+     
+     Scene 5 is special.
+     
+     The first THREE clicks perform the three manual
+     comparisons WITHOUT changing the scene.
+     
+     After the third comparison, the next click moves
+     to Scene 6.
+     ========================================================== */
+
+        nextButton.addEventListener("click", async () => {
+          if (isBusy) return;
+
+          /*
+        SCENE 5 SPECIAL HANDLING
+      */
+
+          if (currentScene === 5) {
+            /*
+          First three clicks:
+          perform one manual comparison.
+        */
+
+            if (manualStep < 3) {
+              isBusy = true;
+
+              await performManualCheck();
+
+              isBusy = false;
+
+              return;
+            }
+
+            /*
+          After the three manual checks,
+          move to automatic continuation.
+        */
+
+            await goToScene(6);
+
+            return;
+          }
+
+          /*
+        SCENE 9 → RESTART
+      */
+
+          if (currentScene === TOTAL_SCENES) {
+            await goToScene(1);
+
+            return;
+          }
+
+          /*
+        Normal scene progression.
+      */
+
+          await goToScene(currentScene + 1);
+        });
+
+        /* ==========================================================
+     KEYBOARD CONTROLS
+     ========================================================== */
+
+        document.addEventListener("keydown", (event) => {
+          /*
+        Space / Enter / Right Arrow
+        = next
+      */
+
+          if (
+            event.key === " " ||
+            event.key === "Enter" ||
+            event.key === "ArrowRight"
+          ) {
+            /*
+          Don't trigger a second click if
+          the button itself has focus.
+        */
+
+            if (
+              document.activeElement &&
+              document.activeElement.tagName === "BUTTON"
+            ) {
+              return;
+            }
+
+            nextButton.click();
+          }
+
+          /*
+        Left Arrow:
+        previous scene.
+        
+        We don't use it during Scene 5's
+        manual comparison sequence.
+      */
+
+          if (
+            event.key === "ArrowLeft" &&
+            currentScene > 1 &&
+            !isBusy &&
+            currentScene !== 5
+          ) {
+            goToScene(currentScene - 1);
+          }
+        });
+
+        /* ==========================================================
+     INITIALIZE
+     ========================================================== */
+
+        scenes.forEach((scene) => {
+          scene.classList.remove("active");
+        });
+
+        activateScene(1);
+
+        /*
+    Start Scene 1.
+  */
+
+        enterScene1();
+      });
+    </script>
+  </body>
+</html>

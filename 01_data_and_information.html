@@ -1,0 +1,2327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Data & Information — Animation</title>
+
+  <!-- =========================================================
+       CSS BLOCK
+       Paste the CSS into this <style> block in Part 2.
+       ========================================================= -->
+  <style>
+/* ============================================================
+   DATA → INFORMATION
+   PART 2 — CSS
+   White-background classroom animation
+   ============================================================ */
+
+
+/* ============================================================
+   CLASSROOM COLOR PALETTE
+   White background + strong readable accents
+   ============================================================ */
+
+:root {
+  --ink: #17213A;
+  --ink-2: #273B73;
+  --muted: #53627A;
+  --blue: #4263EB;
+  --blue-soft: #EEF2FF;
+  --purple: #7C4DFF;
+  --purple-soft: #F3EEFF;
+  --teal: #00A896;
+  --teal-soft: #E8FBF7;
+  --orange: #F59E0B;
+  --orange-soft: #FFF5DE;
+  --pink: #E84A8A;
+  --pink-soft: #FFF0F6;
+  --border: #C7D0E2;
+  --border-strong: #AEB9D0;
+}
+
+/* ---------- Base / Reset ---------- */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  overflow: hidden;
+  background: #ffffff;
+  color: #17213A;
+  font-family:
+    Inter,
+    ui-sans-serif,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font: inherit;
+}
+
+#animation {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  min-width: 900px;
+  min-height: 600px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+
+/* ---------- Global UI ---------- */
+
+.top-bar {
+  position: absolute;
+  z-index: 100;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 34px;
+
+  pointer-events: none;
+}
+
+.lesson-label {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #53627A;
+}
+
+.scene-indicator {
+  font-size: 13px;
+  font-weight: 600;
+  color: #53627A;
+}
+
+.stage {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.scene {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+
+  transition:
+    opacity 420ms ease,
+    visibility 420ms ease;
+}
+
+.scene.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.scene-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+
+/* ---------- Global navigation ---------- */
+
+.navigation {
+  position: absolute;
+  z-index: 200;
+  right: 34px;
+  bottom: 28px;
+}
+
+.main-next-button,
+.scene-next-button {
+  border: 1px solid #B8C2D6;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #17213A;
+
+  padding: 10px 20px;
+
+  font-size: 14px;
+  font-weight: 650;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 4px 14px rgba(25, 35, 55, 0.07);
+
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    background 160ms ease;
+}
+
+.main-next-button:hover,
+.scene-next-button:hover {
+  transform: translateY(-2px);
+  border-color: #73809A;
+  box-shadow:
+    0 7px 20px rgba(25, 35, 55, 0.11);
+}
+
+.main-next-button:active,
+.scene-next-button:active {
+  transform: translateY(0);
+}
+
+.main-next-button:focus-visible,
+.scene-next-button:focus-visible {
+  outline: 3px solid rgba(75, 111, 214, 0.22);
+  outline-offset: 3px;
+}
+
+
+/* ============================================================
+   SCENE 1 — RANDOM RAW DATA
+   ============================================================ */
+
+.scene-1 .scene-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.raw-bubbles {
+  position: absolute;
+  inset: 80px 7% 80px 7%;
+}
+
+.data-bubble {
+  position: absolute;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 112px;
+  height: 112px;
+
+  border: 1px solid #C7D0E2;
+  border-radius: 50%;
+
+  background: #ffffff;
+
+  color: #273B73;
+
+  font-size: 17px;
+  font-weight: 650;
+  text-align: center;
+  line-height: 1.15;
+
+  padding: 12px;
+
+  box-shadow:
+    0 9px 28px rgba(33, 45, 70, 0.08);
+
+  user-select: none;
+}
+
+/* Deliberately non-colliding starting positions */
+
+.scene-1 .bubble-1 {
+  left: 9%;
+  top: 17%;
+}
+
+.scene-1 .bubble-2 {
+  left: 35%;
+  top: 10%;
+}
+
+.scene-1 .bubble-3 {
+  left: 66%;
+  top: 19%;
+}
+
+.scene-1 .bubble-4 {
+  left: 18%;
+  top: 55%;
+}
+
+.scene-1 .bubble-5 {
+  left: 49%;
+  top: 48%;
+}
+
+.scene-1 .bubble-6 {
+  left: 80%;
+  top: 58%;
+}
+
+.scene-1 .bubble-7 {
+  left: 68%;
+  top: 76%;
+}
+
+.scene-1 .bubble-8 {
+  left: 36%;
+  top: 75%;
+}
+
+.scene-1 .data-bubble {
+  animation:
+    scene1Float 4.8s ease-in-out infinite alternate;
+}
+
+.scene-1 .bubble-2 {
+  animation-delay: -1.3s;
+}
+
+.scene-1 .bubble-3 {
+  animation-delay: -2.1s;
+}
+
+.scene-1 .bubble-4 {
+  animation-delay: -0.7s;
+}
+
+.scene-1 .bubble-5 {
+  animation-delay: -2.8s;
+}
+
+.scene-1 .bubble-6 {
+  animation-delay: -1.9s;
+}
+
+.scene-1 .bubble-7 {
+  animation-delay: -3.3s;
+}
+
+.scene-1 .bubble-8 {
+  animation-delay: -0.4s;
+}
+
+@keyframes scene1Float {
+  from {
+    transform: translate3d(0, -5px, 0);
+  }
+
+  to {
+    transform: translate3d(0, 7px, 0);
+  }
+}
+
+.scene-prompt {
+  position: absolute;
+  left: 50%;
+  bottom: 95px;
+  transform: translateX(-50%);
+
+  font-size: clamp(20px, 2.2vw, 30px);
+  font-weight: 650;
+  letter-spacing: -0.02em;
+
+  color: #273B73;
+
+  opacity: 0;
+}
+
+
+/* ============================================================
+   SCENE 2 — DATA DEFINITION
+   ============================================================ */
+
+.definition-card {
+  position: absolute;
+  left: 50%;
+  top: 21%;
+  transform: translateX(-50%);
+
+  width: min(720px, 72vw);
+
+  text-align: center;
+
+  opacity: 0;
+}
+
+.definition-term {
+  margin-bottom: 16px;
+
+  font-size: clamp(36px, 4.2vw, 58px);
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: -0.045em;
+
+  color: #17213A;
+}
+
+.definition-text {
+  max-width: 680px;
+  margin: 0 auto;
+
+  font-size: clamp(17px, 1.65vw, 23px);
+  line-height: 1.5;
+  font-weight: 450;
+
+  color: #53627A;
+}
+
+.raw-diagram {
+  position: absolute;
+  left: 50%;
+  top: 59%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transform: translate(-50%, -50%);
+
+  opacity: 0;
+}
+
+.diagram-node {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 130px;
+  height: 66px;
+
+  padding: 0 24px;
+
+  border: 1px solid #C7D0E2;
+  border-radius: 14px;
+
+  background: #ffffff;
+
+  font-size: 17px;
+  font-weight: 700;
+  color: #273249;
+
+  box-shadow:
+    0 7px 22px rgba(33, 45, 70, 0.06);
+}
+
+.diagram-node-raw {
+  border-color: #B8C2D6;
+}
+
+.diagram-arrow {
+  position: relative;
+  width: 70px;
+  height: 2px;
+  margin: 0 10px;
+
+  background: #73809A;
+}
+
+.diagram-arrow::after {
+  content: "";
+  position: absolute;
+  right: -1px;
+  top: 50%;
+
+  width: 8px;
+  height: 8px;
+
+  border-top: 2px solid #73809A;
+  border-right: 2px solid #73809A;
+
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.diagram-node-facts,
+.diagram-node-values {
+  color: #53627A;
+  font-weight: 600;
+}
+
+
+/* ============================================================
+   SCENE 3 — SAME VALUE, DIFFERENT CONTEXT
+   ============================================================ */
+
+.scene-3 .scene-title {
+  position: absolute;
+  top: 13%;
+  left: 50%;
+  transform: translateX(-50%);
+
+  font-size: clamp(27px, 3vw, 42px);
+  font-weight: 720;
+  letter-spacing: -0.035em;
+
+  color: #17213A;
+
+  opacity: 0;
+}
+
+.single-value-bubble {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 126px;
+  height: 126px;
+
+  border: 1px solid #B8C2D6;
+  border-radius: 50%;
+
+  background: #ffffff;
+
+  transform: translate(-50%, -50%);
+
+  color: #17213A;
+  font-size: 28px;
+  font-weight: 750;
+
+  box-shadow:
+    0 12px 32px rgba(33, 45, 70, 0.09);
+
+  opacity: 0;
+}
+
+.context-relations {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.relation {
+  position: absolute;
+  left: 50%;
+
+  display: flex;
+  align-items: center;
+
+  height: 58px;
+
+  opacity: 0;
+}
+
+.relation-label,
+.relation-value {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 52px;
+
+  border: 1px solid #C7D0E2;
+  border-radius: 12px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 6px 18px rgba(33, 45, 70, 0.055);
+}
+
+.relation-label {
+  min-width: 145px;
+  padding: 0 18px;
+
+  font-size: 14px;
+  font-weight: 750;
+  letter-spacing: 0.07em;
+
+  color: #53627A;
+}
+
+.relation-value {
+  min-width: 78px;
+  margin-left: 18px;
+  padding: 0 18px;
+
+  font-size: 18px;
+  font-weight: 700;
+
+  color: #17213A;
+}
+
+.relation-arrow {
+  position: relative;
+
+  width: 55px;
+  height: 2px;
+
+  margin-left: 14px;
+
+  background: #73809A;
+}
+
+.relation-arrow::after {
+  content: "";
+
+  position: absolute;
+  right: 0;
+  top: 50%;
+
+  width: 8px;
+  height: 8px;
+
+  border-top: 2px solid #73809A;
+  border-right: 2px solid #73809A;
+
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.relation-age {
+  top: 29%;
+  transform: translateX(-50%);
+}
+
+.relation-temperature {
+  top: 43%;
+  transform: translateX(-50%);
+}
+
+.relation-score {
+  top: 57%;
+  transform: translateX(-50%);
+}
+
+.scene-3 .scene-next-button,
+.scene-6 .scene-next-button {
+  position: absolute;
+  right: 50%;
+  bottom: 9%;
+  transform: translateX(50%);
+}
+
+.scene-3 .scene-next-button:hover,
+.scene-6 .scene-next-button:hover {
+  transform: translate(50%, -2px);
+}
+
+
+/* ============================================================
+   SCENE 4 — BUBBLES ORGANIZE
+   ============================================================ */
+
+.scene-4 .scene4-bubbles {
+  inset: 80px 7% 80px 7%;
+}
+
+.scene4-bubble {
+  opacity: 0;
+  transition:
+    left 900ms cubic-bezier(0.22, 1, 0.36, 1),
+    top 900ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 900ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 350ms ease;
+}
+
+/* Starting positions inside Scene 4 */
+
+.scene4-bubble.bubble-1 {
+  left: 8%;
+  top: 15%;
+}
+
+.scene4-bubble.bubble-2 {
+  left: 37%;
+  top: 9%;
+}
+
+.scene4-bubble.bubble-3 {
+  left: 67%;
+  top: 17%;
+}
+
+.scene4-bubble.bubble-4 {
+  left: 20%;
+  top: 57%;
+}
+
+.scene4-bubble.bubble-5 {
+  left: 51%;
+  top: 51%;
+}
+
+.scene4-bubble.bubble-6 {
+  left: 79%;
+  top: 58%;
+}
+
+.organized-data {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+
+  width: min(760px, 72vw);
+
+  transform: translate(-50%, -50%);
+
+  opacity: 0;
+}
+
+.organized-item {
+  display: grid;
+  grid-template-columns: 190px 1fr;
+  align-items: center;
+
+  min-height: 68px;
+
+  border: 1px solid #C7D0E2;
+  border-radius: 14px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 6px 20px rgba(33, 45, 70, 0.055);
+
+  overflow: hidden;
+
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+.organized-label {
+  align-self: stretch;
+
+  display: flex;
+  align-items: center;
+
+  padding: 0 24px;
+
+  border-right: 1px solid #D7DFEC;
+
+  background: #F5F7FF;
+
+  color: #53627A;
+
+  font-size: 13px;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+}
+
+.organized-value {
+  padding: 0 24px;
+
+  color: #17213A;
+
+  font-size: 18px;
+  font-weight: 650;
+}
+
+
+/* ============================================================
+   SCENE 5 — CONTEXT
+   ============================================================ */
+
+.scene-5 .scene-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.context-word {
+  font-size: clamp(72px, 11vw, 150px);
+  line-height: 0.9;
+
+  font-weight: 850;
+  letter-spacing: -0.065em;
+
+  color: #17213A;
+
+  opacity: 0;
+  transform: scale(0.82);
+}
+
+
+/* ============================================================
+   SCENE 6 — DATA + CONTEXT → MEANING → INFORMATION
+   ============================================================ */
+
+.scene6-bubble {
+  position: absolute;
+  left: 50%;
+  top: 27%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 170px;
+  height: 78px;
+  padding: 0 18px;
+
+  border: 2px solid #4263EB;
+  border-radius: 16px;
+
+  background: #EEF2FF;
+
+  color: #3156C9;
+  font-size: clamp(19px, 1.8vw, 26px);
+  font-weight: 800;
+  white-space: nowrap;
+
+  box-shadow:
+    0 12px 32px rgba(66, 99, 235, 0.12);
+
+  transform: translateX(-50%);
+
+  opacity: 0;
+}
+
+.scene6-side-label {
+  position: absolute;
+
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  width: 170px;
+  min-height: 78px;
+
+  padding: 14px 18px;
+
+  border-radius: 12px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 7px 20px rgba(33, 45, 70, 0.08);
+
+  opacity: 0;
+}
+
+.scene6-data-label {
+  left: calc(50% - 185px);
+  top: 39%;
+
+  border: 2px solid #9EB5FF;
+  background: #EEF2FF;
+}
+
+.scene6-context-label {
+  left: calc(50% + 15px);
+  top: 39%;
+
+  border: 2px solid #8DDDD1;
+  background: #E8FBF7;
+}
+
+.label-kicker {
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0.09em;
+}
+
+.scene6-data-label .label-kicker {
+  color: #3156C9;
+}
+
+.scene6-context-label .label-kicker {
+  color: #087D70;
+}
+
+.label-detail {
+  font-size: 17px;
+  font-weight: 700;
+  color: #17213A;
+}
+
+.scene6-combination {
+  position: absolute;
+  left: 50%;
+  top: 55%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+
+  transform: translateX(-50%);
+
+  font-size: clamp(22px, 2.4vw, 34px);
+  font-weight: 750;
+
+  opacity: 0;
+}
+
+.combination-data {
+  color: #4263EB;
+}
+
+.combination-context {
+  color: #00A896;
+}
+
+.combination-plus {
+  color: #53627A;
+  font-weight: 450;
+}
+
+.meaning-arrow {
+  position: absolute;
+  left: calc(50% + 275px);
+  top: 55%;
+
+  width: 125px;
+  height: 3px;
+
+  transform: translateX(-50%);
+
+  opacity: 0;
+}
+
+.arrow-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+
+  height: 3px;
+  border-radius: 999px;
+
+  background: #73809A;
+}
+
+.arrow-head {
+  position: absolute;
+  right: 0;
+  top: 50%;
+
+  width: 11px;
+  height: 11px;
+
+  border-top: 3px solid #73809A;
+  border-right: 3px solid #73809A;
+
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.meaning-block {
+  position: absolute;
+  left: calc(50% + 390px);
+  top: 51%;
+
+  transform: translateX(-50%);
+
+  font-size: clamp(30px, 3.6vw, 50px);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+
+  color: #F59E0B;
+
+  opacity: 0;
+}
+
+.information-block {
+  position: absolute;
+  left: 50%;
+  top: 72%;
+
+  transform: translateX(-50%) scale(0.9);
+
+  padding: 17px 30px;
+
+  border: 1px solid #B9B0FF;
+  border-radius: 16px;
+
+  background: #F3EEFF;
+
+  color: #7C4DFF;
+
+  font-size: clamp(30px, 3.8vw, 54px);
+  font-weight: 850;
+  letter-spacing: -0.045em;
+
+  box-shadow:
+    0 10px 28px rgba(124, 77, 255, 0.12);
+
+  opacity: 0;
+}
+
+
+
+/* ============================================================
+   SCENE 7 — INFORMATION DEFINITION
+   ============================================================ */
+
+.scene-7 .information-definition {
+  left: 50%;
+  top: 25%;
+  width: min(900px, 78vw);
+  transform: translateX(-50%);
+}
+
+.scene-7 .information-definition .definition-text {
+  max-width: 820px;
+}
+
+.information-definition .definition-term {
+  color: #17213A;
+}
+
+.information-formula {
+  position: absolute;
+  left: 50%;
+  top: 64%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 17px;
+
+  width: 100%;
+
+  transform: translateX(-50%);
+
+  font-size: clamp(20px, 2vw, 29px);
+  font-weight: 700;
+
+  opacity: 0;
+}
+
+.formula-data,
+.formula-context {
+  color: #53627A;
+}
+
+.formula-plus,
+.formula-arrow {
+  color: #53627A;
+  font-weight: 450;
+}
+
+.formula-information {
+  color: #17213A;
+  font-weight: 800;
+}
+
+
+
+/* ---------- Colorful bubble system ---------- */
+
+.scene-1 .bubble-1,
+.scene-4 .bubble-1 {
+  border-color: #B9B0FF;
+  background: #F3EEFF;
+  color: #5B3FC4;
+}
+
+.scene-1 .bubble-2,
+.scene-4 .bubble-2 {
+  border-color: #9EB5FF;
+  background: #EEF2FF;
+  color: #3156C9;
+}
+
+.scene-1 .bubble-3,
+.scene-4 .bubble-3 {
+  border-color: #8DDDD1;
+  background: #E8FBF7;
+  color: #087D70;
+}
+
+.scene-1 .bubble-4,
+.scene-4 .bubble-4 {
+  border-color: #FFD48A;
+  background: #FFF5DE;
+  color: #B46A00;
+}
+
+.scene-1 .bubble-5,
+.scene-4 .bubble-5 {
+  border-color: #FFB5D1;
+  background: #FFF0F6;
+  color: #B62F69;
+}
+
+.scene-1 .bubble-6,
+.scene-4 .bubble-6 {
+  border-color: #A9D5FF;
+  background: #EDF7FF;
+  color: #24689D;
+}
+
+.scene-1 .bubble-7,
+.scene-4 .bubble-7 {
+  border-color: #B7E4A8;
+  background: #F0FBEA;
+  color: #3D7D2A;
+}
+
+.scene-1 .bubble-8,
+.scene-4 .bubble-8 {
+  border-color: #D2B4FF;
+  background: #F7F0FF;
+  color: #7040B7;
+}
+
+/* ---------- Strong readable global controls ---------- */
+
+.main-next-button,
+.scene-next-button {
+  border-color: #4263EB;
+  background: #4263EB;
+  color: #FFFFFF;
+  box-shadow: 0 6px 18px rgba(66, 99, 235, 0.20);
+}
+
+.main-next-button:hover,
+.scene-next-button:hover {
+  border-color: #3156C9;
+  background: #3156C9;
+  color: #FFFFFF;
+  box-shadow: 0 9px 24px rgba(66, 99, 235, 0.27);
+}
+
+/* ---------- Definition emphasis ---------- */
+
+.scene-2 .definition-term {
+  color: #4263EB;
+}
+
+.scene-2 .definition-text {
+  color: #53627A;
+}
+
+.scene-2 .diagram-node-raw {
+  border-color: #9EB5FF;
+  background: #EEF2FF;
+  color: #3156C9;
+}
+
+.scene-2 .diagram-node-facts {
+  border-color: #8DDDD1;
+  background: #E8FBF7;
+  color: #087D70;
+}
+
+.scene-2 .diagram-node-values {
+  border-color: #FFD48A;
+  background: #FFF5DE;
+  color: #B46A00;
+}
+
+/* ---------- Scene 3: context labels are intentionally colorful ---------- */
+
+.scene-3 .relation-age .relation-label {
+  border-color: #9EB5FF;
+  background: #EEF2FF;
+  color: #3156C9;
+}
+
+.scene-3 .relation-temperature .relation-label {
+  border-color: #8DDDD1;
+  background: #E8FBF7;
+  color: #087D70;
+}
+
+.scene-3 .relation-score .relation-label {
+  border-color: #FFD48A;
+  background: #FFF5DE;
+  color: #B46A00;
+}
+
+.scene-3 .single-value-bubble {
+  border-color: #4263EB;
+  background: #EEF2FF;
+  color: #3156C9;
+}
+
+/* ---------- Scene 4 organized labels ---------- */
+
+.scene-4 .item-name .organized-label {
+  background: #F3EEFF;
+  color: #5B3FC4;
+}
+
+.scene-4 .item-age .organized-label {
+  background: #EEF2FF;
+  color: #3156C9;
+}
+
+.scene-4 .item-marks .organized-label {
+  background: #FFF5DE;
+  color: #B46A00;
+}
+
+.scene-4 .item-college .organized-label {
+  background: #E8FBF7;
+  color: #087D70;
+}
+
+/* ---------- Scene 5 ---------- */
+
+.context-word {
+  color: #7C4DFF;
+  text-shadow: 0 8px 30px rgba(124, 77, 255, 0.12);
+}
+
+/* ---------- Scene 6 ---------- */
+
+.scene6-bubble {
+  border-color: #4263EB;
+  background: #EEF2FF;
+  color: #3156C9;
+}
+
+.scene6-data-label {
+  border-color: #9EB5FF;
+  background: #EEF2FF;
+}
+
+.scene6-data-label .label-kicker {
+  color: #3156C9;
+}
+
+.scene6-context-label {
+  border-color: #8DDDD1;
+  background: #E8FBF7;
+}
+
+.scene6-context-label .label-kicker {
+  color: #087D70;
+}
+
+.scene6-combination {
+  color: #17213A;
+}
+
+.combination-data {
+  color: #4263EB;
+}
+
+.combination-context {
+  color: #00A896;
+}
+
+.meaning-block {
+  color: #F59E0B;
+}
+
+.information-block {
+  border-color: #B9B0FF;
+  background: #F3EEFF;
+  color: #7C4DFF;
+  box-shadow: 0 12px 30px rgba(124, 77, 255, 0.12);
+}
+
+/* ---------- Scene 7 ---------- */
+
+.scene-7 .definition-term {
+  color: #7C4DFF;
+}
+
+.scene-7 .information-formula .formula-data {
+  color: #4263EB;
+}
+
+.scene-7 .information-formula .formula-context {
+  color: #00A896;
+}
+
+.scene-7 .information-formula .formula-information {
+  color: #7C4DFF;
+}
+
+
+/* ============================================================
+   GENERIC REVEAL / ANIMATION HELPERS
+   JS can add these classes to trigger states.
+   ============================================================ */
+
+.reveal {
+  animation: revealUp 550ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.reveal-soft {
+  animation: revealSoft 450ms ease forwards;
+}
+
+.pop {
+  animation: popIn 500ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.fade-out {
+  animation: fadeOut 350ms ease forwards;
+}
+
+.pulse {
+  animation: pulse 800ms ease-in-out;
+}
+
+@keyframes revealUp {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes revealSoft {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes popIn {
+  0% {
+    opacity: 0;
+  }
+
+  65% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes contextPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.82);
+  }
+
+  65% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.scene-5 .context-word.pop {
+  animation: contextPop 500ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.045);
+  }
+}
+
+
+/* ============================================================
+   RESPONSIVE SCALING
+   ============================================================ */
+
+@media (max-width: 1050px) {
+  #animation {
+    min-width: 760px;
+  }
+
+  .data-bubble {
+    width: 96px;
+    height: 96px;
+    font-size: 15px;
+  }
+
+  .organized-data {
+    width: 68vw;
+  }
+
+  .organized-item {
+    grid-template-columns: 155px 1fr;
+  }
+
+  .relation-label {
+    min-width: 125px;
+  }
+}
+
+@media (max-height: 700px) {
+  .top-bar {
+    height: 52px;
+  }
+
+  .navigation {
+    bottom: 18px;
+  }
+
+  .scene-prompt {
+    bottom: 70px;
+  }
+
+  .context-word {
+    font-size: clamp(62px, 10vw, 115px);
+  }
+}
+
+
+/* ============================================================
+   ACCESSIBILITY / REDUCED MOTION
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+    </style>
+</head>
+
+<body>
+  <!--
+    =============================================================
+    DATA → INFORMATION
+    Interactive classroom animation
+
+    Scene flow:
+      1. Raw floating values
+      2. Data definition
+      3. Same value, different labels
+      4. Data becomes organized/contextualized
+      5. Context
+      6. Data + Context → Meaning → Information
+      7. Information definition
+
+    Interaction:
+      - Click anywhere / main button to advance scenes.
+      - Scene 3 and Scene 6 use their own internal Next buttons.
+      - No automatic progression.
+    =============================================================
+  -->
+
+  <main id="animation">
+
+    <!-- =======================================================
+         GLOBAL UI
+         ======================================================= -->
+
+    <header id="topBar" class="top-bar">
+      <div class="lesson-label">DATA &amp; INFORMATION</div>
+      <div id="sceneIndicator" class="scene-indicator">1 / 7</div>
+    </header>
+
+    <!-- Main stage: white background -->
+    <section id="stage" class="stage">
+
+      <!-- =====================================================
+           SCENE 1 — RANDOM RAW VALUES
+           ===================================================== -->
+      <section id="scene1" class="scene scene-1 active" data-scene="1">
+
+        <div class="scene-content">
+
+          <!-- Floating bubbles are positioned by CSS/JS -->
+          <div id="rawBubbles" class="raw-bubbles">
+
+            <div class="data-bubble bubble-1" data-value="Yashs">
+              <span>Yashs</span>
+            </div>
+
+            <div class="data-bubble bubble-2" data-value="21">
+              <span>21</span>
+            </div>
+
+            <div class="data-bubble bubble-3" data-value="85">
+              <span>85</span>
+            </div>
+
+            <div class="data-bubble bubble-4" data-value="IIT Mandi">
+              <span>IIT Mandi</span>
+            </div>
+
+            <div class="data-bubble bubble-5" data-value="19">
+              <span>19</span>
+            </div>
+
+            <div class="data-bubble bubble-6" data-value="91">
+              <span>91</span>
+            </div>
+
+            <div class="data-bubble bubble-7" data-value="42">
+              <span>42</span>
+            </div>
+
+            <div class="data-bubble bubble-8" data-value="Computer Science">
+              <span>Computer Science</span>
+            </div>
+
+          </div>
+
+          <!-- Optional prompt; kept separate so CSS can control visibility -->
+          <div id="scene1Prompt" class="scene-prompt">
+            What do these tell you?
+          </div>
+
+        </div>
+      </section>
+
+
+      <!-- =====================================================
+           SCENE 2 — DATA DEFINITION + RAW DIAGRAM
+           ===================================================== -->
+      <section id="scene2" class="scene scene-2" data-scene="2">
+
+        <div class="scene-content">
+
+          <div id="dataDefinition" class="definition-card">
+            <div class="definition-term">DATA</div>
+
+            <div class="definition-text">
+              A collection of raw facts, values, or observations.
+            </div>
+          </div>
+
+          <div id="rawDiagram" class="raw-diagram">
+
+            <div class="diagram-node diagram-node-raw">
+              <span>RAW</span>
+            </div>
+
+            <div class="diagram-arrow arrow-1" aria-hidden="true">
+              <span></span>
+            </div>
+
+            <div class="diagram-node diagram-node-facts">
+              <span>facts</span>
+            </div>
+
+            <div class="diagram-arrow arrow-2" aria-hidden="true">
+              <span></span>
+            </div>
+
+            <div class="diagram-node diagram-node-values">
+              <span>values</span>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+
+      <!-- =====================================================
+           SCENE 3 — SAME VALUE, DIFFERENT CONTEXTS
+           Internal step-by-step interaction.
+           ===================================================== -->
+      <section id="scene3" class="scene scene-3" data-scene="3">
+
+        <div class="scene-content">
+
+          <div class="scene-title">
+            The same value...
+          </div>
+
+          <!-- The single selected bubble -->
+          <div id="singleValueBubble" class="single-value-bubble">
+            <span id="singleValue">21</span>
+          </div>
+
+          <!-- Context → value relationships -->
+          <div id="contextRelations" class="context-relations">
+
+            <div id="relationAge" class="relation relation-age">
+              <div class="relation-label">AGE</div>
+              <div class="relation-arrow" aria-hidden="true"></div>
+              <div class="relation-value">21</div>
+            </div>
+
+            <div id="relationTemperature" class="relation relation-temperature">
+              <div class="relation-label">TEMPERATURE</div>
+              <div class="relation-arrow" aria-hidden="true"></div>
+              <div class="relation-value">21</div>
+            </div>
+
+            <div id="relationScore" class="relation relation-score">
+              <div class="relation-label">SCORE</div>
+              <div class="relation-arrow" aria-hidden="true"></div>
+              <div class="relation-value">21</div>
+            </div>
+
+          </div>
+
+          <button
+            id="scene3Next"
+            class="scene-next-button"
+            type="button"
+            aria-label="Next example"
+          >
+            Next
+          </button>
+
+        </div>
+      </section>
+
+
+      <!-- =====================================================
+           SCENE 4 — ORGANIZE THE BUBBLES + LABELS
+           ===================================================== -->
+      <section id="scene4" class="scene scene-4" data-scene="4">
+
+        <div class="scene-content">
+
+          <!-- Original floating bubbles return here -->
+          <div id="scene4FloatingBubbles" class="raw-bubbles scene4-bubbles">
+
+            <div class="data-bubble scene4-bubble bubble-1" data-value="Yashs">
+              <span>Yashs</span>
+            </div>
+
+            <div class="data-bubble scene4-bubble bubble-2" data-value="21">
+              <span>21</span>
+            </div>
+
+            <div class="data-bubble scene4-bubble bubble-3" data-value="85">
+              <span>85</span>
+            </div>
+
+            <div class="data-bubble scene4-bubble bubble-4" data-value="IIT Mandi">
+              <span>IIT Mandi</span>
+            </div>
+
+            <div class="data-bubble scene4-bubble bubble-5" data-value="19">
+              <span>19</span>
+            </div>
+
+            <div class="data-bubble scene4-bubble bubble-6" data-value="91">
+              <span>91</span>
+            </div>
+
+          </div>
+
+          <!-- Organized sequence -->
+          <div id="organizedData" class="organized-data">
+
+            <div class="organized-item item-name">
+              <div class="organized-label">NAME</div>
+              <div class="organized-value">Yashs</div>
+            </div>
+
+            <div class="organized-item item-age">
+              <div class="organized-label">AGE</div>
+              <div class="organized-value">21</div>
+            </div>
+
+            <div class="organized-item item-marks">
+              <div class="organized-label">MARKS</div>
+              <div class="organized-value">85</div>
+            </div>
+
+            <div class="organized-item item-college">
+              <div class="organized-label">COLLEGE</div>
+              <div class="organized-value">IIT Mandi</div>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+
+      <!-- =====================================================
+           SCENE 5 — CONTEXT
+           ===================================================== -->
+      <section id="scene5" class="scene scene-5" data-scene="5">
+
+        <div class="scene-content">
+
+          <div id="contextWord" class="context-word">
+            CONTEXT
+          </div>
+
+        </div>
+      </section>
+
+
+      <!-- =====================================================
+           SCENE 6 — DATA + CONTEXT → MEANING → INFORMATION
+           Internal step-by-step interaction.
+           ===================================================== -->
+      <section id="scene6" class="scene scene-6" data-scene="6">
+
+        <div class="scene-content">
+
+          <!-- Selected raw bubble -->
+          <div id="scene6Bubble" class="scene6-bubble">
+            <span>Age = 21</span>
+          </div>
+
+          <!-- DATA label -->
+          <div id="scene6DataLabel" class="scene6-side-label scene6-data-label">
+            <span class="label-kicker">DATA</span>
+            <span class="label-detail">21</span>
+          </div>
+
+          <!-- CONTEXT label -->
+          <div id="scene6ContextLabel" class="scene6-side-label scene6-context-label">
+            <span class="label-kicker">CONTEXT</span>
+            <span class="label-detail">Age</span>
+          </div>
+
+          <!-- DATA + CONTEXT -->
+          <div id="scene6Combination" class="scene6-combination">
+            <span class="combination-data">DATA</span>
+            <span class="combination-plus">+</span>
+            <span class="combination-context">CONTEXT</span>
+          </div>
+
+          <!-- Arrow leading to meaning -->
+          <div id="meaningArrow" class="meaning-arrow" aria-hidden="true">
+            <span class="arrow-line"></span>
+            <span class="arrow-head"></span>
+          </div>
+
+          <!-- Meaning -->
+          <div id="meaningBlock" class="meaning-block">
+            <span>MEANING</span>
+          </div>
+
+          <!-- Final information -->
+          <div id="informationBlock" class="information-block">
+            <span>INFORMATION</span>
+          </div>
+
+          <button
+            id="scene6Next"
+            class="scene-next-button"
+            type="button"
+            aria-label="Next step"
+          >
+            Next
+          </button>
+
+        </div>
+      </section>
+
+
+      <!-- =====================================================
+           SCENE 7 — INFORMATION DEFINITION
+           ===================================================== -->
+      <section id="scene7" class="scene scene-7" data-scene="7">
+
+        <div class="scene-content">
+
+          <div id="informationDefinition" class="definition-card information-definition">
+
+            <div class="definition-term">INFORMATION</div>
+
+            <div class="definition-text">
+              Meaningful data that has been given context and can be understood or used.
+            </div>
+
+          </div>
+
+          <div id="informationFormula" class="information-formula">
+            <span class="formula-data">DATA</span>
+            <span class="formula-plus">+</span>
+            <span class="formula-context">CONTEXT</span>
+            <span class="formula-arrow">→</span>
+            <span class="formula-information">INFORMATION</span>
+          </div>
+
+        </div>
+      </section>
+
+    </section>
+
+
+    <!-- =======================================================
+         GLOBAL NAVIGATION
+         Scene 3 & 6 use their own internal buttons.
+         This button is for the main scene transitions.
+         ======================================================= -->
+
+    <footer id="navigation" class="navigation">
+
+      <button
+        id="mainNext"
+        class="main-next-button"
+        type="button"
+        aria-label="Continue to next scene"
+      >
+        Continue
+      </button>
+
+    </footer>
+
+  </main>
+
+
+  <!-- =========================================================
+       JAVASCRIPT BLOCK
+       Paste the JavaScript into this <script> block in Part 3.
+       ========================================================= -->
+  <script>
+/* ============================================================
+   DATA → INFORMATION
+   PART 3 — JAVASCRIPT
+   Click-driven scene controller
+   ============================================================ */
+
+document.addEventListener("DOMContentLoaded", () => {
+  const TOTAL_SCENES = 7;
+
+  let currentScene = 1;
+  let scene3Step = 0;
+  let scene6Step = 0;
+  let isTransitioning = false;
+
+  const scenes = Array.from(document.querySelectorAll(".scene"));
+  const sceneIndicator = document.getElementById("sceneIndicator");
+
+  const mainNext = document.getElementById("mainNext");
+  const scene3Next = document.getElementById("scene3Next");
+  const scene6Next = document.getElementById("scene6Next");
+
+  function hide(el) {
+    if (el) el.style.opacity = "0";
+  }
+
+  function resetAnimation(el) {
+    if (!el) return;
+
+    el.classList.remove(
+      "reveal",
+      "reveal-soft",
+      "pop",
+      "fade-out",
+      "pulse"
+    );
+
+    void el.offsetWidth;
+  }
+
+  function animateIn(el, animationClass = "reveal") {
+    if (!el) return;
+
+    resetAnimation(el);
+    el.classList.add(animationClass);
+  }
+
+  function wait(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  function updateSceneIndicator() {
+    sceneIndicator.textContent = `${currentScene} / ${TOTAL_SCENES}`;
+  }
+
+  function activateScene(number) {
+    scenes.forEach(scene => {
+      scene.classList.toggle(
+        "active",
+        Number(scene.dataset.scene) === number
+      );
+    });
+
+    currentScene = number;
+    updateSceneIndicator();
+  }
+
+
+  /* ==========================================================
+     SCENE 1
+     ========================================================== */
+
+  function resetScene1() {
+    document.querySelectorAll("#scene1 .data-bubble").forEach(bubble => {
+      bubble.style.opacity = "1";
+      bubble.style.visibility = "visible";
+      bubble.style.animationPlayState = "running";
+      bubble.style.transition = "";
+      bubble.style.transform = "";
+    });
+
+    hide(document.getElementById("scene1Prompt"));
+  }
+
+  async function enterScene1() {
+    resetScene1();
+
+    const bubbles = Array.from(
+      document.querySelectorAll("#scene1 .data-bubble")
+    );
+
+    bubbles.forEach((bubble, index) => {
+      bubble.style.opacity = "0";
+      bubble.style.transform = "scale(0.82)";
+
+      setTimeout(() => {
+        bubble.style.transition =
+          "opacity 350ms ease, transform 500ms cubic-bezier(0.22,1,0.36,1)";
+        bubble.style.opacity = "1";
+        bubble.style.transform = "scale(1)";
+      }, 80 + index * 90);
+    });
+
+    mainNext.textContent = "Continue";
+  }
+
+
+  /* ==========================================================
+     SCENE 2
+     ========================================================== */
+
+  function resetScene2() {
+    const definition = document.getElementById("dataDefinition");
+    const diagram = document.getElementById("rawDiagram");
+
+    hide(definition);
+    hide(diagram);
+    resetAnimation(definition);
+    resetAnimation(diagram);
+  }
+
+  async function enterScene2() {
+    resetScene2();
+
+    await wait(180);
+    animateIn(document.getElementById("dataDefinition"), "reveal");
+
+    await wait(500);
+    animateIn(document.getElementById("rawDiagram"), "reveal");
+
+    mainNext.textContent = "Continue";
+  }
+
+
+  /* ==========================================================
+     SCENE 3
+     Same value → AGE → TEMPERATURE → SCORE
+     ========================================================== */
+
+  function resetScene3() {
+    scene3Step = 0;
+
+    const title = document.querySelector("#scene3 .scene-title");
+    const bubble = document.getElementById("singleValueBubble");
+
+    hide(title);
+    hide(bubble);
+    resetAnimation(title);
+    resetAnimation(bubble);
+
+    document.querySelectorAll("#scene3 .relation").forEach(relation => {
+      hide(relation);
+      resetAnimation(relation);
+    });
+
+    scene3Next.textContent = "Next";
+    scene3Next.style.display = "block";
+  }
+
+  async function enterScene3() {
+    resetScene3();
+
+    await wait(150);
+    animateIn(document.querySelector("#scene3 .scene-title"), "reveal");
+
+    await wait(300);
+    animateIn(document.getElementById("singleValueBubble"), "pop");
+  }
+
+  async function advanceScene3() {
+    if (isTransitioning) return;
+
+    isTransitioning = true;
+
+    const relations = [
+      document.getElementById("relationAge"),
+      document.getElementById("relationTemperature"),
+      document.getElementById("relationScore")
+    ];
+
+    if (scene3Step < relations.length) {
+      animateIn(relations[scene3Step], "reveal");
+
+      scene3Step += 1;
+
+      if (scene3Step === relations.length) {
+        scene3Next.textContent = "Continue";
+      }
+
+      await wait(500);
+    } else {
+      scene3Next.style.display = "none";
+
+      // Release the internal lock before handing control
+      // back to the main scene transition function.
+      isTransitioning = false;
+      await goToScene(4);
+      return;
+    }
+
+    isTransitioning = false;
+  }
+
+
+  /* ==========================================================
+     SCENE 4
+     Floating bubbles → organized data
+     ========================================================== */
+
+  function resetScene4() {
+    document.querySelectorAll("#scene4 .scene4-bubble").forEach(bubble => {
+      bubble.style.opacity = "0";
+      bubble.style.transform = "";
+      bubble.style.transition = "";
+    });
+
+    const organized = document.getElementById("organizedData");
+    hide(organized);
+
+    document.querySelectorAll("#organizedData .organized-item").forEach(item => {
+      item.style.opacity = "0";
+      item.style.transform = "translateY(12px)";
+      item.style.transition = "";
+    });
+  }
+
+  async function enterScene4() {
+    resetScene4();
+
+    const floating = Array.from(
+      document.querySelectorAll("#scene4 .scene4-bubble")
+    );
+
+    // Phase 1: the raw bubbles reappear.
+    floating.forEach((bubble, index) => {
+      setTimeout(() => {
+        bubble.style.opacity = "1";
+      }, index * 70);
+    });
+
+    await wait(900);
+
+    // Phase 2: raw bubbles disappear/pull away.
+    floating.forEach(bubble => {
+      bubble.style.transition =
+        "opacity 400ms ease, transform 500ms cubic-bezier(0.22,1,0.36,1)";
+      bubble.style.opacity = "0";
+      bubble.style.transform = "scale(0.72)";
+    });
+
+    await wait(500);
+
+    // Phase 3: organized data appears.
+    const organized = document.getElementById("organizedData");
+    organized.style.opacity = "1";
+
+    const items = Array.from(
+      document.querySelectorAll("#organizedData .organized-item")
+    );
+
+    items.forEach((item, index) => {
+      setTimeout(() => {
+        item.style.transition =
+          "opacity 450ms ease, transform 550ms cubic-bezier(0.22,1,0.36,1)";
+        item.style.opacity = "1";
+        item.style.transform = "translateY(0)";
+      }, index * 160);
+    });
+
+    mainNext.textContent = "Continue";
+  }
+
+
+  /* ==========================================================
+     SCENE 5
+     CONTEXT
+     ========================================================== */
+
+  function resetScene5() {
+    const word = document.getElementById("contextWord");
+    hide(word);
+    resetAnimation(word);
+  }
+
+  async function enterScene5() {
+    resetScene5();
+
+    await wait(180);
+    animateIn(document.getElementById("contextWord"), "pop");
+
+    mainNext.textContent = "Continue";
+  }
+
+
+  /* ==========================================================
+     SCENE 6
+     Data → Context → Meaning → Information
+     ========================================================== */
+
+  function resetScene6() {
+    scene6Step = 0;
+
+    [
+      "scene6Bubble",
+      "scene6DataLabel",
+      "scene6ContextLabel",
+      "scene6Combination",
+      "meaningArrow",
+      "meaningBlock",
+      "informationBlock"
+    ].forEach(id => {
+      const el = document.getElementById(id);
+      hide(el);
+      resetAnimation(el);
+    });
+
+    scene6Next.textContent = "Next";
+    scene6Next.style.display = "block";
+  }
+
+  async function enterScene6() {
+    resetScene6();
+
+    // Step 0: raw value is pulled out and identified as DATA.
+    await wait(150);
+    animateIn(document.getElementById("scene6Bubble"), "pop");
+
+    await wait(350);
+    animateIn(document.getElementById("scene6DataLabel"), "reveal");
+  }
+
+  async function advanceScene6() {
+    if (isTransitioning) return;
+
+    isTransitioning = true;
+
+    switch (scene6Step) {
+      case 0:
+        // Step 1: add context.
+        animateIn(document.getElementById("scene6ContextLabel"), "reveal");
+        scene6Step = 1;
+        await wait(500);
+        break;
+
+      case 1:
+        // Step 2: combine data and context.
+        animateIn(document.getElementById("scene6Combination"), "reveal");
+        scene6Step = 2;
+        await wait(500);
+        break;
+
+      case 2:
+        // Step 3: meaning appears.
+        animateIn(document.getElementById("meaningArrow"), "reveal-soft");
+        await wait(250);
+        animateIn(document.getElementById("meaningBlock"), "pop");
+
+        scene6Step = 3;
+        await wait(550);
+        break;
+
+      case 3:
+        // Step 4: information appears.
+        animateIn(document.getElementById("informationBlock"), "pop");
+
+        scene6Next.textContent = "Continue";
+        scene6Step = 4;
+        await wait(550);
+        break;
+
+      case 4:
+        scene6Next.style.display = "none";
+
+        // Release the internal lock before moving to the next scene.
+        isTransitioning = false;
+        await goToScene(7);
+        return;
+    }
+
+    isTransitioning = false;
+  }
+
+
+  /* ==========================================================
+     SCENE 7
+     ========================================================== */
+
+  function resetScene7() {
+    const definition = document.getElementById("informationDefinition");
+    const formula = document.getElementById("informationFormula");
+
+    hide(definition);
+    hide(formula);
+    resetAnimation(definition);
+    resetAnimation(formula);
+  }
+
+  async function enterScene7() {
+    resetScene7();
+
+    await wait(180);
+    animateIn(
+      document.getElementById("informationDefinition"),
+      "reveal"
+    );
+
+    await wait(500);
+    animateIn(
+      document.getElementById("informationFormula"),
+      "reveal"
+    );
+
+    mainNext.textContent = "Restart";
+  }
+
+
+  /* ==========================================================
+     MAIN SCENE TRANSITION
+     ========================================================== */
+
+  async function goToScene(number) {
+    if (isTransitioning) return;
+    if (number < 1 || number > TOTAL_SCENES) return;
+
+    isTransitioning = true;
+
+    activateScene(number);
+
+    switch (number) {
+      case 1:
+        await enterScene1();
+        break;
+      case 2:
+        await enterScene2();
+        break;
+      case 3:
+        await enterScene3();
+        break;
+      case 4:
+        await enterScene4();
+        break;
+      case 5:
+        await enterScene5();
+        break;
+      case 6:
+        await enterScene6();
+        break;
+      case 7:
+        await enterScene7();
+        break;
+    }
+
+    isTransitioning = false;
+  }
+
+
+  /* ==========================================================
+     MAIN NAVIGATION
+     ========================================================== */
+
+  async function handleMainNext() {
+    if (isTransitioning) return;
+
+    if (currentScene === TOTAL_SCENES) {
+      await goToScene(1);
+      return;
+    }
+
+    // Scene 3 and Scene 6 are controlled by their internal buttons.
+    if (currentScene === 3 || currentScene === 6) {
+      return;
+    }
+
+    await goToScene(currentScene + 1);
+  }
+
+  mainNext.addEventListener("click", handleMainNext);
+
+  scene3Next.addEventListener("click", advanceScene3);
+
+  scene6Next.addEventListener("click", advanceScene6);
+
+
+  /* ==========================================================
+     KEYBOARD SUPPORT
+     ========================================================== */
+
+  document.addEventListener("keydown", event => {
+    if (
+      event.key === " " ||
+      event.key === "Enter" ||
+      event.key === "ArrowRight"
+    ) {
+      if (
+        document.activeElement &&
+        document.activeElement.tagName === "BUTTON"
+      ) {
+        return;
+      }
+
+      handleMainNext();
+    }
+
+    if (
+      event.key === "ArrowLeft" &&
+      currentScene > 1 &&
+      currentScene !== 3 &&
+      currentScene !== 6
+    ) {
+      goToScene(currentScene - 1);
+    }
+  });
+
+
+  /* ==========================================================
+     INITIALIZE
+     ========================================================== */
+
+  scenes.forEach(scene => scene.classList.remove("active"));
+
+  activateScene(1);
+  enterScene1();
+});
+  </script>
+
+</body>
+</html>
